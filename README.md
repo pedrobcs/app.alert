@@ -1,36 +1,280 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SafeAlert - Emergency Alert System
+
+A production-ready Next.js Progressive Web App (PWA) for sending emergency alerts with real-time GPS location via WhatsApp integration.
+
+## Features
+
+- 🚨 **One-Tap Emergency Alert**: Large, accessible emergency button with pulsing animation
+- 📍 **Real-time GPS Location**: High-accuracy geolocation using browser Geolocation API
+- 🗺️ **Reverse Geocoding**: Converts GPS coordinates to human-readable addresses
+- 📱 **PWA Support**: Installable on mobile devices with offline capabilities
+- 💬 **WhatsApp Integration**: Sends emergency messages via Twilio Sandbox
+- 🎨 **Beautiful UI**: Clean, minimal design with Tailwind CSS
+- ⚡ **Real-time Feedback**: Loading states, success/error alerts
+- 🔐 **Permission Handling**: Graceful handling of location permissions
+
+## Tech Stack
+
+- **Framework**: Next.js 15.5.5 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS 4
+- **PWA**: Service Worker with offline support
+- **State Management**: React Hooks
+- **API**: RESTful backend integration
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 18+ or Yarn
+- Backend API endpoint (ngrok or production URL)
+
+### Installation
+
+1. **Clone the repository**:
+   ```bash
+   git clone <repository-url>
+   cd workspace
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   yarn install
+   # or
+   npm install
+   ```
+
+3. **Configure environment variables**:
+   ```bash
+   cp .env.local.example .env.local
+   ```
+
+4. **Edit `.env.local`** with your configuration:
+   ```env
+   NEXT_PUBLIC_API_BASE_URL=https://your-ngrok-url.ngrok.io
+   NEXT_PUBLIC_CONTACT_1=+15085140864
+   ```
+
+5. **Generate PWA icons** (optional, for production):
+   ```bash
+   # Visit https://realfavicongenerator.net/
+   # Upload public/icon.svg
+   # Download and extract icon-192.png and icon-512.png to public/
+   
+   # Or use ImageMagick:
+   convert public/icon.svg -resize 192x192 public/icon-192.png
+   convert public/icon.svg -resize 512x512 public/icon-512.png
+   ```
+
+6. **Run the development server**:
+   ```bash
+   yarn dev
+   # or
+   npm run dev
+   ```
+
+7. **Open your browser**: Navigate to [http://localhost:3000](http://localhost:3000)
+
+## Usage
+
+### For Users
+
+1. **Open the app** in your browser or installed PWA
+2. **Allow location permissions** when prompted
+3. **Wait for location to load** (shown in status card)
+4. **Tap the EMERGENCY button** when you need help
+5. **Alert is sent** with your precise location and address
+
+### For Developers
+
+#### Project Structure
+
+```
+/workspace
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx        # Root layout with PWA meta tags
+│   │   ├── page.tsx           # Main emergency screen
+│   │   └── globals.css        # Global styles and animations
+│   ├── components/
+│   │   └── PWAInstallPrompt.tsx # PWA installation prompt
+│   ├── hooks/
+│   │   ├── useGeolocation.ts    # Location management hook
+│   │   └── useEmergencyAlert.ts # Alert functionality hook
+│   └── lib/
+│       ├── geolocation.ts       # Location utilities
+│       ├── api.ts               # API client
+│       └── pwa.ts               # PWA utilities
+├── public/
+│   ├── manifest.json          # PWA manifest
+│   ├── sw.js                  # Service worker
+│   └── icon*.png              # PWA icons
+└── scripts/
+    └── generate-icons.js      # Icon generation helper
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+#### API Integration
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The app sends POST requests to `{API_BASE_URL}/panic` with the following payload:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```json
+{
+  "contacts": ["+15085140864"],
+  "message": "🚨 EMERGÊNCIA! Preciso de ajuda! Estou em: {address}",
+  "location": {
+    "lat": -23.550520,
+    "lng": -46.633308
+  }
+}
+```
 
-## Learn More
+Expected response:
+```json
+{
+  "success": true,
+  "message": "Emergency alert sent successfully"
+}
+```
 
-To learn more about Next.js, take a look at the following resources:
+#### Custom Hooks
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**`useGeolocation(autoFetch?: boolean)`**
+- Manages location state and updates
+- Returns: `{ coordinates, error, loading, accuracy, refreshLocation }`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**`useEmergencyAlert()`**
+- Handles emergency alert sending
+- Returns: `{ sendAlert, loading, error, success }`
 
-## Deploy on Vercel
+#### Environment Variables
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `NEXT_PUBLIC_API_BASE_URL` | Backend API URL | Yes | - |
+| `NEXT_PUBLIC_CONTACT_1` | Emergency contact number | No | +15085140864 |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## PWA Features
+
+### Installation
+
+The app can be installed on mobile devices:
+
+1. **iOS**: Open in Safari → Share → Add to Home Screen
+2. **Android**: Chrome → Menu → Install App
+3. **Desktop**: Address bar → Install icon
+
+### Offline Support
+
+- Basic offline functionality via Service Worker
+- Cached assets for faster loading
+- Graceful degradation when offline
+
+### Manifest Configuration
+
+See `public/manifest.json` for PWA configuration including:
+- App name and description
+- Icons and theme colors
+- Display mode (standalone)
+- Orientation preferences
+
+## Development
+
+### Build for Production
+
+```bash
+yarn build
+yarn start
+```
+
+### Linting
+
+```bash
+yarn lint
+```
+
+### Testing Locally
+
+1. Use ngrok to expose your backend:
+   ```bash
+   ngrok http 3001
+   ```
+
+2. Update `.env.local` with the ngrok URL
+
+3. Test on your mobile device using the ngrok URL
+
+## Browser Support
+
+- ✅ Chrome/Edge (Desktop & Mobile)
+- ✅ Safari (iOS & macOS)
+- ✅ Firefox (Desktop & Mobile)
+- ⚠️ Requires HTTPS (except localhost)
+- ⚠️ Requires Geolocation API support
+
+## Security Considerations
+
+- Location data is only accessed when user grants permission
+- API requests use HTTPS in production
+- No sensitive data stored locally
+- Service worker caches only public assets
+
+## Troubleshooting
+
+### Location not working
+
+1. Check browser permissions (Settings → Site Settings → Location)
+2. Ensure you're using HTTPS or localhost
+3. Check browser console for errors
+4. Try refreshing location manually
+
+### PWA not installing
+
+1. Ensure HTTPS is enabled (required for PWA)
+2. Check manifest.json is accessible
+3. Verify all icon files exist
+4. Clear browser cache and try again
+
+### API errors
+
+1. Verify `NEXT_PUBLIC_API_BASE_URL` is set correctly
+2. Check backend is running and accessible
+3. Verify CORS is enabled on backend
+4. Check network tab for request details
+
+## Production Deployment
+
+### Vercel (Recommended)
+
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel
+```
+
+Add environment variables in Vercel dashboard.
+
+### Other Platforms
+
+The app can be deployed to any platform supporting Next.js:
+- Netlify
+- AWS Amplify
+- Cloudflare Pages
+- Self-hosted with Docker
+
+## License
+
+MIT License - feel free to use this project for your own emergency alert systems.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Support
+
+For issues or questions, please open an issue on the repository.
+
+---
+
+**⚠️ Important**: This is an emergency alert system. Always call local emergency services (911, 112, etc.) for life-threatening emergencies. This app is meant as a supplementary communication tool.
