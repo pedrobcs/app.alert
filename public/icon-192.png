@@ -1,0 +1,18 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="115" fill="#DC2626"/>
+  
+  <!-- Alert Symbol -->
+  <circle cx="256" cy="256" r="180" fill="white" fill-opacity="0.2"/>
+  <circle cx="256" cy="256" r="140" fill="white" fill-opacity="0.3"/>
+  
+  <!-- Emergency Icon -->
+  <path d="M256 120L280 220H232L256 120Z" fill="white"/>
+  <path d="M256 392L232 292H280L256 392Z" fill="white"/>
+  <path d="M120 256L220 232V280L120 256Z" fill="white"/>
+  <path d="M392 256L292 280V232L392 256Z" fill="white"/>
+  
+  <!-- Center Circle -->
+  <circle cx="256" cy="256" r="60" fill="white"/>
+  <text x="256" y="280" font-size="60" fill="#DC2626" text-anchor="middle" font-weight="bold">!</text>
+</svg>
