@@ -1,36 +1,115 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Emergency Alert System 🚨
+
+A modern, Apple-style emergency contact and alert system built with Next.js. Send instant SMS alerts to your emergency contacts with a single button press.
+
+## Features
+
+- 🚨 **Emergency Button**: Large, prominent button to send immediate alerts
+- 📱 **Contact Management**: Add, view, and remove emergency contacts
+- 💬 **SMS Alerts**: Powered by Twilio API
+- 🎨 **Modern UI**: Clean, Apple-style design with dark mode support
+- ⚡ **Fast & Responsive**: Built with Next.js 15 and React 19
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ installed
+- A Twilio account (sign up at https://www.twilio.com)
+
+### Installation
+
+1. Install dependencies:
 ```bash
-npm run dev
+yarn install
 # or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Set up environment variables (see Configuration section below)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Run the development server:
+```bash
+yarn dev
+# or
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-## Learn More
+## Configuration
 
-To learn more about Next.js, take a look at the following resources:
+### Environment Variables
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+You need to set up Twilio credentials for SMS functionality:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **For Local Development**: Create a `.env.local` file in the root directory:
 
-## Deploy on Vercel
+```env
+TWILIO_ACCOUNT_SID=your_account_sid_here
+TWILIO_AUTH_TOKEN=your_auth_token_here
+TWILIO_PHONE_NUMBER=+1234567890
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2. **For Vercel Deployment**: Add these environment variables in your Vercel dashboard:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   - Go to your project in Vercel
+   - Navigate to Settings → Environment Variables
+   - Add the following variables:
+     - `TWILIO_ACCOUNT_SID` (your Twilio Account SID)
+     - `TWILIO_AUTH_TOKEN` (your Twilio Auth Token)
+     - `TWILIO_PHONE_NUMBER` (your Twilio phone number in E.164 format, e.g., +1234567890)
+
+### Getting Twilio Credentials
+
+1. Sign up at [Twilio Console](https://console.twilio.com/)
+2. Get a phone number (or use trial number for testing)
+3. Find your Account SID and Auth Token on the dashboard
+4. Copy these values to your environment variables
+
+**Important**: Make sure your Twilio phone number is in E.164 format (e.g., `+15085140640`)
+
+## How to Use
+
+1. **Add Contacts**: Click the "+" button to add emergency contacts with names and phone numbers
+2. **Emergency Alert**: Press the large red emergency button to send SMS alerts to all contacts
+3. **Manage Contacts**: Delete contacts by clicking the "×" button next to their name
+
+## Deployment
+
+### Deploy to Vercel
+
+1. Push your code to GitHub
+2. Import your repository in Vercel
+3. Add environment variables (see Configuration section)
+4. Deploy!
+
+Or use the Vercel CLI:
+
+```bash
+vercel --prod
+```
+
+Make sure to set the environment variables in your Vercel project settings before deploying.
+
+## Tech Stack
+
+- **Framework**: Next.js 15.5
+- **UI Library**: React 19
+- **Styling**: Tailwind CSS 4
+- **SMS Provider**: Twilio API
+- **Language**: TypeScript
+
+## Important Notes
+
+⚠️ **Always call 911 or your local emergency services first in a real emergency!**
+
+This app is designed to alert your personal emergency contacts, but should not replace official emergency services.
+
+## License
+
+MIT
+
+## Support
+
+For issues or questions, please open an issue on GitHub.
