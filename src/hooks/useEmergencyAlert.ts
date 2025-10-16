@@ -28,7 +28,7 @@ export const useEmergencyAlert = (): UseEmergencyAlertResult => {
       const address = await reverseGeocode(coordinates);
       
       // Prepare message with address
-      const message = `🚨 EMERGÊNCIA! Preciso de ajuda! Estou em: ${address}`;
+      const message = `Help! I'm at: ${address}`;
 
       const payload: EmergencyPayload = {
         contacts,
