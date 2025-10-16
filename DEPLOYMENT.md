@@ -34,9 +34,7 @@ vercel
 2. Go to [vercel.com](https://vercel.com)
 3. Click "Import Project"
 4. Select your repository
-5. Configure environment variables:
-   - `NEXT_PUBLIC_API_BASE_URL`
-   - `NEXT_PUBLIC_CONTACT_1`
+5. Configure environment variables (see below)
 6. Click "Deploy"
 
 #### Environment Variables in Vercel
@@ -45,10 +43,25 @@ vercel
 2. Navigate to "Environment Variables"
 3. Add each variable:
    ```
-   NEXT_PUBLIC_API_BASE_URL = https://api.yourdomain.com
+   TWILIO_ACCOUNT_SID = your_twilio_account_sid
+   TWILIO_AUTH_TOKEN = your_twilio_auth_token
+   TWILIO_WHATSAPP_FROM = +14155238886
    NEXT_PUBLIC_CONTACT_1 = +15085140864
    ```
-4. Save and redeploy
+4. **Important**: Make sure to set these as "Production", "Preview", and "Development" environment variables
+5. Save and redeploy
+
+#### Getting Twilio Credentials
+
+1. Sign up at [twilio.com](https://www.twilio.com/try-twilio)
+2. Go to [Twilio Console](https://console.twilio.com/)
+3. Find your **Account SID** and **Auth Token** on the dashboard
+4. For WhatsApp:
+   - **Sandbox (Development)**: Use the Twilio Sandbox number (e.g., +14155238886)
+     - Go to Console → Messaging → Try it out → Send a WhatsApp message
+     - Join the sandbox by sending the code to the number
+   - **Production**: Request WhatsApp Business approval and use your approved number
+5. Copy these values to your Vercel environment variables
 
 ### 2. Netlify
 

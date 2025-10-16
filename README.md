@@ -27,7 +27,7 @@ A production-ready Next.js Progressive Web App (PWA) for sending emergency alert
 ### Prerequisites
 
 - Node.js 18+ or Yarn
-- Backend API endpoint (ngrok or production URL)
+- Twilio account (free trial available)
 
 ### Installation
 
@@ -49,11 +49,15 @@ A production-ready Next.js Progressive Web App (PWA) for sending emergency alert
    cp .env.local.example .env.local
    ```
 
-4. **Edit `.env.local`** with your configuration:
+4. **Edit `.env.local`** with your Twilio credentials:
    ```env
-   NEXT_PUBLIC_API_BASE_URL=https://your-ngrok-url.ngrok.io
+   TWILIO_ACCOUNT_SID=your_account_sid
+   TWILIO_AUTH_TOKEN=your_auth_token
+   TWILIO_WHATSAPP_FROM=+14155238886
    NEXT_PUBLIC_CONTACT_1=+15085140864
    ```
+
+   **Get Twilio credentials**: See [TWILIO_SETUP.md](TWILIO_SETUP.md) for detailed setup instructions
 
 5. **Generate PWA icons** (optional, for production):
    ```bash
