@@ -90,6 +90,12 @@ export async function POST(request: NextRequest) {
     // Initialize Twilio client
     const client = twilio(accountSid, authToken);
 
+    console.log('Sending WhatsApp message:', {
+      from: `whatsapp:${twilioPhone}`,
+      to: `whatsapp:${contacts[0]}`,
+      messageLength: message.length,
+    });
+
     // Send WhatsApp messages to all contacts
     const promises = contacts.map((contact: string) =>
       client.messages.create({
@@ -99,7 +105,12 @@ export async function POST(request: NextRequest) {
       })
     );
 
-    await Promise.all(promises);
+    const results = await Promise.all(promises);
+    
+    console.log('Messages sent successfully:', {
+      count: results.length,
+      sids: results.map(r => r.sid),
+    });
 
     // Log successful alert (without sensitive data)
     console.log('Emergency alert sent successfully', {
@@ -117,15 +128,23 @@ export async function POST(request: NextRequest) {
 
     // Handle Twilio-specific errors
     if (error && typeof error === 'object' && 'code' in error) {
-      const twilioError = error as { code: number };
+      const twilioError = error as { code: number; message?: string; moreInfo?: string };
+      
+      console.error('Twilio error details:', {
+        code: twilioError.code,
+        message: twilioError.message,
+        moreInfo: twilioError.moreInfo,
+      });
+
       const errorMessages: { [key: number]: string } = {
         20003: 'Authentication failed. Check your Twilio credentials.',
         21211: 'Invalid phone number.',
         21408: 'Permission to send messages to unverified number denied.',
-        21610: 'Message could not be sent. Number may not be opted in.',
+        21610: 'Number not opted in to WhatsApp Sandbox. Send "join [code]" to +14155238886 first.',
+        63007: 'Number not in WhatsApp Sandbox. Send "join [code]" to +14155238886 from your WhatsApp.',
       };
 
-      const errorMessage = errorMessages[twilioError.code] || 'Failed to send WhatsApp message';
+      const errorMessage = errorMessages[twilioError.code] || `Twilio error: ${twilioError.message || 'Failed to send WhatsApp message'}`;
       
       return NextResponse.json(
         { success: false, error: errorMessage },
