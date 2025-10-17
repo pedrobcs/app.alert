@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import twilio from 'twilio';
 
 // Validate E.164 phone number format
 const isValidE164 = (phone: string): boolean => {
