@@ -51,9 +51,17 @@ A production-ready Next.js Progressive Web App (PWA) for sending emergency alert
 
 4. **Edit `.env.local`** with your configuration:
    ```env
+   # Client-side (public)
    NEXT_PUBLIC_API_BASE_URL=https://your-ngrok-url.ngrok.io
    NEXT_PUBLIC_CONTACT_1=+15085140864
+   
+   # Server-side (sensitive - optional for WhatsApp)
+   TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   TWILIO_AUTH_TOKEN=your_auth_token_here
+   TWILIO_WHATSAPP_NUMBER=+14155238886
    ```
+   
+   📚 **See [ENVIRONMENT_VARIABLES.md](./ENVIRONMENT_VARIABLES.md) for detailed security best practices**
 
 5. **Generate PWA icons** (optional, for production):
    ```bash
@@ -148,10 +156,26 @@ Expected response:
 
 #### Environment Variables
 
+**Client-Side (Public):**
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
 | `NEXT_PUBLIC_API_BASE_URL` | Backend API URL | Yes | - |
-| `NEXT_PUBLIC_CONTACT_1` | Emergency contact number | No | +15085140864 |
+| `NEXT_PUBLIC_CONTACT_1` | Emergency contact #1 | No | +15085140864 |
+| `NEXT_PUBLIC_CONTACT_2` | Emergency contact #2 | No | - |
+| `NEXT_PUBLIC_CONTACT_3` | Emergency contact #3 | No | - |
+
+**Server-Side (Sensitive):**
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `TWILIO_ACCOUNT_SID` | Twilio Account SID | Optional* |
+| `TWILIO_AUTH_TOKEN` | Twilio Auth Token | Optional* |
+| `TWILIO_WHATSAPP_NUMBER` | Twilio WhatsApp Number | Optional* |
+
+*Required only if using WhatsApp integration
+
+📚 **Detailed guides:**
+- [Environment Variables Setup](./ENVIRONMENT_VARIABLES.md)
+- [WhatsApp Integration](./WHATSAPP_INTEGRATION.md)
 
 ## PWA Features
 
@@ -213,10 +237,14 @@ yarn lint
 
 ## Security Considerations
 
-- Location data is only accessed when user grants permission
-- API requests use HTTPS in production
-- No sensitive data stored locally
-- Service worker caches only public assets
+- 🔐 **Sensitive credentials** (Twilio) are server-side only and never exposed to browser
+- 🔑 **Environment variables** follow Next.js security best practices (see [ENVIRONMENT_VARIABLES.md](./ENVIRONMENT_VARIABLES.md))
+- 📍 **Location data** is only accessed when user grants permission
+- 🔒 **API requests** use HTTPS in production
+- 💾 **No sensitive data** stored locally
+- 📦 **Service worker** caches only public assets
+
+⚠️ **Warning**: Never prefix sensitive credentials with `NEXT_PUBLIC_` - this would expose them to the browser!
 
 ## Troubleshooting
 

@@ -1,8 +1,12 @@
 /**
  * API client for emergency alert backend communication
+ * 
+ * This module uses ONLY client-side safe environment variables (NEXT_PUBLIC_*)
+ * Sensitive operations are handled by server-side API routes.
  */
 
 import { Coordinates } from './geolocation';
+import { getPublicApiUrl } from './env';
 
 export interface EmergencyPayload {
   contacts: string[];
@@ -18,9 +22,10 @@ export interface EmergencyResponse {
 
 /**
  * Get API base URL from environment or use default
+ * ✅ Safe for client-side use (uses NEXT_PUBLIC_ variable)
  */
 const getApiBaseUrl = (): string => {
-  return process.env.NEXT_PUBLIC_API_BASE_URL || '';
+  return getPublicApiUrl();
 };
 
 /**
