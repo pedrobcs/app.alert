@@ -71,18 +71,34 @@ export async function POST(request: NextRequest) {
     const authToken = process.env.TWILIO_AUTH_TOKEN;
     const twilioPhone = process.env.TWILIO_WHATSAPP_NUMBER;
 
-    if (!accountSid || !authToken) {
-      console.error('Twilio credentials not configured');
+    // Log what we found (without exposing sensitive data)
+    console.log('Environment check:', {
+      accountSid: accountSid ? '✅ SET' : '❌ MISSING',
+      authToken: authToken ? '✅ SET' : '❌ MISSING',
+      twilioPhone: twilioPhone ? `✅ SET (${twilioPhone})` : '❌ MISSING',
+      nodeEnv: process.env.NODE_ENV,
+    });
+
+    if (!accountSid) {
+      console.error('TWILIO_ACCOUNT_SID is not set');
       return NextResponse.json(
-        { success: false, error: 'Messaging service not configured' },
+        { success: false, error: 'Missing TWILIO_ACCOUNT_SID environment variable in Vercel' },
+        { status: 500 }
+      );
+    }
+
+    if (!authToken) {
+      console.error('TWILIO_AUTH_TOKEN is not set');
+      return NextResponse.json(
+        { success: false, error: 'Missing TWILIO_AUTH_TOKEN environment variable in Vercel' },
         { status: 500 }
       );
     }
 
     if (!twilioPhone) {
-      console.error('Twilio WhatsApp number not configured');
+      console.error('TWILIO_WHATSAPP_NUMBER is not set');
       return NextResponse.json(
-        { success: false, error: 'Messaging service not configured' },
+        { success: false, error: 'Missing TWILIO_WHATSAPP_NUMBER environment variable in Vercel (should be +14155238886)' },
         { status: 500 }
       );
     }
