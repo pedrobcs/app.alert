@@ -87,7 +87,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Initialize Twilio client
-    const twilio = require('twilio');
     const client = twilio(accountSid, authToken);
 
     // Send WhatsApp messages to all contacts
@@ -112,11 +111,12 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Emergency alert sent successfully',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error sending emergency alert:', error);
 
     // Handle Twilio-specific errors
-    if (error.code) {
+    if (error && typeof error === 'object' && 'code' in error) {
+      const twilioError = error as { code: number };
       const errorMessages: { [key: number]: string } = {
         20003: 'Authentication failed. Check your Twilio credentials.',
         21211: 'Invalid phone number.',
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
         21610: 'Message could not be sent. Number may not be opted in.',
       };
 
-      const errorMessage = errorMessages[error.code] || 'Failed to send WhatsApp message';
+      const errorMessage = errorMessages[twilioError.code] || 'Failed to send WhatsApp message';
       
       return NextResponse.json(
         { success: false, error: errorMessage },
@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Handle OPTIONS for CORS preflight
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS() {
   return new NextResponse(null, {
     status: 200,
     headers: {
