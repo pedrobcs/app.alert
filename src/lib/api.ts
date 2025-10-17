@@ -17,10 +17,12 @@ export interface EmergencyResponse {
 }
 
 /**
- * Get API base URL from environment or use default
+ * Get API base URL from environment or use default (local API route)
  */
 const getApiBaseUrl = (): string => {
-  return process.env.NEXT_PUBLIC_API_BASE_URL || '';
+  // If NEXT_PUBLIC_API_BASE_URL is set, use it (for external backend)
+  // Otherwise, use the local Next.js API route
+  return process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
 };
 
 /**
@@ -32,10 +34,6 @@ export const sendEmergencyAlert = async (
   payload: EmergencyPayload
 ): Promise<EmergencyResponse> => {
   const apiUrl = getApiBaseUrl();
-  
-  if (!apiUrl) {
-    throw new Error('API URL not configured. Please set NEXT_PUBLIC_API_BASE_URL environment variable.');
-  }
 
   try {
     const response = await fetch(`${apiUrl}/panic`, {
