@@ -1,0 +1,116 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  walletAddress String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  bots          Bot[]
+}
+
+model Bot {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Bot Configuration
+  name            String
+  market          String   // e.g., "SOL-PERP"
+  mode            String   // "non-custodial" | "custodial"
+  status          String   @default("stopped") // "stopped" | "running" | "paused" | "error"
+  
+  // Strategy Parameters (Wyckoff)
+  timeframe       Int      @default(5) // minutes
+  lookbackBars    Int      @default(12) // number of bars to analyze
+  volumeThreshold Float    @default(1.5) // volume spike multiplier
+  accumulationSensitivity Float @default(0.7) // 0-1 scale
+  distributionSensitivity Float @default(0.7) // 0-1 scale
+  
+  // Risk Management
+  positionSizePct Float    @default(10) // % of equity per trade
+  maxLeverage     Int      @default(5)
+  stopLossPct     Float    @default(10) // %
+  takeProfitPct   Float    @default(40) // %
+  maxDailyLoss    Float?   // optional max daily loss %
+  
+  // State
+  lastSignal      String?  // "long" | "short" | "flat"
+  lastSignalTime  DateTime?
+  lastTradeTime   DateTime?
+  errorMessage    String?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  trades          Trade[]
+  
+  @@index([userId])
+  @@index([status])
+}
+
+model Trade {
+  id              String   @id @default(uuid())
+  botId           String
+  bot             Bot      @relation(fields: [botId], references: [id], onDelete: Cascade)
+  
+  // Trade Details
+  signature       String   @unique // Solana transaction signature
+  market          String   // e.g., "SOL-PERP"
+  side            String   // "long" | "short"
+  action          String   // "open" | "close" | "liquidation"
+  
+  // Execution
+  entryPrice      Float?
+  exitPrice       Float?
+  size            Float    // position size
+  leverage        Int
+  
+  // P&L
+  realizedPnl     Float?
+  unrealizedPnl   Float?
+  fees            Float    @default(0)
+  
+  // Signal Context
+  signal          String?  // Wyckoff signal that triggered this
+  signalReason    String?  // explanation
+  
+  // Status
+  status          String   @default("pending") // "pending" | "executed" | "failed" | "cancelled"
+  errorMessage    String?
+  
+  executedAt      DateTime @default(now())
+  closedAt        DateTime?
+  
+  @@index([botId])
+  @@index([status])
+  @@index([executedAt])
+}
+
+model KeeperState {
+  id              String   @id @default(uuid())
+  botId           String   @unique
+  
+  // Keeper Runtime State
+  isRunning       Boolean  @default(false)
+  lastPollTime    DateTime?
+  lastError       String?
+  errorCount      Int      @default(0)
+  
+  // Performance Metrics
+  totalTrades     Int      @default(0)
+  successfulTrades Int     @default(0)
+  totalPnl        Float    @default(0)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
