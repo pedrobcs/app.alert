@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useAccount } from 'wagmi';
 import { WalletConnectButton } from '@/components/WalletConnector';
 import Link from 'next/link';
 import { BotStatus } from '@/components/BotStatus';
@@ -21,7 +21,7 @@ interface Bot {
 }
 
 export default function Home() {
-  const { connected, publicKey } = useWallet();
+  const { address, isConnected } = useAccount();
   const [bots, setBots] = useState<Bot[]>([]);
   const [selectedBot, setSelectedBot] = useState<Bot | null>(null);
   const [botStatus, setBotStatus] = useState<any>(null);
@@ -30,13 +30,14 @@ export default function Home() {
 
   // Fetch user's bots
   useEffect(() => {
-    if (connected && publicKey) {
+    if (isConnected && address) {
       fetchBots();
     } else {
       setBots([]);
       setSelectedBot(null);
     }
-  }, [connected, publicKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, address]);
 
   // Fetch bot status and trades when a bot is selected
   useEffect(() => {
@@ -49,7 +50,7 @@ export default function Home() {
   const fetchBots = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/bots/list?wallet=${publicKey?.toString()}`);
+      const response = await fetch(`/api/bots/list?wallet=${address}`);
       if (response.ok) {
         const data = await response.json();
         setBots(data.bots || []);
@@ -133,7 +134,7 @@ export default function Home() {
             <div className="flex items-center gap-3">
               <div className="text-3xl">📈</div>
               <div>
-                <h1 className="text-2xl font-bold text-white">Drift Trading Bot</h1>
+                <h1 className="text-2xl font-bold text-white">Hyperliquid Trading Bot</h1>
                 <p className="text-sm text-gray-400">Wyckoff Strategy • 5-min Timeframe</p>
               </div>
             </div>
@@ -144,15 +145,15 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        {!connected ? (
+        {!isConnected ? (
           // Not Connected View
           <div className="max-w-2xl mx-auto text-center space-y-6 py-12">
             <div className="text-6xl mb-4">🚀</div>
             <h2 className="text-4xl font-bold text-white mb-4">
-              Welcome to Drift Trading Bot
+              Welcome to Hyperliquid Trading Bot
             </h2>
             <p className="text-xl text-gray-300 mb-8">
-              Automated futures trading on Solana using Wyckoff strategy
+              Automated futures trading on Hyperliquid using Wyckoff strategy
             </p>
             
             <div className="bg-gray-800 rounded-lg p-8 space-y-4 text-left">
@@ -303,17 +304,17 @@ export default function Home() {
         <div className="container mx-auto px-4 py-6 text-center text-gray-400 text-sm">
           <p>
             Built with{' '}
-            <a href="https://drift.trade" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-              Drift Protocol
+            <a href="https://hyperliquid.xyz" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+              Hyperliquid
             </a>{' '}
             • Trade responsibly
           </p>
           <p className="mt-2">
-            <a href="https://docs.drift.trade" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+            <a href="https://hyperliquid.gitbook.io/hyperliquid-docs" target="_blank" rel="noopener noreferrer" className="hover:text-white">
               Documentation
             </a>
             {' | '}
-            <a href="https://github.com/drift-labs" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+            <a href="https://github.com/nktkas/hyperliquid" target="_blank" rel="noopener noreferrer" className="hover:text-white">
               GitHub
             </a>
           </p>

@@ -7,7 +7,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useAccount } from 'wagmi';
 
 export interface BotFormData {
   name: string;
@@ -34,13 +34,13 @@ interface BotConfigFormProps {
 }
 
 export const BotConfigForm: React.FC<BotConfigFormProps> = ({ onSubmit, isLoading }) => {
-  const { connected } = useWallet();
+  const { isConnected } = useAccount();
   const [showCustodialWarning, setShowCustodialWarning] = useState(false);
   const [acceptedRisk, setAcceptedRisk] = useState(false);
 
   const [formData, setFormData] = useState<BotFormData>({
     name: 'My Wyckoff Bot',
-    market: 'SOL-PERP',
+    market: 'BTC',
     mode: 'non-custodial',
     timeframe: 5,
     lookbackBars: 12,
@@ -80,7 +80,7 @@ export const BotConfigForm: React.FC<BotConfigFormProps> = ({ onSubmit, isLoadin
     onSubmit(formData);
   };
 
-  if (!connected) {
+  if (!isConnected) {
     return (
       <div className="bg-gray-800 rounded-lg p-8 text-center">
         <p className="text-gray-400">Please connect your wallet to create a bot</p>
@@ -118,9 +118,14 @@ export const BotConfigForm: React.FC<BotConfigFormProps> = ({ onSubmit, isLoadin
             onChange={handleChange}
             className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary"
           >
-            <option value="SOL-PERP">SOL-PERP</option>
-            <option value="BTC-PERP">BTC-PERP</option>
-            <option value="ETH-PERP">ETH-PERP</option>
+            <option value="BTC">BTC</option>
+            <option value="ETH">ETH</option>
+            <option value="SOL">SOL</option>
+            <option value="ARB">ARB</option>
+            <option value="AVAX">AVAX</option>
+            <option value="MATIC">MATIC</option>
+            <option value="OP">OP</option>
+            <option value="LINK">LINK</option>
           </select>
         </div>
 
@@ -152,7 +157,7 @@ export const BotConfigForm: React.FC<BotConfigFormProps> = ({ onSubmit, isLoadin
               <ul className="text-sm text-red-300 space-y-1 list-disc list-inside">
                 <li>Your private key will be used by the server to sign transactions automatically</li>
                 <li>This is NOT recommended for mainnet or large amounts</li>
-                <li>ONLY use on devnet/testnet for development and testing</li>
+                <li>ONLY use on testnet for development and testing</li>
                 <li>The server must have KEEPER_PRIVATE_KEY environment variable set</li>
                 <li>You could lose all funds if the server is compromised</li>
                 <li>Automated trading involves significant financial risk</li>
@@ -166,7 +171,7 @@ export const BotConfigForm: React.FC<BotConfigFormProps> = ({ onSubmit, isLoadin
                   className="w-4 h-4"
                 />
                 <label htmlFor="acceptRisk" className="text-sm text-red-300 font-medium">
-                  I understand the risks and am using this on devnet/testnet only
+                  I understand the risks and am using this on testnet only
                 </label>
               </div>
             </div>
@@ -318,7 +323,7 @@ export const BotConfigForm: React.FC<BotConfigFormProps> = ({ onSubmit, isLoadin
           <div className="flex-1 text-sm text-yellow-300">
             <strong>Risk Warning:</strong> Automated trading involves significant financial risk. 
             You could lose all or part of your investment. Only trade with funds you can afford to lose. 
-            Always test on devnet before using real funds.
+            Always test on testnet before using real funds.
           </div>
         </div>
       </div>

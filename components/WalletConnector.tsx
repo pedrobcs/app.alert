@@ -1,39 +1,57 @@
 /**
  * Wallet Connector Component
  * 
- * Provides Solana wallet connection functionality using wallet-adapter
+ * Provides EVM wallet connection functionality using wagmi + Web3Modal
  * 
  * Supported wallets:
- * - Phantom
- * - Solflare
+ * - MetaMask
+ * - WalletConnect
  * - Coinbase Wallet
- * - And more via wallet-adapter
+ * - And more via Web3Modal
  * 
- * Reference: https://solana.com/developers/cookbook/wallets/connect-wallet-react
+ * Reference: https://wagmi.sh/react/getting-started
  */
 
 'use client';
 
-import React, { FC, useMemo } from 'react';
-import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
-import {
-  ConnectionProvider,
-  WalletProvider,
-  useWallet,
-} from '@solana/wallet-adapter-react';
-import { WalletModalProvider, WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import {
-  PhantomWalletAdapter,
-  SolflareWalletAdapter,
-  CoinbaseWalletAdapter,
-} from '@solana/wallet-adapter-wallets';
-import { clusterApiUrl } from '@solana/web3.js';
+import React, { FC, ReactNode } from 'react';
+import { WagmiProvider, createConfig, http, useAccount, useDisconnect, useConnect } from 'wagmi';
+import { arbitrum, arbitrumSepolia } from 'wagmi/chains';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createWeb3Modal } from '@web3modal/wagmi';
+import { walletConnect, injected, coinbaseWallet } from 'wagmi/connectors';
 
-// Import wallet adapter CSS
-require('@solana/wallet-adapter-react-ui/styles.css');
+// Create wagmi config
+const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'YOUR_PROJECT_ID';
+
+const isMainnet = process.env.NEXT_PUBLIC_HYPERLIQUID_ENV === 'mainnet';
+
+export const config = createConfig({
+  chains: [isMainnet ? arbitrum : arbitrumSepolia],
+  connectors: [
+    walletConnect({ projectId }),
+    injected(),
+    coinbaseWallet({ appName: 'Hyperliquid Trading Bot' }),
+  ],
+  transports: {
+    [arbitrum.id]: http(),
+    [arbitrumSepolia.id]: http(),
+  },
+});
+
+// Create Web3Modal
+createWeb3Modal({
+  wagmiConfig: config,
+  projectId,
+  enableAnalytics: false,
+  themeMode: 'dark',
+});
+
+// Create query client
+const queryClient = new QueryClient();
 
 interface WalletConnectorProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 /**
@@ -41,33 +59,12 @@ interface WalletConnectorProviderProps {
  * Wrap your app with this component to enable wallet functionality
  */
 export const WalletConnectorProvider: FC<WalletConnectorProviderProps> = ({ children }) => {
-  // Get network from environment or default to devnet
-  const network = (process.env.NEXT_PUBLIC_DRIFT_ENV as WalletAdapterNetwork) || WalletAdapterNetwork.Devnet;
-  
-  // Get RPC endpoint
-  const endpoint = useMemo(() => {
-    if (process.env.NEXT_PUBLIC_RPC_URL) {
-      return process.env.NEXT_PUBLIC_RPC_URL;
-    }
-    return clusterApiUrl(network);
-  }, [network]);
-
-  // Initialize wallet adapters
-  const wallets = useMemo(
-    () => [
-      new PhantomWalletAdapter(),
-      new SolflareWalletAdapter({ network }),
-      new CoinbaseWalletAdapter(),
-    ],
-    [network]
-  );
-
   return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>{children}</WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        {children}
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 };
 
@@ -76,7 +73,39 @@ export const WalletConnectorProvider: FC<WalletConnectorProviderProps> = ({ chil
  * Pre-styled button for connecting/disconnecting wallet
  */
 export const WalletConnectButton: FC = () => {
-  return <WalletMultiButton className="!bg-primary hover:!bg-primary-dark transition-colors" />;
+  const { address, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
+  const { connectors, connect } = useConnect();
+
+  const handleConnect = () => {
+    // Try to connect with injected wallet (MetaMask) first
+    const injectedConnector = connectors.find(c => c.id === 'injected');
+    if (injectedConnector) {
+      connect({ connector: injectedConnector });
+    } else if (connectors.length > 0) {
+      connect({ connector: connectors[0] });
+    }
+  };
+
+  if (isConnected && address) {
+    return (
+      <button
+        onClick={() => disconnect()}
+        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium"
+      >
+        {address.slice(0, 6)}...{address.slice(-4)}
+      </button>
+    );
+  }
+
+  return (
+    <button
+      onClick={handleConnect}
+      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium"
+    >
+      Connect Wallet
+    </button>
+  );
 };
 
 /**
@@ -84,9 +113,9 @@ export const WalletConnectButton: FC = () => {
  * Shows connected wallet address and balance
  */
 export const WalletInfo: FC = () => {
-  const { publicKey, connected } = useWallet();
+  const { address, isConnected, chain } = useAccount();
 
-  if (!connected || !publicKey) {
+  if (!isConnected || !address) {
     return null;
   }
 
@@ -94,10 +123,23 @@ export const WalletInfo: FC = () => {
     <div className="flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-lg">
       <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
       <span className="text-sm text-gray-300">
-        {publicKey.toString().slice(0, 4)}...{publicKey.toString().slice(-4)}
+        {address.slice(0, 6)}...{address.slice(-4)}
       </span>
+      {chain && (
+        <span className="text-xs text-gray-500 ml-2">
+          {chain.name}
+        </span>
+      )}
     </div>
   );
+};
+
+/**
+ * Hook to check if wallet is connected
+ */
+export const useWalletConnection = () => {
+  const { address, isConnected } = useAccount();
+  return { address, isConnected };
 };
 
 export default WalletConnectorProvider;

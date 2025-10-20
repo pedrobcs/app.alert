@@ -6,19 +6,19 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useAccount } from 'wagmi';
 import { WalletConnectButton } from '@/components/WalletConnector';
 import { BotConfigForm, BotFormData } from '@/components/BotConfigForm';
 import Link from 'next/link';
 
 export default function NewBot() {
   const router = useRouter();
-  const { connected, publicKey } = useWallet();
+  const { address, isConnected } = useAccount();
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (formData: BotFormData) => {
-    if (!connected || !publicKey) {
+    if (!isConnected || !address) {
       setError('Please connect your wallet first');
       return;
     }
@@ -33,7 +33,7 @@ export default function NewBot() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          walletAddress: publicKey.toString(),
+          walletAddress: address,
           ...formData,
         }),
       });
@@ -65,7 +65,7 @@ export default function NewBot() {
             <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <div className="text-3xl">📈</div>
               <div>
-                <h1 className="text-2xl font-bold text-white">Drift Trading Bot</h1>
+                <h1 className="text-2xl font-bold text-white">Hyperliquid Trading Bot</h1>
                 <p className="text-sm text-gray-400">Create New Bot</p>
               </div>
             </Link>
@@ -90,7 +90,7 @@ export default function NewBot() {
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-white mb-2">Create Trading Bot</h1>
             <p className="text-gray-400">
-              Configure your automated Wyckoff trading bot for Drift Protocol
+              Configure your automated Wyckoff trading bot for Hyperliquid
             </p>
           </div>
 
@@ -113,8 +113,8 @@ export default function NewBot() {
               <span className="text-xl">ℹ️</span>
               <div className="flex-1 text-sm text-blue-300">
                 <strong>Quick Start:</strong> Start with default settings to create a basic bot. 
-                You can adjust Wyckoff parameters later after observing the bot's behavior. 
-                Always test on devnet first!
+                You can adjust Wyckoff parameters later after observing the bot&apos;s behavior. 
+                Always test on testnet first!
               </div>
             </div>
           </div>
@@ -127,12 +127,12 @@ export default function NewBot() {
             <h3 className="text-lg font-semibold text-white mb-3">Learn More</h3>
             <div className="space-y-2 text-sm text-gray-300">
               <a
-                href="https://docs.drift.trade"
+                href="https://hyperliquid.gitbook.io/hyperliquid-docs"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block hover:text-primary transition-colors"
               >
-                📚 Drift Protocol Documentation →
+                📚 Hyperliquid Documentation →
               </a>
               <a
                 href="https://school.stockcharts.com/doku.php?id=market_analysis:the_wyckoff_method"
@@ -143,12 +143,12 @@ export default function NewBot() {
                 📖 Wyckoff Method Guide →
               </a>
               <a
-                href="https://github.com/drift-labs/keeper-bots-v2"
+                href="https://github.com/nktkas/hyperliquid"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block hover:text-primary transition-colors"
               >
-                💻 Drift Keeper Bots Examples →
+                💻 Hyperliquid SDK Examples →
               </a>
             </div>
           </div>

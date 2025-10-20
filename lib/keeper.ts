@@ -1,5 +1,5 @@
 /**
- * Drift Trading Bot Keeper
+ * Hyperliquid Trading Bot Keeper
  * 
  * This module implements the keeper/bot logic that runs continuously to:
  * 1. Fetch latest market data (5-min OHLCV)
@@ -15,23 +15,14 @@
  * - NEVER commit private keys to source control
  * - Use environment variables with encryption
  * - Consider using AWS KMS or HashiCorp Vault for production
- * - Always test on devnet first
+ * - Always test on testnet first
  * 
  * References:
- * - Drift Keeper Bots: https://github.com/drift-labs/keeper-bots-v2
+ * - Hyperliquid Docs: https://hyperliquid.gitbook.io/hyperliquid-docs
  */
 
-import { Connection, Keypair, PublicKey } from '@solana/web3.js';
-import { DriftClient, Wallet } from '@drift-labs/sdk';
 import { analyzeWyckoff } from './wyckoff';
-import {
-  initDriftClient,
-  getMarketPrice,
-  getPositions,
-  openPosition,
-  closePosition,
-  getAccountBalance,
-} from './driftClient';
+import { HyperliquidClient, initHyperliquidClient } from './hyperliquidClient';
 import { OHLCVBar, BotConfig, WyckoffSignal, TradeInstruction, Position } from '@/types';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -42,7 +33,7 @@ import * as path from 'path';
 interface KeeperState {
   botId: string;
   config: BotConfig;
-  driftClient?: DriftClient;
+  hyperliquidClient?: HyperliquidClient;
   isRunning: boolean;
   intervalId?: NodeJS.Timeout;
   lastPollTime?: Date;
@@ -88,11 +79,11 @@ export async function startKeeper(botConfig: BotConfig): Promise<void> {
     },
   };
 
-  // Initialize Drift client (only for custodial mode)
+  // Initialize Hyperliquid client (only for custodial mode)
   if (botConfig.mode === 'custodial') {
     try {
-      keeperState.driftClient = await initializeCustodialClient();
-      console.log('✅ Custodial DriftClient initialized');
+      keeperState.hyperliquidClient = await initializeCustodialClient();
+      console.log('✅ Custodial HyperliquidClient initialized');
     } catch (error) {
       console.error('❌ Failed to initialize custodial client:', error);
       throw new Error('Cannot start custodial keeper without valid private key');
@@ -132,9 +123,9 @@ export function stopKeeper(botId: string): void {
     clearInterval(keeper.intervalId);
   }
 
-  // Unsubscribe from Drift
-  if (keeper.driftClient) {
-    keeper.driftClient.unsubscribe();
+  // Clean up Hyperliquid client if needed
+  if (keeper.hyperliquidClient) {
+    // Any cleanup needed
   }
 
   // Update state
@@ -177,8 +168,8 @@ async function runKeeperLoop(keeper: KeeperState): Promise<void> {
     console.log(`📈 Signal: ${signal.signal.toUpperCase()} (${signal.confidence.toFixed(2)}) - ${signal.reason}`);
 
     // Step 3: Check current position
-    if (keeper.driftClient) {
-      const positions = await getPositions(keeper.driftClient);
+    if (keeper.hyperliquidClient) {
+      const positions = await keeper.hyperliquidClient.getPositions();
       keeper.currentPosition = positions.find(p => p.market === keeper.config.market);
     }
 
@@ -248,10 +239,10 @@ async function fetchLatestMarketData(marketSymbol: string): Promise<OHLCVBar> {
  * Execute trade if signal warrants it
  */
 async function executeTradeIfNeeded(keeper: KeeperState, signal: WyckoffSignal): Promise<void> {
-  const { config, currentPosition, driftClient } = keeper;
+  const { config, currentPosition, hyperliquidClient } = keeper;
 
   // Need custodial mode to auto-execute
-  if (config.mode !== 'custodial' || !driftClient) {
+  if (config.mode !== 'custodial' || !hyperliquidClient) {
     console.log('ℹ️  Non-custodial mode - skipping auto-execution');
     return;
   }
@@ -274,32 +265,36 @@ async function executeTradeIfNeeded(keeper: KeeperState, signal: WyckoffSignal):
 
     // Close opposite position first
     console.log(`🔄 Closing ${currentPosition.side} position before opening ${signal.signal}`);
-    await closePosition(driftClient, config.market);
+    await hyperliquidClient.closePosition(config.market);
     keeper.currentPosition = undefined;
   }
 
   // Calculate position size
-  const accountBalance = await getAccountBalance(driftClient);
+  const accountBalance = await hyperliquidClient.getAccountBalance();
   const positionSize = (accountBalance * config.positionSizePct) / 100;
+
+  // Get current market price to calculate size in contracts
+  const currentPrice = await hyperliquidClient.getMarketPrice(config.market);
+  const contractSize = positionSize / currentPrice;
 
   // Create trade instruction
   const instruction: TradeInstruction = {
     market: config.market,
     side: signal.signal as 'long' | 'short',
     action: 'open',
-    size: positionSize,
+    size: contractSize,
     leverage: config.maxLeverage,
   };
 
   // Execute trade
   try {
     console.log(`🚀 Executing ${signal.signal.toUpperCase()} trade:`, instruction);
-    const txSig = await openPosition(driftClient, instruction);
+    const result = await hyperliquidClient.openPosition(instruction);
     
     keeper.stats.totalTrades++;
     keeper.stats.successfulTrades++;
     
-    console.log(`✅ Trade executed: ${txSig}`);
+    console.log(`✅ Trade executed:`, result);
     
     // TODO: Save trade to database
     
@@ -317,9 +312,9 @@ async function executeTradeIfNeeded(keeper: KeeperState, signal: WyckoffSignal):
  * - Check max daily loss
  */
 async function monitorRisk(keeper: KeeperState): Promise<void> {
-  const { config, currentPosition, driftClient } = keeper;
+  const { config, currentPosition, hyperliquidClient } = keeper;
 
-  if (!currentPosition || !driftClient) {
+  if (!currentPosition || !hyperliquidClient) {
     return;
   }
 
@@ -334,7 +329,7 @@ async function monitorRisk(keeper: KeeperState): Promise<void> {
   // Check stop-loss
   if (pnlPct <= -stopLossPct) {
     console.log(`🛑 STOP LOSS HIT at ${pnlPct.toFixed(2)}% - Closing position`);
-    await closePosition(driftClient, config.market);
+    await hyperliquidClient.closePosition(config.market);
     keeper.currentPosition = undefined;
     keeper.stats.totalPnl += unrealizedPnl;
     return;
@@ -343,7 +338,7 @@ async function monitorRisk(keeper: KeeperState): Promise<void> {
   // Check take-profit
   if (pnlPct >= takeProfitPct) {
     console.log(`🎯 TAKE PROFIT HIT at ${pnlPct.toFixed(2)}% - Closing position`);
-    await closePosition(driftClient, config.market);
+    await hyperliquidClient.closePosition(config.market);
     keeper.currentPosition = undefined;
     keeper.stats.totalPnl += unrealizedPnl;
     return;
@@ -353,48 +348,35 @@ async function monitorRisk(keeper: KeeperState): Promise<void> {
 }
 
 /**
- * Initialize custodial Drift client using server private key
+ * Initialize custodial Hyperliquid client using server private key
  * 
  * 🚨 SECURITY WARNING:
  * - NEVER commit private keys to source control
  * - Use encrypted storage in production (AWS KMS, HashiCorp Vault)
- * - Only use on devnet/testnet for development
+ * - Only use on testnet for development
  * - Consider using hardware wallets for mainnet
  */
-async function initializeCustodialClient(): Promise<DriftClient> {
+async function initializeCustodialClient(): Promise<HyperliquidClient> {
   const privateKey = process.env.KEEPER_PRIVATE_KEY;
 
   if (!privateKey) {
     throw new Error(
       '🚨 KEEPER_PRIVATE_KEY not set. Cannot run custodial keeper.\n' +
       'To enable custodial mode:\n' +
-      '1. Generate keypair: solana-keygen new --outfile keeper-keypair.json\n' +
-      '2. Fund the wallet (devnet): solana airdrop 2 --url devnet\n' +
-      '3. Set env var: KEEPER_PRIVATE_KEY=\'[1,2,3,...]\' (array from keypair.json)\n' +
+      '1. Generate Ethereum private key: openssl rand -hex 32\n' +
+      '2. Fund the wallet with USDC on Arbitrum (testnet or mainnet)\n' +
+      '3. Set env var: KEEPER_PRIVATE_KEY=0x... (your private key)\n' +
       '4. NEVER commit this key to git!'
     );
   }
 
-  // Parse private key (should be JSON array of bytes)
-  let secretKey: Uint8Array;
-  try {
-    const keyArray = JSON.parse(privateKey);
-    secretKey = Uint8Array.from(keyArray);
-  } catch (error) {
-    throw new Error('Invalid KEEPER_PRIVATE_KEY format. Must be JSON array of bytes.');
-  }
+  // Initialize Hyperliquid client
+  const env = process.env.HYPERLIQUID_ENV || 'testnet';
+  const isMainnet = env === 'mainnet';
+  
+  const hyperliquidClient = initHyperliquidClient(privateKey, isMainnet);
 
-  const keypair = Keypair.fromSecretKey(secretKey);
-
-  // Initialize connection
-  const rpcUrl = process.env.RPC_URL || process.env.NEXT_PUBLIC_RPC_URL || 'https://api.devnet.solana.com';
-  const connection = new Connection(rpcUrl, 'confirmed');
-
-  // Initialize Drift client
-  const env = (process.env.DRIFT_ENV || 'devnet') as 'devnet' | 'mainnet-beta';
-  const driftClient = await initDriftClient(connection, keypair, env);
-
-  return driftClient;
+  return hyperliquidClient;
 }
 
 /**
@@ -452,9 +434,11 @@ export function getAllKeepers(): Map<string, KeeperState> {
  *    - Calculate sharpe ratio, max drawdown, etc.
  */
 
-export default {
+const keeper = {
   startKeeper,
   stopKeeper,
   getKeeperStatus,
   getAllKeepers,
 };
+
+export default keeper;

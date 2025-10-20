@@ -1,7 +1,7 @@
 {
-  "name": "solana-drift-trading-bot",
+  "name": "hyperliquid-trading-bot",
   "version": "1.0.0",
-  "description": "Next.js TypeScript dApp for Solana futures trading with Drift Protocol and Wyckoff strategy",
+  "description": "Next.js TypeScript dApp for Hyperliquid futures trading with Wyckoff strategy",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -15,15 +15,13 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@coral-xyz/anchor": "^0.29.0",
-    "@drift-labs/sdk": "^2.77.0",
     "@prisma/client": "^5.7.0",
-    "@solana/wallet-adapter-base": "^0.9.23",
-    "@solana/wallet-adapter-react": "^0.15.35",
-    "@solana/wallet-adapter-react-ui": "^0.9.35",
-    "@solana/wallet-adapter-wallets": "^0.19.32",
-    "@solana/web3.js": "^1.87.6",
-    "bn.js": "^5.2.1",
+    "hyperliquid": "^1.5.0",
+    "ethers": "^6.9.0",
+    "wagmi": "^2.5.7",
+    "@web3modal/wagmi": "^4.1.0",
+    "viem": "^2.7.0",
+    "@tanstack/react-query": "^5.17.0",
     "dotenv": "^16.3.1",
     "next": "14.0.4",
     "react": "^18.2.0",
@@ -31,7 +29,6 @@
     "recharts": "^2.10.3"
   },
   "devDependencies": {
-    "@types/bn.js": "^5.1.5",
     "@types/jest": "^29.5.11",
     "@types/node": "^20",
     "@types/react": "^18",
