@@ -12,8 +12,8 @@ const nextConfig = {
     return config;
   },
   env: {
-    NEXT_PUBLIC_RPC_URL: process.env.NEXT_PUBLIC_RPC_URL,
-    NEXT_PUBLIC_DRIFT_ENV: process.env.NEXT_PUBLIC_DRIFT_ENV,
+    NEXT_PUBLIC_RPC_URL: process.env.NEXT_PUBLIC_RPC_URL || 'https://api.devnet.solana.com',
+    NEXT_PUBLIC_DRIFT_ENV: process.env.NEXT_PUBLIC_DRIFT_ENV || 'devnet',
   },
 };
 

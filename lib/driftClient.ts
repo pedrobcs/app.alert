@@ -251,7 +251,8 @@ export async function closePosition(
 export async function getPositions(driftClient: DriftClient): Promise<Position[]> {
   try {
     const user = driftClient.getUser();
-    const perpPositions = user.getPerpPositions();
+    const userAccount = user.getUserAccount();
+    const perpPositions = userAccount.perpPositions;
 
     const positions: Position[] = [];
 
@@ -333,7 +334,7 @@ export async function getAccountBalance(driftClient: DriftClient): Promise<numbe
  *    - Margin requirements
  */
 
-export default {
+const driftClientModule = {
   initDriftClient,
   getMarkets,
   getMarketPrice,
@@ -342,3 +343,5 @@ export default {
   getPositions,
   getAccountBalance,
 };
+
+export default driftClientModule;

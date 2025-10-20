@@ -452,9 +452,11 @@ export function getAllKeepers(): Map<string, KeeperState> {
  *    - Calculate sharpe ratio, max drawdown, etc.
  */
 
-export default {
+const keeperModule = {
   startKeeper,
   stopKeeper,
   getKeeperStatus,
   getAllKeepers,
 };
+
+export default keeperModule;

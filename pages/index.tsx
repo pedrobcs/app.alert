@@ -36,6 +36,7 @@ export default function Home() {
       setBots([]);
       setSelectedBot(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connected, publicKey]);
 
   // Fetch bot status and trades when a bot is selected
