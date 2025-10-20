@@ -113,7 +113,7 @@ export default function NewBot() {
               <span className="text-xl">ℹ️</span>
               <div className="flex-1 text-sm text-blue-300">
                 <strong>Quick Start:</strong> Start with default settings to create a basic bot. 
-                You can adjust Wyckoff parameters later after observing the bot's behavior. 
+                You can adjust Wyckoff parameters later after observing the bot&apos;s behavior. 
                 Always test on devnet first!
               </div>
             </div>
