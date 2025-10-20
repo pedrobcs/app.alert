@@ -1,11 +1,11 @@
-# Solana Drift Trading Bot
+# Hyperliquid Trading Bot
 
-A full-stack Next.js TypeScript dApp for automated futures trading on Solana using Drift Protocol and Wyckoff strategy.
+A full-stack Next.js TypeScript dApp for automated futures trading on Hyperliquid using Wyckoff strategy.
 
 ## 🚀 Features
 
-- **Solana Wallet Integration**: Connect with Phantom, Solflare, Coinbase Wallet, and more
-- **Drift Protocol v2**: Automated perpetual futures trading
+- **EVM Wallet Integration**: Connect with MetaMask, WalletConnect, Coinbase Wallet, and more
+- **Hyperliquid L1**: Automated perpetual futures trading on Hyperliquid's native blockchain
 - **Wyckoff Strategy**: Accumulation/distribution detection on 5-minute timeframe
 - **Dual Operating Modes**:
   - **Non-Custodial**: User signs each trade (requires user presence)
@@ -29,8 +29,8 @@ A full-stack Next.js TypeScript dApp for automated futures trading on Solana usi
 ## 📋 Prerequisites
 
 - Node.js 18+ and npm/yarn
-- Solana wallet (Phantom recommended)
-- Solana CLI tools (for generating keypairs)
+- EVM wallet (MetaMask recommended)
+- USDC on Arbitrum (for trading)
 - Basic understanding of trading and risk management
 
 ## 🛠️ Installation
@@ -53,15 +53,15 @@ cp .env.example .env
 Edit `.env` with your configuration:
 
 ```bash
-# Solana RPC Configuration
-NEXT_PUBLIC_RPC_URL=https://api.devnet.solana.com
-RPC_URL=https://api.devnet.solana.com
+# Hyperliquid Configuration
+NEXT_PUBLIC_HYPERLIQUID_ENV=testnet
+HYPERLIQUID_ENV=testnet
 
-# Drift Environment (devnet | mainnet-beta)
-NEXT_PUBLIC_DRIFT_ENV=devnet
-DRIFT_ENV=devnet
+# WalletConnect Project ID (get from https://cloud.walletconnect.com/)
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id_here
 
 # Keeper Private Key (for custodial mode - NEVER commit this!)
+# This is an Ethereum private key (0x...)
 KEEPER_PRIVATE_KEY=
 
 # Database
@@ -106,7 +106,7 @@ KEEPER_PRIVATE_KEY='[1,2,3,...]'
 # NEVER commit keeper-keypair.json or .env!
 ```
 
-### 5. Run the Development Server
+### 6. Run the Development Server
 
 ```bash
 npm run dev
@@ -118,11 +118,11 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### Creating a Bot
 
-1. **Connect Your Wallet**: Click "Connect Wallet" and approve the connection
+1. **Connect Your Wallet**: Click "Connect Wallet" and approve the connection (MetaMask, WalletConnect, etc.)
 2. **Navigate to Create Bot**: Click "Create New Bot"
 3. **Configure Bot**:
    - **Name**: Give your bot a descriptive name
-   - **Market**: Select trading pair (SOL-PERP, BTC-PERP, ETH-PERP)
+   - **Market**: Select trading pair (BTC, ETH, SOL, etc.)
    - **Mode**: Choose Non-Custodial or Custodial
    - **Strategy Parameters**:
      - Lookback Bars: 12 (1 hour of 5-min bars)
@@ -175,7 +175,7 @@ The dashboard shows:
    - Observe signals and behavior
    - Manually review each trade before signing
 
-3. **Test Custodial Mode on Devnet**
+3. **Test Custodial Mode on Testnet**
    - Create a custodial bot with small test amounts
    - Monitor for 24 hours
    - Check trade execution and risk management
@@ -303,16 +303,16 @@ npx prisma studio
 
 ## 📚 References
 
-### Drift Protocol
-- [Drift Documentation](https://docs.drift.trade/)
-- [Drift SDK Guide](https://drift-labs.github.io/v2-teacher/#client)
-- [Drift Keeper Bots](https://github.com/drift-labs/keeper-bots-v2)
-- [Drift TypeScript SDK](https://github.com/drift-labs/protocol-v2/tree/master/sdk)
+### Hyperliquid
+- [Hyperliquid Documentation](https://hyperliquid.gitbook.io/hyperliquid-docs)
+- [Hyperliquid API Docs](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api)
+- [Hyperliquid SDK (nktkas)](https://github.com/nktkas/hyperliquid)
+- [Hyperliquid SDK (nomeida)](https://github.com/nomeida/hyperliquid)
 
-### Solana
-- [Solana Wallet Adapter](https://solana.com/developers/cookbook/wallets/connect-wallet-react)
-- [Solana Web3.js](https://solana-labs.github.io/solana-web3.js/)
-- [Solana Devnet Faucet](https://faucet.solana.com/)
+### Wallet Integration
+- [Wagmi Documentation](https://wagmi.sh/)
+- [Web3Modal](https://docs.walletconnect.com/web3modal/about)
+- [WalletConnect](https://walletconnect.com/)
 
 ### Wyckoff Method
 - [Wyckoff Method Guide](https://school.stockcharts.com/doku.php?id=market_analysis:the_wyckoff_method)
@@ -365,9 +365,10 @@ Contributions are welcome! Please:
 
 For issues and questions:
 - Open an issue on GitHub
-- Check Drift Protocol Discord
-- Review Drift documentation
+- Check Hyperliquid Discord
+- Review Hyperliquid documentation
 
 ---
 
 **Happy Trading! 📈 (but be careful! ⚠️)**
+)**

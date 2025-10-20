@@ -7,13 +7,12 @@ const nextConfig = {
       fs: false,
       net: false,
       tls: false,
-      crypto: false,
     };
     return config;
   },
   env: {
-    NEXT_PUBLIC_RPC_URL: process.env.NEXT_PUBLIC_RPC_URL,
-    NEXT_PUBLIC_DRIFT_ENV: process.env.NEXT_PUBLIC_DRIFT_ENV,
+    NEXT_PUBLIC_HYPERLIQUID_ENV: process.env.NEXT_PUBLIC_HYPERLIQUID_ENV,
+    NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
   },
 };
 
