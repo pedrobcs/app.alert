@@ -66,6 +66,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if we're in mock/development mode
+    const isMockMode = process.env.MOCK_TWILIO === 'true';
+    const isDevelopment = process.env.NODE_ENV === 'development';
+
     // Check Twilio configuration
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -77,28 +81,66 @@ export async function POST(request: NextRequest) {
       authToken: authToken ? '✅ SET' : '❌ MISSING',
       twilioPhone: twilioPhone ? `✅ SET (${twilioPhone})` : '❌ MISSING',
       nodeEnv: process.env.NODE_ENV,
+      mockMode: isMockMode,
     });
 
+    // If in mock mode, simulate sending messages
+    if (isMockMode && isDevelopment) {
+      console.log('🧪 MOCK MODE: Simulating WhatsApp message send:', {
+        from: `whatsapp:+14155238886`,
+        to: contacts.map(c => `whatsapp:${c}`),
+        message: message,
+        location: location,
+      });
+
+      // Simulate a delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      console.log('✅ MOCK MODE: Emergency alert simulated successfully', {
+        timestamp: new Date().toISOString(),
+        contactsCount: contacts.length,
+        location: location,
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: '✅ Mock alert sent successfully (Development Mode - No real messages sent)',
+      });
+    }
+
+    // Production mode - require Twilio credentials
     if (!accountSid) {
       console.error('TWILIO_ACCOUNT_SID is not set');
+      const errorMsg = isDevelopment
+        ? 'Missing TWILIO_ACCOUNT_SID. Set MOCK_TWILIO=true in .env.local for development mode, or add your Twilio credentials.'
+        : 'Missing TWILIO_ACCOUNT_SID environment variable. Please configure in Vercel dashboard.';
+      
       return NextResponse.json(
-        { success: false, error: 'Missing TWILIO_ACCOUNT_SID environment variable in Vercel' },
+        { success: false, error: errorMsg },
         { status: 500 }
       );
     }
 
     if (!authToken) {
       console.error('TWILIO_AUTH_TOKEN is not set');
+      const errorMsg = isDevelopment
+        ? 'Missing TWILIO_AUTH_TOKEN. Set MOCK_TWILIO=true in .env.local for development mode, or add your Twilio credentials.'
+        : 'Missing TWILIO_AUTH_TOKEN environment variable. Please configure in Vercel dashboard.';
+      
       return NextResponse.json(
-        { success: false, error: 'Missing TWILIO_AUTH_TOKEN environment variable in Vercel' },
+        { success: false, error: errorMsg },
         { status: 500 }
       );
     }
 
     if (!twilioPhone) {
       console.error('TWILIO_WHATSAPP_NUMBER is not set');
+      const errorMsg = isDevelopment
+        ? 'Missing TWILIO_WHATSAPP_NUMBER. Set MOCK_TWILIO=true in .env.local for development mode, or add your Twilio WhatsApp number (e.g., +14155238886).'
+        : 'Missing TWILIO_WHATSAPP_NUMBER environment variable. Should be +14155238886 for sandbox.';
+      
       return NextResponse.json(
-        { success: false, error: 'Missing TWILIO_WHATSAPP_NUMBER environment variable in Vercel (should be +14155238886)' },
+        { success: false, error: errorMsg },
         { status: 500 }
       );
     }
