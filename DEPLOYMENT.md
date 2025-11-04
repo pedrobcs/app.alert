@@ -4,7 +4,7 @@ Complete guide for deploying SafeAlert to production.
 
 ## Prerequisites
 
-- A production backend API
+- Twilio account with WhatsApp sandbox or approved sender
 - SSL certificate (required for PWA and Geolocation)
 - Environment variables configured
 - Generated PWA icons (192x192 and 512x512 PNG)
@@ -35,7 +35,9 @@ vercel
 3. Click "Import Project"
 4. Select your repository
 5. Configure environment variables:
-   - `API_BASE_URL`
+   - `TWILIO_ACCOUNT_SID`
+   - `TWILIO_AUTH_TOKEN`
+   - `TWILIO_WHATSAPP_FROM`
    - `NEXT_PUBLIC_CONTACT_1`
 6. Click "Deploy"
 
@@ -45,7 +47,9 @@ vercel
 2. Navigate to "Environment Variables"
 3. Add each variable:
    ```
-   API_BASE_URL = https://api.yourdomain.com
+   TWILIO_ACCOUNT_SID = ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+   TWILIO_AUTH_TOKEN = your_twilio_auth_token
+   TWILIO_WHATSAPP_FROM = whatsapp:+14155238886
    NEXT_PUBLIC_CONTACT_1 = +15085140864
    ```
 4. Save and redeploy
@@ -148,7 +152,9 @@ docker build -t safealert .
 
 # Run container
 docker run -p 3000:3000 \
-  -e API_BASE_URL=https://api.yourdomain.com \
+  -e TWILIO_ACCOUNT_SID=ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \
+  -e TWILIO_AUTH_TOKEN=your_twilio_auth_token \
+  -e TWILIO_WHATSAPP_FROM=whatsapp:+14155238886 \
   -e NEXT_PUBLIC_CONTACT_1=+15085140864 \
   safealert
 ```
@@ -164,7 +170,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-        - API_BASE_URL=https://api.yourdomain.com
+        - TWILIO_ACCOUNT_SID=ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        - TWILIO_AUTH_TOKEN=your_twilio_auth_token
+        - TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
       - NEXT_PUBLIC_CONTACT_1=+15085140864
     restart: unless-stopped
 ```
@@ -213,26 +221,14 @@ server {
 }
 ```
 
-## Backend Deployment
+## Twilio Deployment Checklist
 
-Your backend API needs to:
+Before going live, confirm your Twilio configuration is production-ready:
 
-1. Handle POST /panic endpoint
-2. Enable CORS for your frontend domain
-3. Integrate with Twilio for WhatsApp messaging
-4. Use HTTPS
-
-### Example CORS Configuration (Express.js)
-
-```javascript
-const cors = require('cors');
-
-app.use(cors({
-  origin: 'https://safealert.yourdomain.com',
-  methods: ['POST'],
-  credentials: true
-}));
-```
+1. WhatsApp sender (phone number or message service) is approved for production use
+2. Recipient numbers are registered/opted in according to WhatsApp policies
+3. Messaging service is configured with the correct sender pool (optional but recommended)
+4. Twilio credentials are stored as **Server** environment variables in your hosting provider
 
 ## Pre-Deployment Checklist
 
@@ -241,8 +237,8 @@ app.use(cors({
 - [ ] PWA icons generated (icon-192.png, icon-512.png)
 - [ ] manifest.json configured correctly
 - [ ] Service worker tested
-- [ ] API endpoint is accessible via HTTPS
-- [ ] CORS configured on backend
+- [ ] Twilio WhatsApp sender verified and active
+- [ ] Required contacts joined sandbox or are pre-approved
 - [ ] Location permissions tested on mobile
 - [ ] PWA installation tested
 - [ ] Emergency flow tested end-to-end
@@ -286,19 +282,25 @@ if (process.env.NODE_ENV === 'production') {
 
 ### Development (.env.local)
 ```env
-API_BASE_URL=http://localhost:3001
+TWILIO_ACCOUNT_SID=ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
 NEXT_PUBLIC_CONTACT_1=+15085140864
 ```
 
 ### Staging (.env.staging)
 ```env
-API_BASE_URL=https://staging-api.yourdomain.com
+TWILIO_ACCOUNT_SID=ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+TWILIO_AUTH_TOKEN=your_staging_twilio_auth_token
+TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
 NEXT_PUBLIC_CONTACT_1=+15085140864
 ```
 
 ### Production (.env.production)
 ```env
-API_BASE_URL=https://api.yourdomain.com
+TWILIO_ACCOUNT_SID=ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+TWILIO_AUTH_TOKEN=your_production_twilio_auth_token
+TWILIO_WHATSAPP_FROM=whatsapp:+12345678900
 NEXT_PUBLIC_CONTACT_1=+15085140864
 ```
 
@@ -345,10 +347,10 @@ Run Lighthouse in DevTools:
 - Check Geolocation API support
 
 ### API Errors
-- Verify CORS configuration
-- Check API endpoint accessibility
-- Verify environment variables
-- Check network tab in DevTools
+- Verify Twilio credentials and sender configuration
+- Check Twilio console logs for failed messages
+- Confirm recipient numbers are WhatsApp-enabled and formatted correctly
+- Check browser Network tab for `/api/panic` responses
 
 ## Rollback Strategy
 

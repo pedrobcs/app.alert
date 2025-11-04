@@ -20,14 +20,14 @@ A production-ready Next.js Progressive Web App (PWA) for sending emergency alert
 - **Styling**: Tailwind CSS 4
 - **PWA**: Service Worker with offline support
 - **State Management**: React Hooks
-- **API**: RESTful backend integration
+- **API**: Twilio WhatsApp via Next.js API route
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+ or Yarn
-- Backend API endpoint (ngrok or production URL)
+- Twilio account with WhatsApp sandbox or approved sender
 
 ### Installation
 
@@ -51,7 +51,9 @@ A production-ready Next.js Progressive Web App (PWA) for sending emergency alert
 
 4. **Edit `.env.local`** with your configuration:
    ```env
-   API_BASE_URL=https://your-ngrok-url.ngrok.io
+   TWILIO_ACCOUNT_SID=ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+   TWILIO_AUTH_TOKEN=your_twilio_auth_token
+   TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
    NEXT_PUBLIC_CONTACT_1=+15085140864
    ```
 
@@ -115,7 +117,7 @@ A production-ready Next.js Progressive Web App (PWA) for sending emergency alert
 
 #### API Integration
 
-The Next.js API route at `/api/panic` proxies emergency alerts to `{API_BASE_URL}/panic` with the following payload:
+The Next.js API route at `/api/panic` uses Twilio's WhatsApp API to fan out emergency alerts. It expects the following payload:
 
 ```json
 {
@@ -150,7 +152,9 @@ Expected response:
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
-| `API_BASE_URL` | Backend API URL (server-side) | Yes | - |
+| `TWILIO_ACCOUNT_SID` | Twilio Account SID (server-side) | Yes | - |
+| `TWILIO_AUTH_TOKEN` | Twilio Auth Token (server-side) | Yes | - |
+| `TWILIO_WHATSAPP_FROM` | Twilio WhatsApp-enabled sender (e.g., `whatsapp:+14155238886`) | Yes | - |
 | `NEXT_PUBLIC_CONTACT_1` | Emergency contact number | No | +15085140864 |
 
 ## PWA Features
@@ -236,10 +240,10 @@ yarn lint
 
 ### API errors
 
-1. Verify `API_BASE_URL` is set correctly
-2. Check backend is running and accessible
-3. Verify CORS is enabled on backend
-4. Check network tab for request details
+1. Verify Twilio credentials (`TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM`) are set correctly
+2. Ensure your Twilio number is WhatsApp-enabled and sandbox participants have joined
+3. Confirm the requested contacts are in E.164 format (e.g., `+15551234567`)
+4. Check the browser Network tab for `/api/panic` response details
 
 ## Production Deployment
 

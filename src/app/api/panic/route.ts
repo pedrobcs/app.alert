@@ -1,62 +1,97 @@
 import { NextResponse } from 'next/server';
+import twilio from 'twilio';
 
-const API_BASE_URL = process.env.API_BASE_URL;
+export const runtime = 'nodejs';
 
-const buildEndpoint = () => {
-  if (!API_BASE_URL) {
-    return null;
-  }
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const whatsappFrom = process.env.TWILIO_WHATSAPP_FROM;
 
-  return `${API_BASE_URL.replace(/\/$/, '')}/panic`;
-};
+const hasTwilioConfig = () => Boolean(accountSid && authToken && whatsappFrom);
+
+const isValidContact = (value: unknown): value is string =>
+  typeof value === 'string' && value.trim().length > 0;
+
+const formatWhatsappNumber = (value: string) =>
+  value.startsWith('whatsapp:') ? value : `whatsapp:${value}`;
+
+const twilioClient = hasTwilioConfig() ? twilio(accountSid!, authToken!) : null;
 
 export async function POST(request: Request) {
-  const endpoint = buildEndpoint();
-
-  if (!endpoint) {
+  if (!hasTwilioConfig() || !twilioClient) {
     return NextResponse.json(
-      { success: false, error: 'API_BASE_URL environment variable is not configured.' },
+      { success: false, error: 'Twilio environment variables are not configured.' },
       { status: 500 }
+    );
+  }
+
+  let payload: unknown;
+
+  try {
+    payload = await request.json();
+  } catch (error) {
+    console.error('Invalid JSON payload', error);
+    return NextResponse.json(
+      { success: false, error: 'Invalid JSON payload.' },
+      { status: 400 }
+    );
+  }
+
+  const { contacts, message, location } = (payload ?? {}) as {
+    contacts?: unknown;
+    message?: unknown;
+    location?: unknown;
+  };
+
+  if (!Array.isArray(contacts) || contacts.length === 0 || !contacts.every(isValidContact)) {
+    return NextResponse.json(
+      { success: false, error: 'Contacts array is required and must contain valid phone numbers.' },
+      { status: 400 }
+    );
+  }
+
+  if (typeof message !== 'string' || message.trim().length === 0) {
+    return NextResponse.json(
+      { success: false, error: 'Message is required.' },
+      { status: 400 }
+    );
+  }
+
+  if (
+    !location ||
+    typeof (location as Record<string, unknown>).lat !== 'number' ||
+    typeof (location as Record<string, unknown>).lng !== 'number'
+  ) {
+    return NextResponse.json(
+      { success: false, error: 'Location with numeric lat and lng is required.' },
+      { status: 400 }
     );
   }
 
   try {
-    const payload = await request.json();
-
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-      cache: 'no-store',
-    });
-
-    const data = await response.json().catch(() => ({}));
-
-    if (!response.ok) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: data.error || `Request failed with status ${response.status}`,
-        },
-        { status: response.status }
-      );
-    }
+    await Promise.all(
+      contacts.map((contact) =>
+        twilioClient.messages.create({
+          from: whatsappFrom!,
+          to: formatWhatsappNumber(contact as string),
+          body: message,
+        })
+      )
+    );
 
     return NextResponse.json(
       {
         success: true,
-        message: data.message || 'Emergency alert sent successfully',
+        message: 'Emergency alert sent successfully',
       },
-      { status: response.status }
+      { status: 200 }
     );
   } catch (error) {
-    console.error('Emergency alert proxy error:', error);
+    console.error('Emergency alert Twilio error:', error);
 
     return NextResponse.json(
-      { success: false, error: 'Unable to forward emergency alert request.' },
-      { status: 500 }
+      { success: false, error: 'Failed to send emergency alert via Twilio.' },
+      { status: 502 }
     );
   }
 }

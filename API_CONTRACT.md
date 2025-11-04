@@ -1,12 +1,14 @@
 # SafeAlert API Contract
 
-This document describes the API contract between the SafeAlert frontend and backend.
+This document describes the API contract between the SafeAlert frontend and the internal Next.js API route that sends WhatsApp messages via Twilio.
 
-## Base URL
+## Environment Variables
 
-Configured via `API_BASE_URL` environment variable (server-side).
+The route requires the following server-side variables:
 
-Example: `https://your-backend.ngrok.io`
+- `TWILIO_ACCOUNT_SID`
+- `TWILIO_AUTH_TOKEN`
+- `TWILIO_WHATSAPP_FROM` (e.g., `whatsapp:+14155238886`)
 
 ## Endpoints
 
@@ -18,7 +20,7 @@ Sends an emergency alert with location information.
 
 **Method**: `POST`
 
-**URL**: `{BASE_URL}/panic`
+**URL**: `/api/panic`
 
 **Headers**:
 ```
@@ -267,7 +269,7 @@ For additional security, implement request signing:
 ### Test Request (cURL)
 
 ```bash
-curl -X POST https://your-backend.ngrok.io/panic \
+curl -X POST http://localhost:3000/api/panic \
   -H "Content-Type: application/json" \
   -d '{
     "contacts": ["+15085140864"],

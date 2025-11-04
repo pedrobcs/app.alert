@@ -173,7 +173,9 @@
 
 ### Required Variables
 ```env
-API_BASE_URL=https://your-backend.ngrok.io
+TWILIO_ACCOUNT_SID=ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
 ```
 
 ### Optional Variables
@@ -184,9 +186,9 @@ NEXT_PUBLIC_CONTACT_2=+15551234568
 
 ## API Integration
 
-### Endpoint
+### Internal Endpoint
 ```
-POST {API_BASE_URL}/panic
+POST /api/panic
 ```
 
 ### Request Payload
@@ -209,6 +211,13 @@ POST {API_BASE_URL}/panic
 }
 ```
 
+### Twilio Delivery
+
+The server-side route forwards the message to Twilio's WhatsApp API using the configured credentials. Ensure:
+- The sender (`TWILIO_WHATSAPP_FROM`) is WhatsApp-enabled
+- Contacts are in E.164 format and joined to the sandbox (for development)
+- Twilio credentials are stored as server-only environment variables
+
 ## Getting Started
 
 ### 1. Install Dependencies
@@ -219,7 +228,7 @@ yarn install
 ### 2. Configure Environment
 ```bash
 cp .env.local.example .env.local
-# Edit .env.local with your API URL and contacts
+# Edit .env.local with Twilio credentials and contacts
 ```
 
 ### 3. Run Development Server

@@ -13,7 +13,7 @@ Use this checklist to ensure proper setup of SafeAlert.
 
 - [ ] Run `yarn install` to install dependencies
 - [ ] Copy `.env.local.example` to `.env.local`
-- [ ] Update `API_BASE_URL` in `.env.local`
+- [ ] Populate Twilio credentials in `.env.local`
 - [ ] Update `NEXT_PUBLIC_CONTACT_1` in `.env.local`
 - [ ] Verify all files present (see PROJECT_SUMMARY.md)
 
@@ -40,13 +40,13 @@ Use this checklist to ensure proper setup of SafeAlert.
 - [ ] Install prompt appears (if supported)
 - [ ] Icons load correctly in manifest
 
-## Backend Integration
+## Twilio Integration
 
-- [ ] Backend API running and accessible
-- [ ] ngrok tunnel created (if needed)
-- [ ] API URL updated in .env.local (`API_BASE_URL`)
-- [ ] CORS enabled on backend for localhost:3000
-- [ ] Test API endpoint with curl/Postman
+- [ ] Twilio WhatsApp sandbox or approved sender configured
+- [ ] `.env.local` contains `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM`
+- [ ] Test device joined Twilio sandbox (if applicable)
+- [ ] Contacts stored in E.164 format (e.g., `+15551234567`)
+- [ ] Twilio console shows successful test message
 
 ## Emergency Flow Testing
 
@@ -54,8 +54,7 @@ Use this checklist to ensure proper setup of SafeAlert.
 - [ ] Loading state appears
 - [ ] API request sent (check Network tab)
 - [ ] Success/error notification appears
-- [ ] Backend receives correct payload
-- [ ] WhatsApp message sent (if Twilio configured)
+- [ ] Twilio receives payload and delivers WhatsApp message
 
 ## Production Build
 

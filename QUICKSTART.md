@@ -22,7 +22,9 @@ yarn install
 
 2. Edit `.env.local` and add your configuration:
    ```env
-   API_BASE_URL=https://your-ngrok-url.ngrok.io
+   TWILIO_ACCOUNT_SID=ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+   TWILIO_AUTH_TOKEN=your_twilio_auth_token
+   TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
    NEXT_PUBLIC_CONTACT_1=+15085140864
    ```
 
@@ -39,51 +41,19 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 1. **Allow Location Access**: The browser will ask for location permission
 2. **Wait for Location**: The status card will show your coordinates
 3. **Test Emergency Button**: Click the red emergency button
-4. **Check Backend**: Verify the API receives the POST request
+4. **Check Twilio**: Confirm the WhatsApp message is delivered via the Twilio console
 
-## Backend API Setup
+## Twilio WhatsApp Setup
 
-Your backend needs to handle POST requests to `/panic` endpoint:
+To deliver alerts you need a WhatsApp-enabled Twilio number (sandbox or production):
 
-### Expected Request Format
+1. Sign in to the [Twilio Console](https://www.twilio.com/console)
+2. Open the **Messaging → Try it out → WhatsApp Sandbox** page
+3. Copy your **Account SID**, **Auth Token**, and the **WhatsApp sandbox number**
+4. Paste them into `.env.local` (`TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM`)
+5. On each test device, join the sandbox by sending the provided keyword to the Twilio sandbox number
 
-```json
-POST /panic
-Content-Type: application/json
-
-{
-  "contacts": ["+15085140864"],
-  "message": "🚨 EMERGÊNCIA! Preciso de ajuda! Estou em: {address}",
-  "location": {
-    "lat": -23.550520,
-    "lng": -46.633308
-  }
-}
-```
-
-### Example Response
-
-```json
-{
-  "success": true,
-  "message": "Alert sent successfully"
-}
-```
-
-### Quick Backend with ngrok
-
-If you have a backend running on port 3001:
-
-```bash
-# Install ngrok
-npm install -g ngrok
-
-# Start ngrok tunnel
-ngrok http 3001
-
-# Copy the HTTPS URL (e.g., https://abc123.ngrok.io)
-# Add it to .env.local as API_BASE_URL
-```
+> For production senders, replace the sandbox number with your approved WhatsApp-enabled Twilio number.
 
 ## Building for Production
 
@@ -136,10 +106,10 @@ yarn start
 - ✓ Try refreshing location manually
 
 ### API Errors?
-- ✓ Verify `API_BASE_URL` is correct
-- ✓ Check backend is running
-- ✓ Verify CORS is enabled on backend
-- ✓ Check network tab in browser DevTools
+- ✓ Verify Twilio credentials (`TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM`)
+- ✓ Ensure contacts are WhatsApp-enabled in your sandbox or approved list
+- ✓ Confirm phone numbers use E.164 format (e.g., `+15551234567`)
+- ✓ Check the Network tab for `/api/panic` and Twilio console logs
 
 ### PWA Not Installing?
 - ✓ Must use HTTPS (production)
