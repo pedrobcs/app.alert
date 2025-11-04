@@ -13,8 +13,8 @@ Use this checklist to ensure proper setup of SafeAlert.
 
 - [ ] Run `yarn install` to install dependencies
 - [ ] Copy `.env.local.example` to `.env.local`
-- [ ] Update `NEXT_PUBLIC_API_BASE_URL` in `.env.local`
-- [ ] Update `NEXT_PUBLIC_CONTACT_1` in `.env.local`
+- [ ] Update `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and WhatsApp numbers in `.env.local`
+- [ ] Update `NEXT_PUBLIC_CONTACT_1` (and additional contacts) in `.env.local`
 - [ ] Verify all files present (see PROJECT_SUMMARY.md)
 
 ## Development Environment
@@ -40,13 +40,12 @@ Use this checklist to ensure proper setup of SafeAlert.
 - [ ] Install prompt appears (if supported)
 - [ ] Icons load correctly in manifest
 
-## Backend Integration
+## WhatsApp Integration
 
-- [ ] Backend API running and accessible
-- [ ] ngrok tunnel created (if needed)
-- [ ] API URL updated in .env.local
-- [ ] CORS enabled on backend for localhost:3000
-- [ ] Test API endpoint with curl/Postman
+- [ ] Twilio WhatsApp Sandbox activated and join code shared with contacts
+- [ ] `TWILIO_*` environment variables configured in `.env.local`
+- [ ] Test `/api/panic` with curl/Postman to confirm Twilio delivery
+- [ ] Twilio credentials added to Vercel project settings (Environment Variables)
 
 ## Emergency Flow Testing
 
@@ -54,7 +53,7 @@ Use this checklist to ensure proper setup of SafeAlert.
 - [ ] Loading state appears
 - [ ] API request sent (check Network tab)
 - [ ] Success/error notification appears
-- [ ] Backend receives correct payload
+- [ ] `/api/panic` invocation logged with correct payload (Vercel or local console)
 - [ ] WhatsApp message sent (if Twilio configured)
 
 ## Production Build
@@ -67,9 +66,8 @@ Use this checklist to ensure proper setup of SafeAlert.
 
 ## Mobile Testing (Development)
 
-- [ ] ngrok tunnel created for mobile access
-- [ ] Mobile device on same network
-- [ ] Access ngrok URL on mobile
+- [ ] Mobile device on same network or using a deployed preview (Vercel)
+- [ ] Access local machine via LAN IP (e.g., http://192.168.x.x:3000) or preview URL
 - [ ] Location permission granted on mobile
 - [ ] GPS accuracy acceptable
 - [ ] Emergency button tap works
@@ -125,8 +123,7 @@ Use this checklist to ensure proper setup of SafeAlert.
 - [ ] All tests above passing
 - [ ] Production icons generated
 - [ ] Environment variables documented
-- [ ] Backend deployed and accessible
-- [ ] CORS configured for production domain
+- [ ] Twilio credentials stored in Vercel environment variables
 - [ ] SSL certificate ready
 - [ ] Domain configured (if applicable)
 - [ ] Error tracking setup (optional)

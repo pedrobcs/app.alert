@@ -5,7 +5,7 @@ Get your emergency alert system running in 5 minutes!
 ## Prerequisites
 
 - Node.js 18+ or Yarn installed
-- A backend API endpoint (see Backend Setup below)
+- Twilio WhatsApp Sandbox credentials (and joined phone numbers)
 
 ## Step 1: Install Dependencies
 

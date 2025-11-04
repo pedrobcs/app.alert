@@ -20,14 +20,14 @@ A production-ready Next.js Progressive Web App (PWA) for sending emergency alert
 - **Styling**: Tailwind CSS 4
 - **PWA**: Service Worker with offline support
 - **State Management**: React Hooks
-- **API**: RESTful backend integration
+- **API**: Next.js API routes with Twilio WhatsApp integration
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+ or Yarn
-- Backend API endpoint (ngrok or production URL)
+- Twilio account with WhatsApp Sandbox configured
 
 ### Installation
 
@@ -49,9 +49,13 @@ A production-ready Next.js Progressive Web App (PWA) for sending emergency alert
    cp .env.local.example .env.local
    ```
 
-4. **Edit `.env.local`** with your configuration:
+4. **Edit `.env.local`** with your Twilio sandbox credentials and contacts:
    ```env
-   NEXT_PUBLIC_API_BASE_URL=https://your-ngrok-url.ngrok.io
+   TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   TWILIO_AUTH_TOKEN=your_twilio_auth_token
+   TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
+   TWILIO_WHATSAPP_TO=whatsapp:+55XXXXXXXXXXX
+   TWILIO_WHATSAPP_TEST_TO=whatsapp:+15085140864
    NEXT_PUBLIC_CONTACT_1=+15085140864
    ```
 
@@ -115,7 +119,7 @@ A production-ready Next.js Progressive Web App (PWA) for sending emergency alert
 
 #### API Integration
 
-The app sends POST requests to `{API_BASE_URL}/panic` with the following payload:
+The app sends POST requests to the built-in Next.js route `/api/panic` with the following payload:
 
 ```json
 {
@@ -132,7 +136,7 @@ Expected response:
 ```json
 {
   "success": true,
-  "message": "Emergency alert sent successfully"
+  "recipients": 2
 }
 ```
 
@@ -150,8 +154,12 @@ Expected response:
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
-| `NEXT_PUBLIC_API_BASE_URL` | Backend API URL | Yes | - |
-| `NEXT_PUBLIC_CONTACT_1` | Emergency contact number | No | +15085140864 |
+| `TWILIO_ACCOUNT_SID` | Twilio account SID | Yes | - |
+| `TWILIO_AUTH_TOKEN` | Twilio auth token | Yes | - |
+| `TWILIO_WHATSAPP_FROM` | Twilio sandbox WhatsApp sender (must start with `whatsapp:`) | Yes | whatsapp:+14155238886 |
+| `TWILIO_WHATSAPP_TO` | Primary WhatsApp recipient for button tests | Yes | - |
+| `TWILIO_WHATSAPP_TEST_TO` | Optional fallback/test recipient (joins the Twilio sandbox) | No | whatsapp:+15085140864 |
+| `NEXT_PUBLIC_CONTACT_1` | Default emergency contact number rendered in the UI | No | +15085140864 |
 
 ## PWA Features
 
@@ -194,14 +202,10 @@ yarn lint
 
 ### Testing Locally
 
-1. Use ngrok to expose your backend:
-   ```bash
-   ngrok http 3001
-   ```
-
-2. Update `.env.local` with the ngrok URL
-
-3. Test on your mobile device using the ngrok URL
+1. Add your personal WhatsApp number to the Twilio Sandbox by sending the provided join code to `+1 415 523 8886` from WhatsApp.
+2. Ensure every emergency contact listed in `.env.local` has also joined the sandbox.
+3. Start the dev server with `yarn dev` and visit [http://localhost:3000](http://localhost:3000).
+4. Trigger the emergency button or the "Send WhatsApp Message" button to verify messages flow through the sandbox.
 
 ## Browser Support
 
@@ -236,10 +240,10 @@ yarn lint
 
 ### API errors
 
-1. Verify `NEXT_PUBLIC_API_BASE_URL` is set correctly
-2. Check backend is running and accessible
-3. Verify CORS is enabled on backend
-4. Check network tab for request details
+  1. Verify Twilio credentials (`TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM`) are set in your environment.
+  2. Confirm every recipient has joined the Twilio WhatsApp Sandbox.
+  3. Check the Twilio console logs for any delivery or authentication errors.
+  4. Inspect the browser network tab for failed requests to `/api/panic` or `/api/send-message`.
 
 ## Production Deployment
 

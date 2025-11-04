@@ -173,11 +173,15 @@
 
 ### Required Variables
 ```env
-NEXT_PUBLIC_API_BASE_URL=https://your-backend.ngrok.io
+TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
+TWILIO_WHATSAPP_TO=whatsapp:+55XXXXXXXXXXX
 ```
 
 ### Optional Variables
 ```env
+TWILIO_WHATSAPP_TEST_TO=whatsapp:+15085140864
 NEXT_PUBLIC_CONTACT_1=+15085140864
 NEXT_PUBLIC_CONTACT_2=+15551234568
 ```
@@ -186,7 +190,7 @@ NEXT_PUBLIC_CONTACT_2=+15551234568
 
 ### Endpoint
 ```
-POST {NEXT_PUBLIC_API_BASE_URL}/panic
+POST /api/panic
 ```
 
 ### Request Payload
@@ -205,7 +209,7 @@ POST {NEXT_PUBLIC_API_BASE_URL}/panic
 ```json
 {
   "success": true,
-  "message": "Emergency alert sent successfully"
+  "recipients": 2
 }
 ```
 
@@ -219,7 +223,7 @@ yarn install
 ### 2. Configure Environment
 ```bash
 cp .env.local.example .env.local
-# Edit .env.local with your API URL and contacts
+# Edit .env.local with your Twilio credentials and contacts
 ```
 
 ### 3. Run Development Server
@@ -240,9 +244,9 @@ yarn start
 - [x] Production build
 - [ ] Location permissions (manual)
 - [ ] GPS accuracy (manual)
-- [ ] API integration (requires backend)
+- [ ] API integration (requires Twilio sandbox credentials)
 - [ ] PWA installation (requires HTTPS)
-- [ ] Emergency flow (requires backend)
+- [ ] Emergency flow (requires WhatsApp sandbox contacts)
 
 ## Browser Compatibility
 
@@ -268,7 +272,7 @@ yarn start
 - ✅ No local data storage
 - ✅ Secure API communication
 - ✅ Environment variable protection
-- ✅ CORS configuration required
+- ✅ Twilio Sandbox join codes restrict recipients
 
 ## Deployment Options
 
@@ -331,8 +335,8 @@ yarn start
 
 ## Next Steps
 
-1. **Setup Backend**: Implement the /panic endpoint
-2. **Configure Twilio**: Set up WhatsApp integration
+1. **Configure Twilio**: Add sandbox credentials to environment variables
+2. **Invite Contacts**: Ensure every emergency recipient has joined the sandbox
 3. **Generate Icons**: Create production-ready icons
 4. **Test Thoroughly**: Test on real devices
 5. **Deploy**: Choose a deployment platform
