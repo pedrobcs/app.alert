@@ -22,7 +22,11 @@ yarn install
 
 2. Edit `.env.local` and add your configuration:
    ```env
-   NEXT_PUBLIC_API_BASE_URL=https://your-ngrok-url.ngrok.io
+   TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   TWILIO_AUTH_TOKEN=your_twilio_auth_token
+   TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
+   TWILIO_WHATSAPP_TO=whatsapp:+55XXXXXXXXXXX
+   TWILIO_WHATSAPP_TEST_TO=whatsapp:+15085140864
    NEXT_PUBLIC_CONTACT_1=+15085140864
    ```
 
@@ -39,51 +43,14 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 1. **Allow Location Access**: The browser will ask for location permission
 2. **Wait for Location**: The status card will show your coordinates
 3. **Test Emergency Button**: Click the red emergency button
-4. **Check Backend**: Verify the API receives the POST request
+4. **Check API Logs**: Inspect the browser network tab or Vercel function logs for `/api/panic`
 
-## Backend API Setup
+## WhatsApp Sandbox Setup
 
-Your backend needs to handle POST requests to `/panic` endpoint:
-
-### Expected Request Format
-
-```json
-POST /panic
-Content-Type: application/json
-
-{
-  "contacts": ["+15085140864"],
-  "message": "🚨 EMERGÊNCIA! Preciso de ajuda! Estou em: {address}",
-  "location": {
-    "lat": -23.550520,
-    "lng": -46.633308
-  }
-}
-```
-
-### Example Response
-
-```json
-{
-  "success": true,
-  "message": "Alert sent successfully"
-}
-```
-
-### Quick Backend with ngrok
-
-If you have a backend running on port 3001:
-
-```bash
-# Install ngrok
-npm install -g ngrok
-
-# Start ngrok tunnel
-ngrok http 3001
-
-# Copy the HTTPS URL (e.g., https://abc123.ngrok.io)
-# Add it to .env.local as NEXT_PUBLIC_API_BASE_URL
-```
+1. Activate the Twilio WhatsApp Sandbox and note the join code.
+2. From each test phone, send the join message (e.g., `join your-code`) to `+1 415 523 8886` on WhatsApp.
+3. Confirm the numbers listed in `.env.local` have joined the sandbox.
+4. Deploy to Vercel (or run locally) and click either emergency button to send WhatsApp messages via `/api/panic`.
 
 ## Building for Production
 
@@ -120,12 +87,9 @@ yarn start
 - Allow location access for localhost
 
 ### Mobile Testing
-1. Use ngrok to expose your dev server:
-   ```bash
-   ngrok http 3000
-   ```
-2. Open the ngrok URL on your mobile device
-3. HTTPS is required for location access on mobile
+1. Access your local dev machine via LAN IP (e.g., http://192.168.x.x:3000) or use a deployed Vercel preview.
+2. Open the URL on your mobile device.
+3. HTTPS (or localhost) is required for location access on mobile.
 
 ## Troubleshooting
 
@@ -136,10 +100,10 @@ yarn start
 - ✓ Try refreshing location manually
 
 ### API Errors?
-- ✓ Verify `NEXT_PUBLIC_API_BASE_URL` is correct
-- ✓ Check backend is running
-- ✓ Verify CORS is enabled on backend
-- ✓ Check network tab in browser DevTools
+- ✓ Verify Twilio credentials are set in `.env.local` or Vercel
+- ✓ Confirm your phone numbers joined the Twilio Sandbox
+- ✓ Check Twilio console logs for delivery errors
+- ✓ Check network tab in browser DevTools and Vercel function logs
 
 ### PWA Not Installing?
 - ✓ Must use HTTPS (production)
@@ -157,10 +121,10 @@ yarn start
 
 ## Security Checklist
 
-- [ ] Configure HTTPS for production
-- [ ] Set up CORS properly on backend
+- [ ] Configure HTTPS for production (Vercel handles automatically)
+- [ ] Protect Twilio credentials via environment variables
 - [ ] Test location permissions on all devices
-- [ ] Verify API endpoints are secure
+- [ ] Verify `/api/panic` handles invalid input safely
 - [ ] Test emergency flow end-to-end
 - [ ] Add error monitoring (Sentry, etc.)
 
