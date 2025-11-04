@@ -35,7 +35,7 @@ vercel
 3. Click "Import Project"
 4. Select your repository
 5. Configure environment variables:
-   - `NEXT_PUBLIC_API_BASE_URL`
+   - `API_BASE_URL`
    - `NEXT_PUBLIC_CONTACT_1`
 6. Click "Deploy"
 
@@ -45,7 +45,7 @@ vercel
 2. Navigate to "Environment Variables"
 3. Add each variable:
    ```
-   NEXT_PUBLIC_API_BASE_URL = https://api.yourdomain.com
+   API_BASE_URL = https://api.yourdomain.com
    NEXT_PUBLIC_CONTACT_1 = +15085140864
    ```
 4. Save and redeploy
@@ -148,7 +148,7 @@ docker build -t safealert .
 
 # Run container
 docker run -p 3000:3000 \
-  -e NEXT_PUBLIC_API_BASE_URL=https://api.yourdomain.com \
+  -e API_BASE_URL=https://api.yourdomain.com \
   -e NEXT_PUBLIC_CONTACT_1=+15085140864 \
   safealert
 ```
@@ -164,7 +164,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_BASE_URL=https://api.yourdomain.com
+        - API_BASE_URL=https://api.yourdomain.com
       - NEXT_PUBLIC_CONTACT_1=+15085140864
     restart: unless-stopped
 ```
@@ -286,19 +286,19 @@ if (process.env.NODE_ENV === 'production') {
 
 ### Development (.env.local)
 ```env
-NEXT_PUBLIC_API_BASE_URL=http://localhost:3001
+API_BASE_URL=http://localhost:3001
 NEXT_PUBLIC_CONTACT_1=+15085140864
 ```
 
 ### Staging (.env.staging)
 ```env
-NEXT_PUBLIC_API_BASE_URL=https://staging-api.yourdomain.com
+API_BASE_URL=https://staging-api.yourdomain.com
 NEXT_PUBLIC_CONTACT_1=+15085140864
 ```
 
 ### Production (.env.production)
 ```env
-NEXT_PUBLIC_API_BASE_URL=https://api.yourdomain.com
+API_BASE_URL=https://api.yourdomain.com
 NEXT_PUBLIC_CONTACT_1=+15085140864
 ```
 

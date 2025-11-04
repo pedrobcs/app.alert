@@ -4,7 +4,7 @@ This document describes the API contract between the SafeAlert frontend and back
 
 ## Base URL
 
-Configured via `NEXT_PUBLIC_API_BASE_URL` environment variable.
+Configured via `API_BASE_URL` environment variable (server-side).
 
 Example: `https://your-backend.ngrok.io`
 

@@ -51,7 +51,7 @@ A production-ready Next.js Progressive Web App (PWA) for sending emergency alert
 
 4. **Edit `.env.local`** with your configuration:
    ```env
-   NEXT_PUBLIC_API_BASE_URL=https://your-ngrok-url.ngrok.io
+   API_BASE_URL=https://your-ngrok-url.ngrok.io
    NEXT_PUBLIC_CONTACT_1=+15085140864
    ```
 
@@ -115,7 +115,7 @@ A production-ready Next.js Progressive Web App (PWA) for sending emergency alert
 
 #### API Integration
 
-The app sends POST requests to `{API_BASE_URL}/panic` with the following payload:
+The Next.js API route at `/api/panic` proxies emergency alerts to `{API_BASE_URL}/panic` with the following payload:
 
 ```json
 {
@@ -150,7 +150,7 @@ Expected response:
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
-| `NEXT_PUBLIC_API_BASE_URL` | Backend API URL | Yes | - |
+| `API_BASE_URL` | Backend API URL (server-side) | Yes | - |
 | `NEXT_PUBLIC_CONTACT_1` | Emergency contact number | No | +15085140864 |
 
 ## PWA Features
@@ -236,7 +236,7 @@ yarn lint
 
 ### API errors
 
-1. Verify `NEXT_PUBLIC_API_BASE_URL` is set correctly
+1. Verify `API_BASE_URL` is set correctly
 2. Check backend is running and accessible
 3. Verify CORS is enabled on backend
 4. Check network tab for request details

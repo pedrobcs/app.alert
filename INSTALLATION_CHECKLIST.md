@@ -13,7 +13,7 @@ Use this checklist to ensure proper setup of SafeAlert.
 
 - [ ] Run `yarn install` to install dependencies
 - [ ] Copy `.env.local.example` to `.env.local`
-- [ ] Update `NEXT_PUBLIC_API_BASE_URL` in `.env.local`
+- [ ] Update `API_BASE_URL` in `.env.local`
 - [ ] Update `NEXT_PUBLIC_CONTACT_1` in `.env.local`
 - [ ] Verify all files present (see PROJECT_SUMMARY.md)
 
@@ -44,7 +44,7 @@ Use this checklist to ensure proper setup of SafeAlert.
 
 - [ ] Backend API running and accessible
 - [ ] ngrok tunnel created (if needed)
-- [ ] API URL updated in .env.local
+- [ ] API URL updated in .env.local (`API_BASE_URL`)
 - [ ] CORS enabled on backend for localhost:3000
 - [ ] Test API endpoint with curl/Postman
 

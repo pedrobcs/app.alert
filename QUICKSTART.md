@@ -22,7 +22,7 @@ yarn install
 
 2. Edit `.env.local` and add your configuration:
    ```env
-   NEXT_PUBLIC_API_BASE_URL=https://your-ngrok-url.ngrok.io
+   API_BASE_URL=https://your-ngrok-url.ngrok.io
    NEXT_PUBLIC_CONTACT_1=+15085140864
    ```
 
@@ -82,7 +82,7 @@ npm install -g ngrok
 ngrok http 3001
 
 # Copy the HTTPS URL (e.g., https://abc123.ngrok.io)
-# Add it to .env.local as NEXT_PUBLIC_API_BASE_URL
+# Add it to .env.local as API_BASE_URL
 ```
 
 ## Building for Production
@@ -136,7 +136,7 @@ yarn start
 - ✓ Try refreshing location manually
 
 ### API Errors?
-- ✓ Verify `NEXT_PUBLIC_API_BASE_URL` is correct
+- ✓ Verify `API_BASE_URL` is correct
 - ✓ Check backend is running
 - ✓ Verify CORS is enabled on backend
 - ✓ Check network tab in browser DevTools

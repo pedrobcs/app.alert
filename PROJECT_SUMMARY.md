@@ -173,7 +173,7 @@
 
 ### Required Variables
 ```env
-NEXT_PUBLIC_API_BASE_URL=https://your-backend.ngrok.io
+API_BASE_URL=https://your-backend.ngrok.io
 ```
 
 ### Optional Variables
@@ -186,7 +186,7 @@ NEXT_PUBLIC_CONTACT_2=+15551234568
 
 ### Endpoint
 ```
-POST {NEXT_PUBLIC_API_BASE_URL}/panic
+POST {API_BASE_URL}/panic
 ```
 
 ### Request Payload
