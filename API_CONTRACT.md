@@ -4,9 +4,9 @@ This document describes the API contract between the SafeAlert frontend and back
 
 ## Base URL
 
-Configured via `NEXT_PUBLIC_API_BASE_URL` environment variable.
+Served from the Next.js App Router on the same origin as the frontend.
 
-Example: `https://your-backend.ngrok.io`
+Example (Vercel): `https://your-app.vercel.app/api`
 
 ## Endpoints
 
@@ -18,7 +18,7 @@ Sends an emergency alert with location information.
 
 **Method**: `POST`
 
-**URL**: `{BASE_URL}/panic`
+**URL**: `/api/panic`
 
 **Headers**:
 ```
@@ -55,7 +55,7 @@ Content-Type: application/json
 ```json
 {
   "success": true,
-  "message": "Emergency alert sent successfully"
+  "recipients": 2
 }
 ```
 
@@ -63,7 +63,7 @@ Content-Type: application/json
 ```json
 {
   "success": false,
-  "error": "Invalid phone number format"
+  "error": "At least one contact number is required."
 }
 ```
 
@@ -71,7 +71,7 @@ Content-Type: application/json
 ```json
 {
   "success": false,
-  "error": "Failed to send WhatsApp message"
+  "error": "Failed to send WhatsApp messages."
 }
 ```
 
@@ -80,7 +80,8 @@ Content-Type: application/json
 ```typescript
 {
   success: boolean;
-  message?: string;    // Present on success
+  recipients?: number; // Count of WhatsApp recipients on success
+  message?: string;    // Optional human-readable message
   error?: string;      // Present on error
 }
 ```
@@ -159,29 +160,15 @@ The frontend handles these error scenarios:
 - "Location request timed out. Please try again."
 
 ### API Errors
-- Invalid API URL
-- Backend error responses
-- Invalid response format
+- Missing or invalid Twilio credentials
+- Twilio sandbox rejection (number not joined)
+- Unexpected response format
 
-**User Message**: Error message from backend or "Failed to send alert"
+**User Message**: Error message from API or "Failed to send alert"
 
-## CORS Configuration
+## CORS Considerations
 
-The backend must enable CORS for the frontend domain.
-
-### Development
-```javascript
-Access-Control-Allow-Origin: http://localhost:3000
-Access-Control-Allow-Methods: POST, OPTIONS
-Access-Control-Allow-Headers: Content-Type
-```
-
-### Production
-```javascript
-Access-Control-Allow-Origin: https://safealert.yourdomain.com
-Access-Control-Allow-Methods: POST, OPTIONS
-Access-Control-Allow-Headers: Content-Type
-```
+The API executes on the same origin as the frontend when deployed to Vercel, so no additional CORS configuration is required. If the route is consumed by external clients, enable the appropriate `Access-Control-*` headers.
 
 ## Rate Limiting
 
@@ -267,7 +254,7 @@ For additional security, implement request signing:
 ### Test Request (cURL)
 
 ```bash
-curl -X POST https://your-backend.ngrok.io/panic \
+curl -X POST https://your-app.vercel.app/api/panic \
   -H "Content-Type: application/json" \
   -d '{
     "contacts": ["+15085140864"],
@@ -284,80 +271,19 @@ curl -X POST https://your-backend.ngrok.io/panic \
 ```json
 {
   "success": true,
-  "message": "Emergency alert sent successfully"
+  "recipients": 2
 }
 ```
 
-## Example Backend Implementation (Node.js/Express)
+## Reference Implementation (Next.js)
 
-```javascript
-const express = require('express');
-const cors = require('cors');
-const twilio = require('twilio');
+The repository ships with a serverless implementation located at `src/app/api/panic/route.ts`. The handler:
 
-const app = express();
-const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-
-app.use(cors({
-  origin: process.env.FRONTEND_URL,
-  methods: ['POST']
-}));
-app.use(express.json());
-
-app.post('/panic', async (req, res) => {
-  try {
-    const { contacts, message, location } = req.body;
-
-    // Validate input
-    if (!contacts || !Array.isArray(contacts) || contacts.length === 0) {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid contacts array'
-      });
-    }
-
-    if (!message || typeof message !== 'string') {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid message'
-      });
-    }
-
-    if (!location || typeof location.lat !== 'number' || typeof location.lng !== 'number') {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid location'
-      });
-    }
-
-    // Send WhatsApp messages
-    const promises = contacts.map(contact =>
-      client.messages.create({
-        from: 'whatsapp:+14155238886',
-        to: `whatsapp:${contact}`,
-        body: message
-      })
-    );
-
-    await Promise.all(promises);
-
-    res.json({
-      success: true,
-      message: 'Emergency alert sent successfully'
-    });
-  } catch (error) {
-    console.error('Error sending alert:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to send emergency alert'
-    });
-  }
-});
-
-app.listen(3001, () => {
-  console.log('Backend listening on port 3001');
-});
-```
+- Validates the `contacts` array and message payload.
+- Normalizes every recipient into Twilio's `whatsapp:` format and deduplicates.
+- Uses the `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_WHATSAPP_FROM` environment variables to instantiate the Twilio client.
+- Sends the WhatsApp messages in parallel and returns `{ success: true, recipients }`.
+- Surfaces failures with HTTP 400/500 responses that include descriptive `error` messages.
 
 ## Monitoring and Logging
 

@@ -12,6 +12,54 @@ const EMERGENCY_CONTACTS = [
   process.env.NEXT_PUBLIC_CONTACT_1 || "+15085140864",
 ];
 
+const SendButton = () => {
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Twilio credentials must be added in Vercel → Project Settings → Environment Variables for this button to work on the live site.
+  const handleSendMessage = async () => {
+    try {
+      setLoading(true);
+      setSuccess(false);
+      setError(null);
+
+      const response = await fetch("/api/send-message", {
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send message");
+      }
+
+      setSuccess(true);
+    } catch (err) {
+      console.error("Failed to send WhatsApp message:", err);
+      setError("Failed to send WhatsApp message. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="mt-10 flex flex-col items-center">
+      <button
+        onClick={handleSendMessage}
+        disabled={loading}
+        className="rounded-full bg-green-600 px-6 py-3 text-white shadow-lg transition-colors hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300 disabled:cursor-not-allowed disabled:bg-green-300"
+      >
+        {loading ? "Sending..." : "Send WhatsApp Message"}
+      </button>
+      {success && (
+        <p className="mt-3 text-sm text-green-600">✅ Message sent successfully!</p>
+      )}
+      {error && (
+        <p className="mt-3 text-sm text-red-600">{error}</p>
+      )}
+    </div>
+  );
+};
+
 export default function EmergencyPage() {
   const { coordinates, error: locationError, loading: locationLoading, accuracy, refreshLocation } = useGeolocation(true);
   const { sendAlert, loading: alertLoading, error: alertError, success: alertSuccess } = useEmergencyAlert();
@@ -146,48 +194,50 @@ export default function EmergencyPage() {
           </div>
         </div>
 
-        {/* Emergency Button */}
-        <div className="flex flex-col items-center">
-          <button
-            onClick={handleEmergencyClick}
-            disabled={isButtonDisabled}
-            className={`
-              w-64 h-64 rounded-full shadow-2xl
-              transition-all duration-300 transform
-              ${
-                isButtonDisabled
-                  ? "bg-gray-300 cursor-not-allowed scale-95"
-                  : "bg-red-600 hover:bg-red-700 hover:scale-105 active:scale-95 animate-pulse-slow"
-              }
-              flex flex-col items-center justify-center
-              focus:outline-none focus:ring-4 focus:ring-red-300
-            `}
-          >
-            <div className="text-white">
-              {alertLoading ? (
-                <>
-                  <div className="animate-spin rounded-full h-16 w-16 border-4 border-white border-t-transparent mx-auto mb-4"></div>
-                  <span className="text-xl font-bold">SENDING...</span>
-                </>
-              ) : (
-                <>
-                  <div className="text-6xl mb-2">🚨</div>
-                  <span className="text-3xl font-bold tracking-wider">EMERGENCY</span>
-                  {locationLoading && (
-                    <span className="text-xs mt-2 block">Getting location...</span>
-                  )}
-                </>
-              )}
-            </div>
-          </button>
+          {/* Emergency Button */}
+          <div className="flex flex-col items-center">
+            <button
+              onClick={handleEmergencyClick}
+              disabled={isButtonDisabled}
+              className={`
+                w-64 h-64 rounded-full shadow-2xl
+                transition-all duration-300 transform
+                ${
+                  isButtonDisabled
+                    ? "bg-gray-300 cursor-not-allowed scale-95"
+                    : "bg-red-600 hover:bg-red-700 hover:scale-105 active:scale-95 animate-pulse-slow"
+                }
+                flex flex-col items-center justify-center
+                focus:outline-none focus:ring-4 focus:ring-red-300
+              `}
+            >
+              <div className="text-white">
+                {alertLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-white border-t-transparent mx-auto mb-4"></div>
+                    <span className="text-xl font-bold">SENDING...</span>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-6xl mb-2">🚨</div>
+                    <span className="text-3xl font-bold tracking-wider">EMERGENCY</span>
+                    {locationLoading && (
+                      <span className="text-xs mt-2 block">Getting location...</span>
+                    )}
+                  </>
+                )}
+              </div>
+            </button>
 
-          {/* Help Text */}
-          <p className="text-center text-sm text-gray-600 mt-6 max-w-xs">
-            {isButtonDisabled && !alertLoading
-              ? "Waiting for location access..."
-              : "Tap to send emergency alert with your current location"}
-          </p>
-        </div>
+            {/* Help Text */}
+            <p className="text-center text-sm text-gray-600 mt-6 max-w-xs">
+              {isButtonDisabled && !alertLoading
+                ? "Waiting for location access..."
+                : "Tap to send emergency alert with your current location"}
+            </p>
+          </div>
+
+          <SendButton />
 
         {/* Instructions */}
         {locationError?.code === 1 && (

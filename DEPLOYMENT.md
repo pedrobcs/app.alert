@@ -4,7 +4,7 @@ Complete guide for deploying SafeAlert to production.
 
 ## Prerequisites
 
-- A production backend API
+- Twilio WhatsApp Sandbox credentials (and joined recipient numbers)
 - SSL certificate (required for PWA and Geolocation)
 - Environment variables configured
 - Generated PWA icons (192x192 and 512x512 PNG)
@@ -35,7 +35,11 @@ vercel
 3. Click "Import Project"
 4. Select your repository
 5. Configure environment variables:
-   - `NEXT_PUBLIC_API_BASE_URL`
+   - `TWILIO_ACCOUNT_SID`
+   - `TWILIO_AUTH_TOKEN`
+   - `TWILIO_WHATSAPP_FROM`
+   - `TWILIO_WHATSAPP_TO`
+   - `TWILIO_WHATSAPP_TEST_TO`
    - `NEXT_PUBLIC_CONTACT_1`
 6. Click "Deploy"
 
@@ -45,8 +49,12 @@ vercel
 2. Navigate to "Environment Variables"
 3. Add each variable:
    ```
-   NEXT_PUBLIC_API_BASE_URL = https://api.yourdomain.com
-   NEXT_PUBLIC_CONTACT_1 = +15085140864
+   TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   TWILIO_AUTH_TOKEN=your_twilio_auth_token
+   TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
+   TWILIO_WHATSAPP_TO=whatsapp:+55XXXXXXXXXXX
+   TWILIO_WHATSAPP_TEST_TO=whatsapp:+15085140864
+   NEXT_PUBLIC_CONTACT_1=+15085140864
    ```
 4. Save and redeploy
 
@@ -148,7 +156,11 @@ docker build -t safealert .
 
 # Run container
 docker run -p 3000:3000 \
-  -e NEXT_PUBLIC_API_BASE_URL=https://api.yourdomain.com \
+  -e TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
+  -e TWILIO_AUTH_TOKEN=your_twilio_auth_token \
+  -e TWILIO_WHATSAPP_FROM=whatsapp:+14155238886 \
+  -e TWILIO_WHATSAPP_TO=whatsapp:+55XXXXXXXXXXX \
+  -e TWILIO_WHATSAPP_TEST_TO=whatsapp:+15085140864 \
   -e NEXT_PUBLIC_CONTACT_1=+15085140864 \
   safealert
 ```
@@ -164,8 +176,12 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_BASE_URL=https://api.yourdomain.com
-      - NEXT_PUBLIC_CONTACT_1=+15085140864
+        - TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        - TWILIO_AUTH_TOKEN=your_twilio_auth_token
+        - TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
+        - TWILIO_WHATSAPP_TO=whatsapp:+55XXXXXXXXXXX
+        - TWILIO_WHATSAPP_TEST_TO=whatsapp:+15085140864
+        - NEXT_PUBLIC_CONTACT_1=+15085140864
     restart: unless-stopped
 ```
 
@@ -213,26 +229,9 @@ server {
 }
 ```
 
-## Backend Deployment
+## Serverless API Deployment
 
-Your backend API needs to:
-
-1. Handle POST /panic endpoint
-2. Enable CORS for your frontend domain
-3. Integrate with Twilio for WhatsApp messaging
-4. Use HTTPS
-
-### Example CORS Configuration (Express.js)
-
-```javascript
-const cors = require('cors');
-
-app.use(cors({
-  origin: 'https://safealert.yourdomain.com',
-  methods: ['POST'],
-  credentials: true
-}));
-```
+The `/api/panic` and `/api/send-message` routes are deployed alongside the Next.js app. Ensure the required `TWILIO_*` environment variables are configured in every environment (Preview, Production) and re-deploy after changes. No separate backend service or CORS configuration is required when hosting on Vercel.
 
 ## Pre-Deployment Checklist
 
@@ -241,8 +240,8 @@ app.use(cors({
 - [ ] PWA icons generated (icon-192.png, icon-512.png)
 - [ ] manifest.json configured correctly
 - [ ] Service worker tested
-- [ ] API endpoint is accessible via HTTPS
-- [ ] CORS configured on backend
+- [ ] `/api/panic` tested on preview deployment
+- [ ] Twilio sandbox recipients verified
 - [ ] Location permissions tested on mobile
 - [ ] PWA installation tested
 - [ ] Emergency flow tested end-to-end
@@ -286,19 +285,31 @@ if (process.env.NODE_ENV === 'production') {
 
 ### Development (.env.local)
 ```env
-NEXT_PUBLIC_API_BASE_URL=http://localhost:3001
+TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
+TWILIO_WHATSAPP_TO=whatsapp:+55XXXXXXXXXXX
+TWILIO_WHATSAPP_TEST_TO=whatsapp:+15085140864
 NEXT_PUBLIC_CONTACT_1=+15085140864
 ```
 
 ### Staging (.env.staging)
 ```env
-NEXT_PUBLIC_API_BASE_URL=https://staging-api.yourdomain.com
+TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
+TWILIO_WHATSAPP_TO=whatsapp:+55XXXXXXXXXXX
+TWILIO_WHATSAPP_TEST_TO=whatsapp:+15085140864
 NEXT_PUBLIC_CONTACT_1=+15085140864
 ```
 
 ### Production (.env.production)
 ```env
-NEXT_PUBLIC_API_BASE_URL=https://api.yourdomain.com
+TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
+TWILIO_WHATSAPP_TO=whatsapp:+55XXXXXXXXXXX
+TWILIO_WHATSAPP_TEST_TO=whatsapp:+15085140864
 NEXT_PUBLIC_CONTACT_1=+15085140864
 ```
 
@@ -345,9 +356,9 @@ Run Lighthouse in DevTools:
 - Check Geolocation API support
 
 ### API Errors
-- Verify CORS configuration
-- Check API endpoint accessibility
-- Verify environment variables
+- Verify Twilio credentials for the deployment environment
+- Confirm recipients are approved in the Twilio Sandbox
+- Check Vercel function logs for `/api/panic`
 - Check network tab in DevTools
 
 ## Rollback Strategy
