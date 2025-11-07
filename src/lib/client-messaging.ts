@@ -171,7 +171,10 @@ export function vibrateDevice(pattern: number | number[] = [200, 100, 200]): voi
  */
 export function playAlertSound(): void {
   // Create a simple beep sound
-  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  const AudioContextClass = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!AudioContextClass) return;
+  
+  const audioContext = new AudioContextClass();
   const oscillator = audioContext.createOscillator();
   const gainNode = audioContext.createGain();
   

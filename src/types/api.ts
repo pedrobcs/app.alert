@@ -47,7 +47,7 @@ export interface PanicRequest {
     lat: number;
     lng: number;
   };
-  meta?: Record<string, any>; // Additional metadata
+  meta?: Record<string, unknown>; // Additional metadata
 }
 
 export interface PanicResult {
@@ -143,7 +143,7 @@ export interface TwilioWebhookRequest {
   Body: string;
   MessageSid: string;
   AccountSid: string;
-  [key: string]: any;
+  [key: string]: string;
 }
 
 // ============================================================================
@@ -182,7 +182,7 @@ export interface NominatimResponse {
 
 export interface ApiError {
   error: string;
-  details?: any;
+  details?: unknown;
 }
 
 export interface SuccessResponse {
