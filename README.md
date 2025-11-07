@@ -27,9 +27,11 @@ A production-ready Next.js Progressive Web App (PWA) for sending emergency alert
 ### Prerequisites
 
 - Node.js 18+ or Yarn
-- Backend API endpoint (ngrok or production URL)
+- Twilio account (for backend)
 
 ### Installation
+
+#### Option 1: Quick Setup (Recommended)
 
 1. **Clone the repository**:
    ```bash
@@ -37,21 +39,55 @@ A production-ready Next.js Progressive Web App (PWA) for sending emergency alert
    cd workspace
    ```
 
-2. **Install dependencies**:
+2. **Set up the backend server**:
    ```bash
-   yarn install
-   # or
-   npm install
+   cd server
+   ./setup.sh
+   # Follow the prompts to configure Twilio
+   npm run dev
    ```
 
-3. **Configure environment variables**:
+3. **In a new terminal, set up the frontend**:
+   ```bash
+   cd workspace  # Back to root directory
+   yarn install
+   ```
+
+4. **Configure environment variables**:
    ```bash
    cp .env.local.example .env.local
    ```
 
-4. **Edit `.env.local`** with your configuration:
+5. **Edit `.env.local`**:
    ```env
-   NEXT_PUBLIC_API_BASE_URL=https://your-ngrok-url.ngrok.io
+   NEXT_PUBLIC_API_BASE_URL=http://localhost:3001
+   NEXT_PUBLIC_CONTACT_1=+15085140864
+   ```
+
+6. **Run the frontend**:
+   ```bash
+   yarn dev
+   ```
+
+7. **Open your browser**: Navigate to [http://localhost:3000](http://localhost:3000)
+
+#### Option 2: Frontend Only (External Backend)
+
+1. **Clone and install**:
+   ```bash
+   git clone <repository-url>
+   cd workspace
+   yarn install
+   ```
+
+2. **Configure environment variables**:
+   ```bash
+   cp .env.local.example .env.local
+   ```
+
+3. **Edit `.env.local`** with your backend URL:
+   ```env
+   NEXT_PUBLIC_API_BASE_URL=https://your-backend.ngrok.io
    NEXT_PUBLIC_CONTACT_1=+15085140864
    ```
 
@@ -262,6 +298,42 @@ The app can be deployed to any platform supporting Next.js:
 - AWS Amplify
 - Cloudflare Pages
 - Self-hosted with Docker
+
+## Backend Server
+
+This project includes a complete Twilio-powered backend server in the `/server` directory.
+
+### Features
+
+- 🚨 Emergency panic alerts via WhatsApp
+- 📱 SMS support (optional)
+- 💾 SQLite database for contacts and event tracking
+- 🗺️ Reverse geocoding integration
+- 🔗 Webhook support for incoming messages
+- 👥 Contact management API
+
+### Quick Start
+
+```bash
+cd server
+./setup.sh
+npm run dev
+```
+
+### Documentation
+
+- **Quick Start**: `server/QUICKSTART.md` - Get running in 5 minutes
+- **Full Setup Guide**: `TWILIO_SETUP.md` - Complete Twilio configuration
+- **API Documentation**: `server/README.md` - Complete API reference
+
+### Key Endpoints
+
+- `POST /panic` - Send emergency alert
+- `GET /contacts` - List all contacts
+- `POST /contacts` - Add new contact
+- `GET /panic-events` - View alert history
+
+See `server/README.md` for complete API documentation.
 
 ## License
 
