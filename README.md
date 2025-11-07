@@ -299,9 +299,44 @@ The app can be deployed to any platform supporting Next.js:
 - Cloudflare Pages
 - Self-hosted with Docker
 
+## 🎯 Choose Your Version
+
+This project offers **THREE versions** - pick what works best for you:
+
+### Option 1: 100% Client-Side - NO BACKEND! 🌟 (Recommended for Simplicity)
+
+**Zero backend, zero hosting, zero cost!**
+
+Works entirely in the browser using your phone's SMS/WhatsApp apps.
+
+**Quick Start:**
+```bash
+cp src/app/page-client.tsx src/app/page.tsx
+npm run dev
+```
+
+**Features:**
+- ✅ **$0 cost** - No Twilio, no server hosting
+- ✅ **100% offline** - Works without internet
+- ✅ **100% private** - Data stays on your device
+- ✅ Opens SMS/WhatsApp apps automatically
+- ✅ Stores contacts in localStorage
+- ✅ Deploy anywhere for FREE (Vercel, Netlify, etc.)
+
+**Perfect for:**
+- Personal use
+- No budget
+- Maximum privacy
+- Offline capability
+- Simple deployment
+
+**Documentation:** `CLIENT_SIDE_GUIDE.md`
+
+---
+
 ## Backend Options
 
-This project supports **two backend options**:
+If you need automatic message sending, this project also supports **two backend options**:
 
 ### Option 1: Integrated Next.js Backend (Recommended) ⭐
 
