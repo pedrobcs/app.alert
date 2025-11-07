@@ -299,41 +299,72 @@ The app can be deployed to any platform supporting Next.js:
 - Cloudflare Pages
 - Self-hosted with Docker
 
-## Backend Server
+## Backend Options
 
-This project includes a complete Twilio-powered backend server in the `/server` directory.
+This project supports **two backend options**:
 
-### Features
+### Option 1: Integrated Next.js Backend (Recommended) ⭐
 
+**TypeScript backend built into Next.js** - No separate server needed!
+
+**Features:**
 - 🚨 Emergency panic alerts via WhatsApp
 - 📱 SMS support (optional)
-- 💾 SQLite database for contacts and event tracking
+- 💾 SQLite database with better-sqlite3
 - 🗺️ Reverse geocoding integration
 - 🔗 Webhook support for incoming messages
 - 👥 Contact management API
+- 📘 Full TypeScript type safety
+- ⚡ Integrated with Next.js (same port)
 
-### Quick Start
+**Quick Start:**
+```bash
+npm install
+cp .env.local.example .env.local
+# Edit .env.local with Twilio credentials
+npm run dev
+```
 
+**API Base:** `http://localhost:3000/api`
+
+**Documentation:**
+- **Quick Start**: `NEXTJS_QUICKSTART.md` - 5-minute setup
+- **Full Guide**: `NEXTJS_BACKEND_GUIDE.md` - Complete documentation
+- **Types**: `src/types/api.ts` - TypeScript types
+
+**Key Endpoints:**
+- `POST /api/panic` - Send emergency alert
+- `GET /api/contacts` - List all contacts
+- `POST /api/contacts` - Add new contact
+- `GET /api/panic-events` - View alert history
+
+### Option 2: Standalone Express Server
+
+**JavaScript backend in separate process** - For those who prefer Express.
+
+**Location:** `/server` directory
+
+**Quick Start:**
 ```bash
 cd server
 ./setup.sh
 npm run dev
 ```
 
-### Documentation
+**API Base:** `http://localhost:3001`
 
-- **Quick Start**: `server/QUICKSTART.md` - Get running in 5 minutes
-- **Full Setup Guide**: `TWILIO_SETUP.md` - Complete Twilio configuration
-- **API Documentation**: `server/README.md` - Complete API reference
+**Documentation:**
+- **Quick Start**: `server/QUICKSTART.md`
+- **Full Setup**: `TWILIO_SETUP.md`
+- **API Docs**: `server/README.md`
 
-### Key Endpoints
+---
 
-- `POST /panic` - Send emergency alert
-- `GET /contacts` - List all contacts
-- `POST /contacts` - Add new contact
-- `GET /panic-events` - View alert history
-
-See `server/README.md` for complete API documentation.
+**Recommendation:** Use the **Next.js TypeScript backend** (Option 1) for:
+- ✅ Simpler deployment (one app)
+- ✅ Type safety with TypeScript
+- ✅ Better Next.js integration
+- ✅ Faster development
 
 ## License
 
