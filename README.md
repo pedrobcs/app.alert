@@ -27,9 +27,11 @@ A production-ready Next.js Progressive Web App (PWA) for sending emergency alert
 ### Prerequisites
 
 - Node.js 18+ or Yarn
-- Backend API endpoint (ngrok or production URL)
+- Twilio account (for backend)
 
 ### Installation
+
+#### Option 1: Quick Setup (Recommended)
 
 1. **Clone the repository**:
    ```bash
@@ -37,21 +39,55 @@ A production-ready Next.js Progressive Web App (PWA) for sending emergency alert
    cd workspace
    ```
 
-2. **Install dependencies**:
+2. **Set up the backend server**:
    ```bash
-   yarn install
-   # or
-   npm install
+   cd server
+   ./setup.sh
+   # Follow the prompts to configure Twilio
+   npm run dev
    ```
 
-3. **Configure environment variables**:
+3. **In a new terminal, set up the frontend**:
+   ```bash
+   cd workspace  # Back to root directory
+   yarn install
+   ```
+
+4. **Configure environment variables**:
    ```bash
    cp .env.local.example .env.local
    ```
 
-4. **Edit `.env.local`** with your configuration:
+5. **Edit `.env.local`**:
    ```env
-   NEXT_PUBLIC_API_BASE_URL=https://your-ngrok-url.ngrok.io
+   NEXT_PUBLIC_API_BASE_URL=http://localhost:3001
+   NEXT_PUBLIC_CONTACT_1=+15085140864
+   ```
+
+6. **Run the frontend**:
+   ```bash
+   yarn dev
+   ```
+
+7. **Open your browser**: Navigate to [http://localhost:3000](http://localhost:3000)
+
+#### Option 2: Frontend Only (External Backend)
+
+1. **Clone and install**:
+   ```bash
+   git clone <repository-url>
+   cd workspace
+   yarn install
+   ```
+
+2. **Configure environment variables**:
+   ```bash
+   cp .env.local.example .env.local
+   ```
+
+3. **Edit `.env.local`** with your backend URL:
+   ```env
+   NEXT_PUBLIC_API_BASE_URL=https://your-backend.ngrok.io
    NEXT_PUBLIC_CONTACT_1=+15085140864
    ```
 
@@ -262,6 +298,108 @@ The app can be deployed to any platform supporting Next.js:
 - AWS Amplify
 - Cloudflare Pages
 - Self-hosted with Docker
+
+## 🎯 Choose Your Version
+
+This project offers **THREE versions** - pick what works best for you:
+
+### Option 1: 100% Client-Side - NO BACKEND! 🌟 (Recommended for Simplicity)
+
+**Zero backend, zero hosting, zero cost!**
+
+Works entirely in the browser using your phone's SMS/WhatsApp apps.
+
+**Quick Start:**
+```bash
+cp src/app/page-client.tsx src/app/page.tsx
+npm run dev
+```
+
+**Features:**
+- ✅ **$0 cost** - No Twilio, no server hosting
+- ✅ **100% offline** - Works without internet
+- ✅ **100% private** - Data stays on your device
+- ✅ Opens SMS/WhatsApp apps automatically
+- ✅ Stores contacts in localStorage
+- ✅ Deploy anywhere for FREE (Vercel, Netlify, etc.)
+
+**Perfect for:**
+- Personal use
+- No budget
+- Maximum privacy
+- Offline capability
+- Simple deployment
+
+**Documentation:** `CLIENT_SIDE_GUIDE.md`
+
+---
+
+## Backend Options
+
+If you need automatic message sending, this project also supports **two backend options**:
+
+### Option 1: Integrated Next.js Backend (Recommended) ⭐
+
+**TypeScript backend built into Next.js** - No separate server needed!
+
+**Features:**
+- 🚨 Emergency panic alerts via WhatsApp
+- 📱 SMS support (optional)
+- 💾 SQLite database with better-sqlite3
+- 🗺️ Reverse geocoding integration
+- 🔗 Webhook support for incoming messages
+- 👥 Contact management API
+- 📘 Full TypeScript type safety
+- ⚡ Integrated with Next.js (same port)
+
+**Quick Start:**
+```bash
+npm install
+cp .env.local.example .env.local
+# Edit .env.local with Twilio credentials
+npm run dev
+```
+
+**API Base:** `http://localhost:3000/api`
+
+**Documentation:**
+- **Quick Start**: `NEXTJS_QUICKSTART.md` - 5-minute setup
+- **Full Guide**: `NEXTJS_BACKEND_GUIDE.md` - Complete documentation
+- **Types**: `src/types/api.ts` - TypeScript types
+
+**Key Endpoints:**
+- `POST /api/panic` - Send emergency alert
+- `GET /api/contacts` - List all contacts
+- `POST /api/contacts` - Add new contact
+- `GET /api/panic-events` - View alert history
+
+### Option 2: Standalone Express Server
+
+**JavaScript backend in separate process** - For those who prefer Express.
+
+**Location:** `/server` directory
+
+**Quick Start:**
+```bash
+cd server
+./setup.sh
+npm run dev
+```
+
+**API Base:** `http://localhost:3001`
+
+**Documentation:**
+- **Quick Start**: `server/QUICKSTART.md`
+- **Full Setup**: `TWILIO_SETUP.md`
+- **API Docs**: `server/README.md`
+
+---
+
+**Recommendation:** Use the **Next.js TypeScript backend** (Option 1) for:
+- ✅ Simpler deployment (one app)
+- ✅ Type safety with TypeScript
+- ✅ Better Next.js integration
+- ✅ Faster development
 
 ## License
 
