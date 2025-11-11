@@ -9,7 +9,7 @@ import PWAInstallPrompt from '@/components/PWAInstallPrompt';
 
 // Default emergency contacts (can be configured via environment variables)
 const EMERGENCY_CONTACTS = [
-  process.env.NEXT_PUBLIC_CONTACT_1 || "+15085140864",
+  process.env.NEXT_PUBLIC_CONTACT_1 || "+5085140864",
 ];
 
 export default function EmergencyPage() {

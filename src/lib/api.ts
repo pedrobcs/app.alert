@@ -1,5 +1,6 @@
 /**
  * API client for emergency alert backend communication
+ * Now uses built-in Twilio API route instead of external API
  */
 
 import { Coordinates } from './geolocation';
@@ -17,46 +18,47 @@ export interface EmergencyResponse {
 }
 
 /**
- * Get API base URL from environment or use default
- */
-const getApiBaseUrl = (): string => {
-  return process.env.NEXT_PUBLIC_API_BASE_URL || '';
-};
-
-/**
- * Sends emergency alert to backend
+ * Sends emergency alert using Twilio WhatsApp API
  * @param payload Emergency data including contacts, message, and location
  * @returns Promise with response data
  */
 export const sendEmergencyAlert = async (
   payload: EmergencyPayload
 ): Promise<EmergencyResponse> => {
-  const apiUrl = getApiBaseUrl();
-  
-  if (!apiUrl) {
-    throw new Error('API URL not configured. Please set NEXT_PUBLIC_API_BASE_URL environment variable.');
-  }
-
   try {
-    const response = await fetch(`${apiUrl}/panic`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
+    // Add location link to the message
+    const googleMapsLink = `https://www.google.com/maps?q=${payload.location.lat},${payload.location.lng}`;
+    const fullMessage = `${payload.message}\n\n📍 Localização exata:\nLatitude: ${payload.location.lat}\nLongitude: ${payload.location.lng}\n\n🗺️ Ver no mapa: ${googleMapsLink}`;
+
+    // Send message to each contact using Twilio API
+    const sendPromises = payload.contacts.map(async (contact) => {
+      const response = await fetch('/api/sendMessage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: contact,
+          message: fullMessage,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.error || `Failed to send message to ${contact}`
+        );
+      }
+
+      return response.json();
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.error || `Request failed with status ${response.status}`
-      );
-    }
+    // Wait for all messages to be sent
+    await Promise.all(sendPromises);
 
-    const data = await response.json();
     return {
       success: true,
-      message: data.message || 'Emergency alert sent successfully',
+      message: 'Emergency alert sent successfully to all contacts',
     };
   } catch (error) {
     if (error instanceof TypeError && error.message.includes('fetch')) {
