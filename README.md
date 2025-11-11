@@ -21,6 +21,7 @@ A production-ready Next.js Progressive Web App (PWA) for sending emergency alert
 - **PWA**: Service Worker with offline support
 - **State Management**: React Hooks
 - **API**: RESTful backend integration
+- **WhatsApp Integration**: Twilio API (built-in API route)
 
 ## Getting Started
 
@@ -51,9 +52,17 @@ A production-ready Next.js Progressive Web App (PWA) for sending emergency alert
 
 4. **Edit `.env.local`** with your configuration:
    ```env
+   # API Configuration (if using external API)
    NEXT_PUBLIC_API_BASE_URL=https://your-ngrok-url.ngrok.io
    NEXT_PUBLIC_CONTACT_1=+15085140864
+   
+   # Twilio Configuration (for built-in WhatsApp integration)
+   TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   TWILIO_AUTH_TOKEN=your_auth_token_here
+   TWILIO_WHATSAPP_NUMBER=+14155238886
    ```
+   
+   > **Note**: See `TWILIO_SETUP.md` for detailed Twilio configuration instructions.
 
 5. **Generate PWA icons** (optional, for production):
    ```bash
@@ -93,29 +102,62 @@ A production-ready Next.js Progressive Web App (PWA) for sending emergency alert
 /workspace
 ├── src/
 │   ├── app/
+│   │   ├── api/
+│   │   │   └── sendMessage/     # Twilio WhatsApp API route
+│   │   │       └── route.ts
 │   │   ├── layout.tsx        # Root layout with PWA meta tags
 │   │   ├── page.tsx           # Main emergency screen
 │   │   └── globals.css        # Global styles and animations
 │   ├── components/
-│   │   └── PWAInstallPrompt.tsx # PWA installation prompt
+│   │   ├── PWAInstallPrompt.tsx # PWA installation prompt
+│   │   └── SendMessageExample.tsx # Example Twilio usage
 │   ├── hooks/
 │   │   ├── useGeolocation.ts    # Location management hook
 │   │   └── useEmergencyAlert.ts # Alert functionality hook
 │   └── lib/
 │       ├── geolocation.ts       # Location utilities
 │       ├── api.ts               # API client
-│       └── pwa.ts               # PWA utilities
+│       ├── pwa.ts               # PWA utilities
+│       └── twilio.ts            # Twilio helper functions
 ├── public/
 │   ├── manifest.json          # PWA manifest
 │   ├── sw.js                  # Service worker
 │   └── icon*.png              # PWA icons
 └── scripts/
-    └── generate-icons.js      # Icon generation helper
+    ├── generate-icons.js      # Icon generation helper
+    └── test-twilio-api.sh     # Twilio API testing script
 ```
 
 #### API Integration
 
-The app sends POST requests to `{API_BASE_URL}/panic` with the following payload:
+##### Built-in Twilio API (Recommended)
+
+The app now includes a built-in API route for sending WhatsApp messages via Twilio:
+
+**Endpoint**: `POST /api/sendMessage`
+
+**Request**:
+```json
+{
+  "to": "+5511999999999",
+  "message": "🚨 EMERGÊNCIA! Preciso de ajuda!"
+}
+```
+
+**Response**:
+```json
+{
+  "success": true,
+  "messageSid": "SM1234567890abcdef",
+  "status": "queued"
+}
+```
+
+See `TWILIO_SETUP.md` for complete setup instructions.
+
+##### External API (Legacy)
+
+The app can also send POST requests to `{API_BASE_URL}/panic` with the following payload:
 
 ```json
 {
@@ -150,8 +192,11 @@ Expected response:
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
-| `NEXT_PUBLIC_API_BASE_URL` | Backend API URL | Yes | - |
+| `NEXT_PUBLIC_API_BASE_URL` | External backend API URL | No | - |
 | `NEXT_PUBLIC_CONTACT_1` | Emergency contact number | No | +15085140864 |
+| `TWILIO_ACCOUNT_SID` | Twilio Account SID | Yes (for Twilio) | - |
+| `TWILIO_AUTH_TOKEN` | Twilio Auth Token | Yes (for Twilio) | - |
+| `TWILIO_WHATSAPP_NUMBER` | Twilio WhatsApp Number | Yes (for Twilio) | - |
 
 ## PWA Features
 
