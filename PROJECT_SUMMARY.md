@@ -2,7 +2,7 @@
 
 ## Overview
 
-**SafeAlert** is a production-ready Next.js Progressive Web App (PWA) for emergency alerts with real-time GPS location and WhatsApp integration via Twilio.
+**SafeAlert** is a production-ready Next.js Progressive Web App (PWA) for emergency alerts with real-time GPS location and WhatsApp integration via UltraMsg API.
 
 ## Quick Stats
 
@@ -332,7 +332,7 @@ yarn start
 ## Next Steps
 
 1. **Setup Backend**: Implement the /panic endpoint
-2. **Configure Twilio**: Set up WhatsApp integration
+2. **Configure UltraMsg**: Set up WhatsApp integration
 3. **Generate Icons**: Create production-ready icons
 4. **Test Thoroughly**: Test on real devices
 5. **Deploy**: Choose a deployment platform

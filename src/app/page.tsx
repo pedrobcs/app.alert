@@ -7,11 +7,6 @@ import { formatCoordinates } from '@/lib/geolocation';
 import { registerServiceWorker } from '@/lib/pwa';
 import PWAInstallPrompt from '@/components/PWAInstallPrompt';
 
-// Default emergency contacts (can be configured via environment variables)
-const EMERGENCY_CONTACTS = [
-  process.env.NEXT_PUBLIC_CONTACT_1 || "+15085140864",
-];
-
 export default function EmergencyPage() {
   const { coordinates, error: locationError, loading: locationLoading, accuracy, refreshLocation } = useGeolocation(true);
   const { sendAlert, loading: alertLoading, error: alertError, success: alertSuccess } = useEmergencyAlert();
@@ -19,6 +14,7 @@ export default function EmergencyPage() {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState<"success" | "error">("success");
+  const [whatsappNumber, setWhatsappNumber] = useState("");
 
   useEffect(() => {
     setIsClient(true);
@@ -52,8 +48,13 @@ export default function EmergencyPage() {
       return;
     }
 
+    if (!whatsappNumber || whatsappNumber.trim() === "") {
+      showNotification("Please enter a WhatsApp number first.", "error");
+      return;
+    }
+
     try {
-      await sendAlert(coordinates, EMERGENCY_CONTACTS);
+      await sendAlert(coordinates, whatsappNumber);
     } catch (err) {
       // Error is already handled by the hook
       console.error("Emergency alert failed:", err);
@@ -73,7 +74,7 @@ export default function EmergencyPage() {
     return "text-gray-500";
   };
 
-  const isButtonDisabled = alertLoading || locationLoading || !coordinates;
+  const isButtonDisabled = alertLoading || locationLoading || !coordinates || !whatsappNumber;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-gray-50 to-gray-100">
@@ -113,8 +114,27 @@ export default function EmergencyPage() {
 
         {/* Status Card */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-          {/* Location Status */}
+          {/* WhatsApp Number Input */}
           <div className="mb-4">
+            <label htmlFor="whatsapp" className="block text-sm font-medium text-gray-700 mb-2">
+              WhatsApp Number
+            </label>
+            <input
+              id="whatsapp"
+              type="tel"
+              value={whatsappNumber}
+              onChange={(e) => setWhatsappNumber(e.target.value)}
+              placeholder="+15085140864"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900 placeholder-gray-400"
+              disabled={alertLoading}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Include country code (e.g., +1 for USA)
+            </p>
+          </div>
+
+          {/* Location Status */}
+          <div className="mb-4 pt-4 border-t border-gray-200">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-gray-700">Location Status</span>
               {isClient && (
@@ -135,14 +155,6 @@ export default function EmergencyPage() {
                 Accuracy: ±{Math.round(accuracy)}m
               </p>
             )}
-          </div>
-
-          {/* Contact Count */}
-          <div className="pt-4 border-t border-gray-200">
-            <span className="text-sm font-medium text-gray-700">Emergency Contacts</span>
-            <p className="text-sm text-gray-600 mt-1">
-              {EMERGENCY_CONTACTS.length} contact{EMERGENCY_CONTACTS.length !== 1 ? 's' : ''} configured
-            </p>
           </div>
         </div>
 
@@ -183,7 +195,9 @@ export default function EmergencyPage() {
 
           {/* Help Text */}
           <p className="text-center text-sm text-gray-600 mt-6 max-w-xs">
-            {isButtonDisabled && !alertLoading
+            {!whatsappNumber
+              ? "Enter a WhatsApp number to get started"
+              : isButtonDisabled && !alertLoading
               ? "Waiting for location access..."
               : "Tap to send emergency alert with your current location"}
           </p>

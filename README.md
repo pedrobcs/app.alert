@@ -8,7 +8,7 @@ A production-ready Next.js Progressive Web App (PWA) for sending emergency alert
 - 📍 **Real-time GPS Location**: High-accuracy geolocation using browser Geolocation API
 - 🗺️ **Reverse Geocoding**: Converts GPS coordinates to human-readable addresses
 - 📱 **PWA Support**: Installable on mobile devices with offline capabilities
-- 💬 **WhatsApp Integration**: Sends emergency messages via Twilio Sandbox
+- 💬 **WhatsApp Integration**: Sends emergency messages via UltraMsg API
 - 🎨 **Beautiful UI**: Clean, minimal design with Tailwind CSS
 - ⚡ **Real-time Feedback**: Loading states, success/error alerts
 - 🔐 **Permission Handling**: Graceful handling of location permissions

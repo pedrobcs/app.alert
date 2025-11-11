@@ -25,9 +25,9 @@ Complete list of implemented features and capabilities.
 - **No API Key Required**: Works without additional configuration
 
 ### 💬 WhatsApp Integration
-- **Twilio Backend**: Designed for Twilio WhatsApp API
-- **Multiple Contacts**: Support for multiple emergency contacts
-- **Custom Messages**: Portuguese emergency message template
+- **UltraMsg API**: Direct WhatsApp messaging integration
+- **Custom Phone Number**: Users can add their own WhatsApp number
+- **Custom Messages**: Emergency alert message template
 - **Location Sharing**: Includes precise address in message
 - **Emoji Support**: Uses alert emoji for visual emphasis
 

@@ -20,11 +20,14 @@ yarn install
    cp .env.local.example .env.local
    ```
 
-2. Edit `.env.local` and add your configuration:
+2. Edit `.env.local` and add your UltraMsg configuration:
    ```env
-   NEXT_PUBLIC_API_BASE_URL=https://your-ngrok-url.ngrok.io
-   NEXT_PUBLIC_CONTACT_1=+15085140864
+   # Get these from https://ultramsg.com
+   ULTRAMSG_TOKEN=your_token_here
+   ULTRAMSG_INSTANCE_ID=your_instance_id_here
    ```
+
+   The default values will work for testing, but for production use, get your own credentials from UltraMsg.
 
 ## Step 3: Run Development Server
 
@@ -38,52 +41,22 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 1. **Allow Location Access**: The browser will ask for location permission
 2. **Wait for Location**: The status card will show your coordinates
-3. **Test Emergency Button**: Click the red emergency button
-4. **Check Backend**: Verify the API receives the POST request
+3. **Enter WhatsApp Number**: Add a WhatsApp number (with country code) in the input field
+4. **Test Emergency Button**: Click the red emergency button
+5. **Check WhatsApp**: The alert message should be sent to the entered WhatsApp number
 
-## Backend API Setup
+## How It Works
 
-Your backend needs to handle POST requests to `/panic` endpoint:
+The app now uses **UltraMsg API** to send WhatsApp messages directly:
 
-### Expected Request Format
+1. User enters their WhatsApp number
+2. Location is retrieved using GPS
+3. When the emergency button is clicked, the app:
+   - Gets the current address from coordinates
+   - Sends a message via UltraMsg API to the entered WhatsApp number
+   - Includes the location in the message
 
-```json
-POST /panic
-Content-Type: application/json
-
-{
-  "contacts": ["+15085140864"],
-  "message": "🚨 EMERGÊNCIA! Preciso de ajuda! Estou em: {address}",
-  "location": {
-    "lat": -23.550520,
-    "lng": -46.633308
-  }
-}
-```
-
-### Example Response
-
-```json
-{
-  "success": true,
-  "message": "Alert sent successfully"
-}
-```
-
-### Quick Backend with ngrok
-
-If you have a backend running on port 3001:
-
-```bash
-# Install ngrok
-npm install -g ngrok
-
-# Start ngrok tunnel
-ngrok http 3001
-
-# Copy the HTTPS URL (e.g., https://abc123.ngrok.io)
-# Add it to .env.local as NEXT_PUBLIC_API_BASE_URL
-```
+No external backend is required! The Next.js API route handles everything internally.
 
 ## Building for Production
 
@@ -136,9 +109,9 @@ yarn start
 - ✓ Try refreshing location manually
 
 ### API Errors?
-- ✓ Verify `NEXT_PUBLIC_API_BASE_URL` is correct
-- ✓ Check backend is running
-- ✓ Verify CORS is enabled on backend
+- ✓ Verify UltraMsg credentials are correct in `.env.local`
+- ✓ Check WhatsApp number format (include country code)
+- ✓ Ensure you have a valid UltraMsg account
 - ✓ Check network tab in browser DevTools
 
 ### PWA Not Installing?
@@ -149,20 +122,21 @@ yarn start
 
 ## Next Steps
 
-1. **Customize the UI**: Edit `src/app/page.tsx`
-2. **Add More Contacts**: Update `.env.local`
-3. **Change Message**: Edit `src/hooks/useEmergencyAlert.ts`
+1. **Get UltraMsg Account**: Sign up at https://ultramsg.com for your own credentials
+2. **Customize the UI**: Edit `src/app/page.tsx`
+3. **Change Message Template**: Edit `src/hooks/useEmergencyAlert.ts`
 4. **Create Custom Icons**: Replace `public/icon-*.png`
-5. **Deploy to Production**: See README.md for deployment options
+5. **Deploy to Production**: See DEPLOYMENT.md for deployment options
 
 ## Security Checklist
 
 - [ ] Configure HTTPS for production
-- [ ] Set up CORS properly on backend
+- [ ] Get your own UltraMsg credentials (don't use defaults)
 - [ ] Test location permissions on all devices
-- [ ] Verify API endpoints are secure
+- [ ] Verify WhatsApp number format
 - [ ] Test emergency flow end-to-end
 - [ ] Add error monitoring (Sentry, etc.)
+- [ ] Keep UltraMsg credentials secure (never commit to git)
 
 ## Need Help?
 

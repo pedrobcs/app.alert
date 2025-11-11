@@ -219,7 +219,7 @@ Your backend API needs to:
 
 1. Handle POST /panic endpoint
 2. Enable CORS for your frontend domain
-3. Integrate with Twilio for WhatsApp messaging
+3. Integrate with UltraMsg for WhatsApp messaging
 4. Use HTTPS
 
 ### Example CORS Configuration (Express.js)
