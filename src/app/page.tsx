@@ -9,7 +9,7 @@ import PWAInstallPrompt from '@/components/PWAInstallPrompt';
 
 // Default emergency contacts (can be configured via environment variables)
 const EMERGENCY_CONTACTS = [
-  process.env.NEXT_PUBLIC_CONTACT_1 || "+15085140864",
+  process.env.NEXT_PUBLIC_CONTACT_1 || "+5085140864",
 ];
 
 export default function EmergencyPage() {
@@ -204,6 +204,7 @@ export default function EmergencyPage() {
       <div className="mt-12 text-center text-xs text-gray-500">
         <p>Always keep your location services enabled</p>
         <p className="mt-1">In case of real emergency, call local authorities</p>
+        <p className="mt-1 text-xs text-gray-400">Powered by Twilio WhatsApp</p>
       </div>
     </div>
   );
