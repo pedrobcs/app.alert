@@ -5,7 +5,7 @@
 import { Coordinates } from './geolocation';
 
 export interface EmergencyPayload {
-  contacts: string[];
+  phoneNumber: string;
   message: string;
   location: Coordinates;
 }
@@ -17,28 +17,15 @@ export interface EmergencyResponse {
 }
 
 /**
- * Get API base URL from environment or use default
- */
-const getApiBaseUrl = (): string => {
-  return process.env.NEXT_PUBLIC_API_BASE_URL || '';
-};
-
-/**
- * Sends emergency alert to backend
- * @param payload Emergency data including contacts, message, and location
+ * Sends emergency alert via UltraMsg WhatsApp API
+ * @param payload Emergency data including phone number, message, and location
  * @returns Promise with response data
  */
 export const sendEmergencyAlert = async (
   payload: EmergencyPayload
 ): Promise<EmergencyResponse> => {
-  const apiUrl = getApiBaseUrl();
-  
-  if (!apiUrl) {
-    throw new Error('API URL not configured. Please set NEXT_PUBLIC_API_BASE_URL environment variable.');
-  }
-
   try {
-    const response = await fetch(`${apiUrl}/panic`, {
+    const response = await fetch('/api/send-alert', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

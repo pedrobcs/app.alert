@@ -55,7 +55,7 @@ Use this checklist to ensure proper setup of SafeAlert.
 - [ ] API request sent (check Network tab)
 - [ ] Success/error notification appears
 - [ ] Backend receives correct payload
-- [ ] WhatsApp message sent (if Twilio configured)
+- [ ] WhatsApp message sent (if UltraMsg configured)
 
 ## Production Build
 

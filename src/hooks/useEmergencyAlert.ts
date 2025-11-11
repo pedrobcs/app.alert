@@ -7,7 +7,7 @@ import { sendEmergencyAlert, reverseGeocode, EmergencyPayload } from '@/lib/api'
 import { Coordinates } from '@/lib/geolocation';
 
 interface UseEmergencyAlertResult {
-  sendAlert: (coordinates: Coordinates, contacts: string[]) => Promise<void>;
+  sendAlert: (coordinates: Coordinates, phoneNumber: string) => Promise<void>;
   loading: boolean;
   error: string | null;
   success: boolean;
@@ -18,7 +18,7 @@ export const useEmergencyAlert = (): UseEmergencyAlertResult => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const sendAlert = useCallback(async (coordinates: Coordinates, contacts: string[]) => {
+  const sendAlert = useCallback(async (coordinates: Coordinates, phoneNumber: string) => {
     setLoading(true);
     setError(null);
     setSuccess(false);
@@ -28,10 +28,10 @@ export const useEmergencyAlert = (): UseEmergencyAlertResult => {
       const address = await reverseGeocode(coordinates);
       
       // Prepare message with address
-      const message = `🚨 EMERGÊNCIA! Preciso de ajuda! Estou em: ${address}`;
+      const message = `🚨 EMERGENCY ALERT! I need help! I am at: ${address}`;
 
       const payload: EmergencyPayload = {
-        contacts,
+        phoneNumber,
         message,
         location: coordinates,
       };

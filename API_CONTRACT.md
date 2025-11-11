@@ -199,33 +199,50 @@ Consider implementing rate limiting on the backend:
 }
 ```
 
-## Twilio WhatsApp Integration
+## UltraMsg WhatsApp Integration
 
-The backend should integrate with Twilio's WhatsApp API:
+The backend should integrate with UltraMsg's WhatsApp API:
 
-### Twilio Sandbox (Development)
+### UltraMsg Configuration
 
-1. Set up Twilio account
-2. Configure WhatsApp Sandbox
-3. Users must send "join {your-code}" to activate
-
-### Twilio Production (Production)
-
-1. Request WhatsApp Business Profile approval
-2. Configure WhatsApp messaging service
-3. Users can receive messages without joining
+1. Create an UltraMsg account at https://ultramsg.com
+2. Get your Instance ID and Token
+3. Configure your WhatsApp number with UltraMsg
+4. Use the API to send messages directly
 
 ### Message Sending
 
 ```javascript
-// Example using Twilio SDK
-const client = require('twilio')(accountSid, authToken);
+// Example using UltraMsg API
+const https = require('https');
+const querystring = require('querystring');
 
-await client.messages.create({
-  from: 'whatsapp:+14155238886',
-  to: `whatsapp:${contact}`,
+const postData = querystring.stringify({
+  token: process.env.ULTRAMSG_TOKEN,
+  to: phoneNumber, // Format: +15085140864
   body: message
 });
+
+const options = {
+  method: 'POST',
+  hostname: 'api.ultramsg.com',
+  path: `/instance${process.env.ULTRAMSG_INSTANCE_ID}/messages/chat`,
+  headers: {
+    'content-type': 'application/x-www-form-urlencoded',
+    'Content-Length': postData.length
+  }
+};
+
+const req = https.request(options, (res) => {
+  let data = '';
+  res.on('data', (chunk) => { data += chunk; });
+  res.on('end', () => {
+    console.log('Message sent:', data);
+  });
+});
+
+req.write(postData);
+req.end();
 ```
 
 ## Security Considerations
@@ -293,16 +310,51 @@ curl -X POST https://your-backend.ngrok.io/panic \
 ```javascript
 const express = require('express');
 const cors = require('cors');
-const twilio = require('twilio');
+const https = require('https');
+const querystring = require('querystring');
 
 const app = express();
-const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 app.use(cors({
   origin: process.env.FRONTEND_URL,
   methods: ['POST']
 }));
 app.use(express.json());
+
+async function sendUltraMsgWhatsApp(phoneNumber, message) {
+  return new Promise((resolve, reject) => {
+    const postData = querystring.stringify({
+      token: process.env.ULTRAMSG_TOKEN,
+      to: phoneNumber,
+      body: message
+    });
+
+    const options = {
+      method: 'POST',
+      hostname: 'api.ultramsg.com',
+      path: `/instance${process.env.ULTRAMSG_INSTANCE_ID}/messages/chat`,
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded',
+        'Content-Length': postData.length
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => { data += chunk; });
+      res.on('end', () => {
+        resolve(JSON.parse(data));
+      });
+    });
+
+    req.on('error', (error) => {
+      reject(error);
+    });
+
+    req.write(postData);
+    req.end();
+  });
+}
 
 app.post('/panic', async (req, res) => {
   try {
@@ -330,13 +382,9 @@ app.post('/panic', async (req, res) => {
       });
     }
 
-    // Send WhatsApp messages
+    // Send WhatsApp messages via UltraMsg
     const promises = contacts.map(contact =>
-      client.messages.create({
-        from: 'whatsapp:+14155238886',
-        to: `whatsapp:${contact}`,
-        body: message
-      })
+      sendUltraMsgWhatsApp(contact, message)
     );
 
     await Promise.all(promises);
