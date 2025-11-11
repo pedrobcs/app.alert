@@ -204,6 +204,7 @@ export default function EmergencyPage() {
       <div className="mt-12 text-center text-xs text-gray-500">
         <p>Always keep your location services enabled</p>
         <p className="mt-1">In case of real emergency, call local authorities</p>
+        <p className="mt-1 text-xs text-gray-400">Powered by Twilio WhatsApp</p>
       </div>
     </div>
   );
