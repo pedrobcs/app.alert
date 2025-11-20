@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
 export function DisclaimerModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -57,7 +57,7 @@ export function DisclaimerModal() {
               <h3 className="font-bold text-gray-900 mb-2">Non-Custodial Nature</h3>
               <p>
                 By using this platform, you understand that you are sending funds directly to
-                the operator's wallet address. This platform does not custody your funds.
+                the operator&apos;s wallet address. This platform does not custody your funds.
                 Once transferred, funds are under the control of the operator.
               </p>
             </section>
@@ -66,7 +66,7 @@ export function DisclaimerModal() {
               <h3 className="font-bold text-gray-900 mb-2">No Guarantees</h3>
               <p>
                 We make no guarantees or promises regarding investment returns, profits, or
-                performance. The trading bot's performance may vary and is subject to market
+                performance. The trading bot&apos;s performance may vary and is subject to market
                 conditions, technical issues, and other factors beyond our control.
               </p>
             </section>

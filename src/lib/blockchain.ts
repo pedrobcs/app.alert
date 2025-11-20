@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { ARBITRUM_CHAIN_ID, ERC20_ABI, ACTIVE_USDC_ADDRESS, USDC_DECIMALS } from './config';
+import { ERC20_ABI, ACTIVE_USDC_ADDRESS, USDC_DECIMALS } from './config';
 
 // Get provider for server-side blockchain interactions
 export function getProvider(): ethers.JsonRpcProvider {

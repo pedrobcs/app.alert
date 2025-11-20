@@ -34,8 +34,6 @@ export default function HomePage() {
       
       if (!nonceRes.ok) throw new Error('Failed to get nonce');
       
-      const { nonce } = await nonceRes.json();
-      
       // For now, redirect to dashboard
       // In production, you'd sign the nonce with the wallet
       router.push('/dashboard');

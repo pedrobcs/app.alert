@@ -65,7 +65,7 @@ export async function verifySession(token: string): Promise<SessionPayload | nul
     }
 
     return payload;
-  } catch (error) {
+  } catch {
     return null;
   }
 }

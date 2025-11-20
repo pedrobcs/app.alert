@@ -22,17 +22,12 @@ const mockPerformanceData = [
 export default function PerformancePage() {
   const { isConnected } = useAccount();
   const router = useRouter();
-  const [settings, setSettings] = useState<any>(null);
+  const [settings, setSettings] = useState<{
+    performanceYTD: number;
+    currentNAV: number;
+    totalAUM: number;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!isConnected) {
-      router.push('/');
-      return;
-    }
-
-    fetchData();
-  }, [isConnected]);
 
   const fetchData = async () => {
     try {
@@ -46,6 +41,16 @@ export default function PerformancePage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!isConnected) {
+      router.push('/');
+      return;
+    }
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected]);
 
   if (!isConnected || loading) {
     return (

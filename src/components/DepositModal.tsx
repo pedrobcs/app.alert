@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { X, Copy, ExternalLink, QrCode } from 'lucide-react';
-import { formatAddress, getArbiscanAddressLink } from '@/lib/utils';
+import { getArbiscanAddressLink } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { QRCodeSVG } from 'qrcode.react';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
