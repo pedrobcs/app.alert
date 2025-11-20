@@ -1,152 +1,253 @@
-# SafeAlert - Quick Start Guide
+# Quick Start Guide
 
-Get your emergency alert system running in 5 minutes!
+Get the USDC Investment Platform running in 5 minutes.
 
 ## Prerequisites
 
-- Node.js 18+ or Yarn installed
-- A backend API endpoint (see Backend Setup below)
+- Node.js 18+ installed
+- PostgreSQL database (local or remote)
+- Alchemy or Infura account
+- WalletConnect Project ID
 
-## Step 1: Install Dependencies
+## Installation Steps
+
+### 1. Install Dependencies
 
 ```bash
-yarn install
+npm install
 ```
 
-## Step 2: Configure Environment
+### 2. Set Up Environment
 
-1. Copy the example environment file:
-   ```bash
-   cp .env.local.example .env.local
-   ```
+```bash
+cp .env.example .env
+```
 
-2. Edit `.env.local` and add your UltraMsg configuration:
+Edit `.env` with your values:
+
+```env
+# REQUIRED
+DATABASE_URL="postgresql://user:password@localhost:5432/usdc_investment"
+ALCHEMY_API_KEY="your_alchemy_key"
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID="your_project_id"
+JWT_SECRET="generate_a_32_char_random_string"
+
+# IMPORTANT: Set these to your actual addresses
+NEXT_PUBLIC_OPERATOR_WALLET_ADDRESS="0xYourWalletAddress"
+NEXT_PUBLIC_USDC_ADDRESS="0xFF970A61A04b1cA14834A43f5DE4533eBDDB5CC8"
+```
+
+### 3. Set Up Database
+
+```bash
+# Generate Prisma client
+npx prisma generate
+
+# Create database tables
+npx prisma db push
+
+# Open Prisma Studio to view data (optional)
+npx prisma studio
+```
+
+### 4. Initialize Admin Settings
+
+Option A: Use Prisma Studio
+1. Run `npx prisma studio`
+2. Go to AdminSettings table
+3. Add a new record with your settings
+
+Option B: Use SQL
+```sql
+INSERT INTO "AdminSettings" (
+  "id",
+  "receivingWalletAddress",
+  "usdcTokenAddress",
+  "tokenSymbol",
+  "minimumDeposit",
+  "requiredConfirmations",
+  "currentNav",
+  "createdAt",
+  "updatedAt"
+) VALUES (
+  'admin-settings-1',
+  '0xYourOperatorWalletAddress',
+  '0xFF970A61A04b1cA14834A43f5DE4533eBDDB5CC8',
+  'USDC',
+  '100',
+  5,
+  '1.0',
+  NOW(),
+  NOW()
+);
+```
+
+### 5. Run Development Server
+
+```bash
+npm run dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000)
+
+### 6. Start Blockchain Scanner (Optional for Development)
+
+In a separate terminal:
+
+```bash
+npm run scanner
+```
+
+This will continuously scan for deposits.
+
+## Test the Platform
+
+### Test on Arbitrum Sepolia (Testnet)
+
+1. **Get testnet tokens**
+   - Get Sepolia ETH from [faucet](https://sepoliafaucet.com/)
+   - Bridge to Arbitrum Sepolia
+   - Get testnet USDC
+
+2. **Update .env for testnet**
    ```env
-   # Get these from https://ultramsg.com
-   ULTRAMSG_TOKEN=your_token_here
-   ULTRAMSG_INSTANCE_ID=your_instance_id_here
+   NEXT_PUBLIC_ARBITRUM_CHAIN_ID=421614
+   NEXT_PUBLIC_USDC_ADDRESS="0x..."  # Sepolia USDC address
    ```
 
-   The default values will work for testing, but for production use, get your own credentials from UltraMsg.
+3. **Test deposit flow**
+   - Connect wallet
+   - Sign authentication message
+   - Make test deposit
+   - Verify in dashboard
 
-## Step 3: Run Development Server
+### Access Admin Dashboard
 
-```bash
-yarn dev
-```
+1. Visit [http://localhost:3000/admin](http://localhost:3000/admin)
+2. Enter password (from `ADMIN_PASSWORD` env var, or default: `admin123`)
+3. Configure platform settings
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+## Common Issues
 
-## Step 4: Test the App
-
-1. **Allow Location Access**: The browser will ask for location permission
-2. **Wait for Location**: The status card will show your coordinates
-3. **Enter WhatsApp Number**: Add a WhatsApp number (with country code) in the input field
-4. **Test Emergency Button**: Click the red emergency button
-5. **Check WhatsApp**: The alert message should be sent to the entered WhatsApp number
-
-## How It Works
-
-The app now uses **UltraMsg API** to send WhatsApp messages directly:
-
-1. User enters their WhatsApp number
-2. Location is retrieved using GPS
-3. When the emergency button is clicked, the app:
-   - Gets the current address from coordinates
-   - Sends a message via UltraMsg API to the entered WhatsApp number
-   - Includes the location in the message
-
-No external backend is required! The Next.js API route handles everything internally.
-
-## Building for Production
+### "Database connection error"
 
 ```bash
-# Build the app
-yarn build
+# Check PostgreSQL is running
+psql -U postgres
 
-# Start production server
-yarn start
+# Test connection
+npx prisma db pull
 ```
 
-## Installing as PWA
+### "Module not found" errors
 
-### On Mobile (iOS)
-1. Open in Safari
-2. Tap Share button
-3. Select "Add to Home Screen"
-4. Tap "Add"
+```bash
+# Clear node_modules and reinstall
+rm -rf node_modules package-lock.json
+npm install
+```
 
-### On Mobile (Android)
-1. Open in Chrome
-2. Tap menu (three dots)
-3. Select "Install app" or "Add to Home Screen"
+### "Prisma Client not generated"
 
-### On Desktop
-1. Look for install icon in address bar
-2. Click to install
-3. App opens in standalone window
-
-## Testing Location Features
-
-### Desktop Testing
-- Chrome: Settings → Privacy and Security → Site Settings → Location
-- Allow location access for localhost
-
-### Mobile Testing
-1. Use ngrok to expose your dev server:
-   ```bash
-   ngrok http 3000
-   ```
-2. Open the ngrok URL on your mobile device
-3. HTTPS is required for location access on mobile
-
-## Troubleshooting
-
-### Location Not Working?
-- ✓ Check browser permissions
-- ✓ Ensure HTTPS (or localhost)
-- ✓ Check browser console for errors
-- ✓ Try refreshing location manually
-
-### API Errors?
-- ✓ Verify UltraMsg credentials are correct in `.env.local`
-- ✓ Check WhatsApp number format (include country code)
-- ✓ Ensure you have a valid UltraMsg account
-- ✓ Check network tab in browser DevTools
-
-### PWA Not Installing?
-- ✓ Must use HTTPS (production)
-- ✓ Check manifest.json is accessible
-- ✓ Verify icon files exist
-- ✓ Clear cache and retry
+```bash
+npx prisma generate
+```
 
 ## Next Steps
 
-1. **Get UltraMsg Account**: Sign up at https://ultramsg.com for your own credentials
-2. **Customize the UI**: Edit `src/app/page.tsx`
-3. **Change Message Template**: Edit `src/hooks/useEmergencyAlert.ts`
-4. **Create Custom Icons**: Replace `public/icon-*.png`
-5. **Deploy to Production**: See DEPLOYMENT.md for deployment options
+1. **Configure Admin Settings**
+   - Set your receiving wallet address
+   - Choose USDC token address
+   - Set minimum deposit and confirmations
 
-## Security Checklist
+2. **Customize Branding**
+   - Update app name in `.env`
+   - Modify colors in `tailwind.config.ts`
+   - Update metadata in `app/layout.tsx`
 
-- [ ] Configure HTTPS for production
-- [ ] Get your own UltraMsg credentials (don't use defaults)
-- [ ] Test location permissions on all devices
-- [ ] Verify WhatsApp number format
-- [ ] Test emergency flow end-to-end
-- [ ] Add error monitoring (Sentry, etc.)
-- [ ] Keep UltraMsg credentials secure (never commit to git)
+3. **Add Legal Pages**
+   - Create `/app/terms/page.tsx`
+   - Create `/app/privacy/page.tsx`
+   - Create `/app/risks/page.tsx`
 
-## Need Help?
+4. **Deploy to Production**
+   - Follow `DEPLOYMENT_GUIDE.md`
+   - Set up monitoring
+   - Test thoroughly
 
-- Check the full README.md for detailed documentation
-- Review the code comments in each file
-- Open an issue on the repository
-- Test in browser DevTools console
+## Development Tips
+
+### Useful Commands
+
+```bash
+# View database
+npm run db:studio
+
+# Create migration
+npm run db:migrate
+
+# Format code
+npx prettier --write .
+
+# Type check
+npx tsc --noEmit
+```
+
+### Hot Reload
+
+Next.js supports hot module reloading. Changes will appear automatically.
+
+### Debug Mode
+
+```typescript
+// Enable debug logging
+console.log('[DEBUG]', yourVariable);
+```
+
+## Architecture Overview
+
+```
+User Flow:
+1. Connect Wallet → RainbowKit
+2. Sign Message → Wallet Signature
+3. Deposit USDC → Blockchain Transaction
+4. Track Deposit → API Call
+5. Verify On-Chain → Ethers.js
+6. Credit Account → Database Update
+
+Admin Flow:
+1. Login → Password Auth
+2. View Stats → Database Query
+3. Update Settings → API Call
+4. Manage Deposits → Database Query
+```
+
+## Resources
+
+- [Next.js Docs](https://nextjs.org/docs)
+- [Prisma Docs](https://www.prisma.io/docs)
+- [RainbowKit Docs](https://www.rainbowkit.com/docs/introduction)
+- [Arbitrum Docs](https://docs.arbitrum.io/)
+- [Ethers.js Docs](https://docs.ethers.org/)
+
+## Getting Help
+
+- Check `README.md` for detailed documentation
+- Review `DEPLOYMENT_GUIDE.md` for production setup
+- Open an issue on GitHub
+- Contact: support@yourdomain.com
+
+## Security Reminder
+
+⚠️ **Before going to production:**
+- [ ] Change all default passwords
+- [ ] Use strong JWT secrets
+- [ ] Enable HTTPS
+- [ ] Set up proper admin authentication
+- [ ] Review all security settings
+- [ ] Conduct security audit
+- [ ] Test on testnet thoroughly
 
 ---
 
-**Ready to go!** Your emergency alert system is now set up and ready for testing.
-
-Remember: This is a supplementary communication tool. Always call local emergency services for life-threatening situations.
+**Happy Building! 🚀**
