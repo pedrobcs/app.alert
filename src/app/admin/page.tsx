@@ -14,8 +14,23 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [deposits, setDeposits] = useState<any[]>([]);
-  const [stats, setStats] = useState<any>(null);
+  const [deposits, setDeposits] = useState<Array<{
+    id: string;
+    txHash: string;
+    amount: number;
+    status: string;
+    createdAt: string;
+    user?: {
+      walletAddress: string;
+      email?: string | null;
+    };
+  }>>([]);
+  const [stats, setStats] = useState<{
+    totalUsers: number;
+    totalDeposits: number;
+    pendingDeposits: number;
+    depositCount: number;
+  } | null>(null);
   const [settings, setSettings] = useState({
     operatorWalletAddress: '',
     acceptedTokenAddress: '',
@@ -405,7 +420,7 @@ export default function AdminPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {deposits.map((deposit: any) => (
+                  {deposits.map((deposit) => (
                     <tr key={deposit.id} className="border-b border-gray-100">
                       <td className="py-4 px-4 text-sm font-mono text-gray-900">
                         {deposit.user?.walletAddress?.substring(0, 10)}...

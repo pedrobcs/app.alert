@@ -21,6 +21,7 @@ export default function HomePage() {
       // Authenticate user and redirect to dashboard
       authenticateUser(address);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, address, mounted]);
 
   const authenticateUser = async (walletAddress: string) => {
