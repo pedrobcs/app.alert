@@ -1,152 +1,225 @@
-# SafeAlert - Quick Start Guide
+# Quick Start Guide - ArbiBot Invest
 
-Get your emergency alert system running in 5 minutes!
+Get up and running in 15 minutes.
 
 ## Prerequisites
 
-- Node.js 18+ or Yarn installed
-- A backend API endpoint (see Backend Setup below)
+- Node.js 18+ installed
+- PostgreSQL database (local or cloud)
+- Alchemy/Infura account for RPC
+- WalletConnect Project ID
+- Wallet with some Arbitrum ETH for testing
 
-## Step 1: Install Dependencies
+## Step 1: Install Dependencies (2 minutes)
 
 ```bash
+# Install packages
 yarn install
+
+# or with npm
+npm install
 ```
 
-## Step 2: Configure Environment
+## Step 2: Set Up Database (3 minutes)
 
-1. Copy the example environment file:
-   ```bash
-   cp .env.local.example .env.local
-   ```
-
-2. Edit `.env.local` and add your UltraMsg configuration:
-   ```env
-   # Get these from https://ultramsg.com
-   ULTRAMSG_TOKEN=your_token_here
-   ULTRAMSG_INSTANCE_ID=your_instance_id_here
-   ```
-
-   The default values will work for testing, but for production use, get your own credentials from UltraMsg.
-
-## Step 3: Run Development Server
+### Option A: Local PostgreSQL
 
 ```bash
+# Start PostgreSQL
+brew services start postgresql@14  # macOS
+# or
+sudo systemctl start postgresql    # Linux
+
+# Create database
+createdb usdc_investment
+```
+
+### Option B: Supabase (Recommended)
+
+1. Go to [supabase.com](https://supabase.com)
+2. Create new project
+3. Copy connection string from Settings → Database
+
+## Step 3: Configure Environment (5 minutes)
+
+```bash
+# Copy example env file
+cp .env.example .env
+
+# Edit .env file
+nano .env
+```
+
+**Minimum required variables:**
+
+```env
+# Database (use your actual connection string)
+DATABASE_URL="postgresql://postgres:password@localhost:5432/usdc_investment"
+
+# Get from alchemy.com
+ALCHEMY_API_KEY="your_alchemy_key"
+
+# Get from cloud.walletconnect.com
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID="your_project_id"
+
+# Your wallet addresses (will be admin)
+ADMIN_WALLET_ADDRESS="0xYourWalletAddress"
+OPERATOR_WALLET_ADDRESS="0xYourWalletAddress"
+
+# Generate a random secret (min 32 chars)
+JWT_SECRET="your_super_secret_jwt_key_minimum_32_characters_long"
+NEXTAUTH_SECRET="another_secret_key_for_nextauth"
+
+# USDC token (bridged USDC.e on Arbitrum)
+NEXT_PUBLIC_USDC_ADDRESS="0xFF970A61A04b1cA14834A43f5DE4533eBDDB5CC8"
+```
+
+**Quick way to generate secrets:**
+
+```bash
+# Generate random secrets
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+## Step 4: Initialize Database (2 minutes)
+
+```bash
+# Generate Prisma client
+yarn prisma:generate
+
+# Run migrations
+yarn prisma:migrate deploy
+
+# (Optional) Seed initial data
+yarn prisma db seed
+```
+
+## Step 5: Start Development Server (1 minute)
+
+```bash
+# Start Next.js dev server
 yarn dev
+
+# Open browser
+open http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+## Step 6: Configure Admin Settings (2 minutes)
 
-## Step 4: Test the App
+1. Open http://localhost:3000
+2. Click "Connect Wallet"
+3. Connect with your admin wallet (from ADMIN_WALLET_ADDRESS)
+4. Navigate to http://localhost:3000/admin
+5. Configure:
+   - Operator wallet address (where USDC will be sent)
+   - Token address (already set from env)
+   - Minimum deposit: 100
+   - Required confirmations: 5
+   - Click "Save Settings"
 
-1. **Allow Location Access**: The browser will ask for location permission
-2. **Wait for Location**: The status card will show your coordinates
-3. **Enter WhatsApp Number**: Add a WhatsApp number (with country code) in the input field
-4. **Test Emergency Button**: Click the red emergency button
-5. **Check WhatsApp**: The alert message should be sent to the entered WhatsApp number
+## Step 7: Test Deposit Flow (Optional)
 
-## How It Works
+### On Arbitrum Testnet (Sepolia)
 
-The app now uses **UltraMsg API** to send WhatsApp messages directly:
+1. Change chain ID to testnet in `.env`:
+```env
+NEXT_PUBLIC_ARBITRUM_CHAIN_ID=421614
+```
 
-1. User enters their WhatsApp number
-2. Location is retrieved using GPS
-3. When the emergency button is clicked, the app:
-   - Gets the current address from coordinates
-   - Sends a message via UltraMsg API to the entered WhatsApp number
-   - Includes the location in the message
+2. Get testnet ETH and USDC from faucets
+3. Make a test deposit through the UI
 
-No external backend is required! The Next.js API route handles everything internally.
+### On Arbitrum Mainnet
 
-## Building for Production
+1. Ensure you have USDC on Arbitrum
+2. Make a small test deposit (e.g., $100)
+3. Verify it appears in deposits page
 
+## Verification Checklist
+
+- [ ] App loads at http://localhost:3000
+- [ ] Can connect wallet
+- [ ] Dashboard loads after connecting
+- [ ] Admin panel accessible at /admin
+- [ ] Settings can be saved
+- [ ] Deposit modal opens and shows operator address
+
+## Common Issues
+
+### "Failed to connect to database"
 ```bash
-# Build the app
-yarn build
+# Check DATABASE_URL format
+echo $DATABASE_URL
 
-# Start production server
-yarn start
+# Test connection
+psql $DATABASE_URL -c "SELECT 1"
 ```
 
-## Installing as PWA
+### "Cannot find module '@prisma/client'"
+```bash
+yarn prisma:generate
+```
 
-### On Mobile (iOS)
-1. Open in Safari
-2. Tap Share button
-3. Select "Add to Home Screen"
-4. Tap "Add"
+### "Invalid WalletConnect project ID"
+```bash
+# Get a new one from cloud.walletconnect.com
+# Update NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID in .env
+```
 
-### On Mobile (Android)
-1. Open in Chrome
-2. Tap menu (three dots)
-3. Select "Install app" or "Add to Home Screen"
+### Port 3000 already in use
+```bash
+# Find and kill process
+lsof -ti:3000 | xargs kill
 
-### On Desktop
-1. Look for install icon in address bar
-2. Click to install
-3. App opens in standalone window
-
-## Testing Location Features
-
-### Desktop Testing
-- Chrome: Settings → Privacy and Security → Site Settings → Location
-- Allow location access for localhost
-
-### Mobile Testing
-1. Use ngrok to expose your dev server:
-   ```bash
-   ngrok http 3000
-   ```
-2. Open the ngrok URL on your mobile device
-3. HTTPS is required for location access on mobile
-
-## Troubleshooting
-
-### Location Not Working?
-- ✓ Check browser permissions
-- ✓ Ensure HTTPS (or localhost)
-- ✓ Check browser console for errors
-- ✓ Try refreshing location manually
-
-### API Errors?
-- ✓ Verify UltraMsg credentials are correct in `.env.local`
-- ✓ Check WhatsApp number format (include country code)
-- ✓ Ensure you have a valid UltraMsg account
-- ✓ Check network tab in browser DevTools
-
-### PWA Not Installing?
-- ✓ Must use HTTPS (production)
-- ✓ Check manifest.json is accessible
-- ✓ Verify icon files exist
-- ✓ Clear cache and retry
+# Or use different port
+yarn dev -p 3001
+```
 
 ## Next Steps
 
-1. **Get UltraMsg Account**: Sign up at https://ultramsg.com for your own credentials
-2. **Customize the UI**: Edit `src/app/page.tsx`
-3. **Change Message Template**: Edit `src/hooks/useEmergencyAlert.ts`
-4. **Create Custom Icons**: Replace `public/icon-*.png`
-5. **Deploy to Production**: See DEPLOYMENT.md for deployment options
+1. **Read the full README.md** for detailed documentation
+2. **Review DEPLOYMENT_GUIDE.md** before going to production
+3. **Check API_DOCUMENTATION.md** for API reference
+4. **Test all features** thoroughly before accepting real deposits
+5. **Set up monitoring** and backups
 
-## Security Checklist
+## Production Deployment
 
-- [ ] Configure HTTPS for production
-- [ ] Get your own UltraMsg credentials (don't use defaults)
-- [ ] Test location permissions on all devices
-- [ ] Verify WhatsApp number format
-- [ ] Test emergency flow end-to-end
-- [ ] Add error monitoring (Sentry, etc.)
-- [ ] Keep UltraMsg credentials secure (never commit to git)
+When ready for production:
 
-## Need Help?
+```bash
+# Build for production
+yarn build
 
-- Check the full README.md for detailed documentation
-- Review the code comments in each file
-- Open an issue on the repository
-- Test in browser DevTools console
+# Test production build locally
+yarn start
+
+# Deploy to Vercel
+vercel --prod
+```
+
+See **DEPLOYMENT_GUIDE.md** for complete deployment instructions.
+
+## Getting Help
+
+- Check README.md for detailed docs
+- Review troubleshooting section
+- Open GitHub issue for bugs
+- Email: support@arbibot.com
+
+## Important Security Notes
+
+⚠️ **Before Production:**
+
+1. Never commit `.env` file
+2. Use strong, unique secrets
+3. Enable 2FA on all accounts
+4. Test thoroughly on testnet first
+5. Start with small amounts
+6. Monitor closely for first 24 hours
 
 ---
 
-**Ready to go!** Your emergency alert system is now set up and ready for testing.
+**You're all set!** 🎉
 
-Remember: This is a supplementary communication tool. Always call local emergency services for life-threatening situations.
+Your USDC Investment SaaS is running locally. Start building and testing your platform.
