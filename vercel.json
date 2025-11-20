@@ -1,4 +1,4 @@
 {
-  "buildCommand": "prisma generate && next build",
-  "installCommand": "yarn install && prisma generate"
+  "buildCommand": "yarn prisma:generate && yarn build",
+  "installCommand": "yarn install"
 }
