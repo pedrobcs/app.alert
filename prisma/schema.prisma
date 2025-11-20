@@ -1,0 +1,178 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  walletAddress String    @unique
+  email         String?   @unique
+  nonce         String?
+  kycVerified   Boolean   @default(false)
+  kycData       Json?
+  totalInvested String    @default("0") // Store as string to handle large numbers
+  shares        String    @default("0") // Internal share units
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  deposits      Deposit[]
+  transactions  Transaction[]
+  
+  @@index([walletAddress])
+  @@index([email])
+}
+
+model Deposit {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  txHash          String   @unique
+  fromAddress     String
+  toAddress       String
+  tokenAddress    String
+  amount          String   // Store as string to handle large numbers
+  
+  blockNumber     BigInt
+  blockTimestamp  DateTime
+  confirmations   Int      @default(0)
+  
+  status          DepositStatus @default(PENDING)
+  
+  // Credited info
+  creditedAt      DateTime?
+  sharesIssued    String?  // Shares credited for this deposit
+  navAtDeposit    String?  // NAV at time of deposit
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([status])
+  @@index([txHash])
+  @@index([blockNumber])
+}
+
+enum DepositStatus {
+  PENDING
+  CONFIRMED
+  CREDITED
+  REJECTED
+}
+
+model Transaction {
+  id          String          @id @default(cuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type        TransactionType
+  amount      String          // Amount in USDC
+  shares      String?         // Shares involved
+  
+  txHash      String?         // On-chain tx hash if applicable
+  description String?
+  
+  createdAt   DateTime        @default(now())
+  
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  PROFIT_DISTRIBUTION
+  FEE
+  ADJUSTMENT
+}
+
+model AdminSettings {
+  id                    String   @id @default(cuid())
+  
+  // Wallet & Token Config
+  receivingWalletAddress String
+  usdcTokenAddress      String   // USDC or USDC.e address
+  tokenSymbol           String   @default("USDC")
+  
+  // Deposit Settings
+  minimumDeposit        String   @default("100") // Minimum USDC amount
+  requiredConfirmations Int      @default(5)
+  
+  // KYC Settings
+  kycRequired           Boolean  @default(false)
+  kycProvider           String?
+  
+  // Trading Bot Settings
+  currentNav            String   @default("1.0") // Net Asset Value per share
+  totalAum              String   @default("0")   // Total Assets Under Management
+  
+  // Fee Settings
+  managementFeePercent  String   @default("2.0")
+  performanceFeePercent String   @default("20.0")
+  
+  // Withdrawal Settings
+  withdrawalsEnabled    Boolean  @default(false)
+  withdrawalFeePercent  String   @default("0.5")
+  
+  // API Keys (encrypted)
+  alchemyApiKey         String?
+  infuraApiKey          String?
+  etherscanApiKey       String?
+  
+  // Admin contact
+  adminEmail            String?
+  supportEmail          String?
+  
+  // Legal
+  termsUrl              String?
+  privacyPolicyUrl      String?
+  
+  lastScanBlock         BigInt   @default(0) // Last scanned block for deposits
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  @@index([receivingWalletAddress])
+}
+
+model PerformanceSnapshot {
+  id              String   @id @default(cuid())
+  
+  date            DateTime @unique
+  nav             String   // NAV at this date
+  totalAum        String   // Total AUM
+  totalInvestors  Int
+  dailyReturn     String?
+  cumulativeReturn String?
+  
+  createdAt       DateTime @default(now())
+  
+  @@index([date])
+}
+
+model AdminUser {
+  id              String   @id @default(cuid())
+  username        String   @unique
+  email           String   @unique
+  passwordHash    String
+  role            AdminRole @default(ADMIN)
+  
+  lastLogin       DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([username])
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  VIEWER
+}
