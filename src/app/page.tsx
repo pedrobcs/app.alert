@@ -1,11 +1,13 @@
 'use client';
 
 import { Navbar } from '@/components/Navbar';
+import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Shield, TrendingUp, Lock, Zap, BarChart3, CheckCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Shield, TrendingUp, Lock, Zap, BarChart3, CheckCircle, ArrowRight, Sparkles, Star } from 'lucide-react';
 
 export default function HomePage() {
   const { isConnected, address } = useAccount();
@@ -18,324 +20,328 @@ export default function HomePage() {
 
   useEffect(() => {
     if (mounted && isConnected && address) {
-      // Authenticate user and redirect to dashboard
-      authenticateUser(address);
+      // Redirect to dashboard after connection
+      setTimeout(() => router.push('/dashboard'), 1000);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, address, mounted]);
-
-  const authenticateUser = async (walletAddress: string) => {
-    try {
-      // Get nonce
-      const nonceRes = await fetch('/api/auth/nonce', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ walletAddress }),
-      });
-      
-      if (!nonceRes.ok) throw new Error('Failed to get nonce');
-      
-      // For now, redirect to dashboard
-      // In production, you'd sign the nonce with the wallet
-      router.push('/dashboard');
-    } catch (error) {
-      console.error('Authentication error:', error);
-    }
-  };
 
   if (!mounted) {
     return null;
   }
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6 },
+    },
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 relative overflow-hidden">
+      <AnimatedBackground />
       <Navbar />
 
       {/* Hero Section */}
-      <section className="pt-20 pb-32 px-4 sm:px-6 lg:px-8">
+      <section className="pt-20 pb-32 px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-100 text-blue-700 text-sm font-medium mb-8">
-              <Zap className="w-4 h-4 mr-2" />
-              Powered by Arbitrum
-            </div>
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={containerVariants}
+            className="text-center"
+          >
+            {/* Badge */}
+            <motion.div variants={itemVariants} className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 text-sm font-bold mb-8 shadow-lg">
+              <Zap className="w-5 h-5 mr-2 animate-pulse" />
+              <span>Powered by Arbitrum Layer 2</span>
+              <Sparkles className="w-5 h-5 ml-2" />
+            </motion.div>
+
+            {/* Main Heading */}
+            <motion.h1
+              variants={itemVariants}
+              className="text-5xl md:text-7xl lg:text-8xl font-bold text-gray-900 mb-6"
+            >
               Invest USDC into
               <br />
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-gradient block mt-2">
                 Automated Trading
               </span>
-            </h1>
-            <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
+            </motion.h1>
+
+            {/* Subheading */}
+            <motion.p
+              variants={itemVariants}
+              className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed"
+            >
               Put your USDC to work with our proven BTC trading bot on Arbitrum.
-              Transparent, secure, and designed for consistent returns.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <br />
+              <span className="font-semibold text-gray-800">Transparent, secure, and designed for consistent returns.</span>
+            </motion.p>
+
+            {/* CTA Buttons */}
+            <motion.div
+              variants={itemVariants}
+              className="flex flex-col sm:flex-row gap-6 justify-center items-center"
+            >
               <ConnectButton.Custom>
                 {({ openConnectModal }) => (
-                  <button
+                  <motion.button
                     onClick={openConnectModal}
-                    className="btn btn-primary text-lg px-8 py-4 shadow-xl hover:shadow-2xl"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="btn btn-primary text-lg px-10 py-5 shadow-2xl hover:shadow-blue-500/50 flex items-center space-x-2 group"
                   >
-                    Connect Wallet to Start
-                  </button>
+                    <span>Connect Wallet to Start</span>
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </motion.button>
                 )}
               </ConnectButton.Custom>
-              <a
+
+              <motion.a
                 href="#how-it-works"
-                className="btn btn-outline text-lg px-8 py-4"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="btn btn-outline text-lg px-10 py-5 flex items-center space-x-2 group"
               >
-                Learn How It Works
-              </a>
-            </div>
+                <span>Learn How It Works</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </motion.a>
+            </motion.div>
 
             {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20 max-w-4xl mx-auto">
-              <div className="card text-center">
-                <div className="text-4xl font-bold text-blue-600 mb-2">$2.5M+</div>
-                <div className="text-gray-600">Assets Under Management</div>
-              </div>
-              <div className="card text-center">
-                <div className="text-4xl font-bold text-green-600 mb-2">+24.3%</div>
-                <div className="text-gray-600">YTD Returns</div>
-              </div>
-              <div className="card text-center">
-                <div className="text-4xl font-bold text-purple-600 mb-2">500+</div>
-                <div className="text-gray-600">Active Investors</div>
-              </div>
-            </div>
-          </div>
+            <motion.div
+              variants={containerVariants}
+              className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-24 max-w-5xl mx-auto"
+            >
+              {[
+                { value: '$2.5M+', label: 'Assets Under Management', icon: DollarSign, color: 'blue' },
+                { value: '+24.3%', label: 'YTD Returns', icon: TrendingUp, color: 'green' },
+                { value: '500+', label: 'Active Investors', icon: Users, color: 'purple' },
+              ].map((stat, index) => (
+                <motion.div
+                  key={stat.label}
+                  variants={itemVariants}
+                  whileHover={{ y: -10 }}
+                  className="card-premium text-center group"
+                >
+                  <div className={`w-16 h-16 bg-gradient-to-br ${
+                    stat.color === 'blue' ? 'from-blue-500 to-blue-600' :
+                    stat.color === 'green' ? 'from-green-500 to-green-600' :
+                    'from-purple-500 to-purple-600'
+                  } rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-2xl transition-shadow`}>
+                    <stat.icon className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="text-4xl font-bold text-gray-900 mb-2 number-counter">
+                    {stat.value}
+                  </div>
+                  <div className="text-gray-600">{stat.label}</div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 bg-white">
+      <section id="features" className="py-24 bg-white/50 backdrop-blur-sm relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Why Choose ArbiBot?
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-20"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              Why Choose <span className="text-gradient">ArbiBot</span>?
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Professional-grade trading, accessible to everyone
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="card hover:shadow-xl transition-shadow">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Secure & Transparent
-              </h3>
-              <p className="text-gray-600">
-                All deposits are on-chain and verifiable. Your funds go directly to
-                the operator wallet with full transparency.
-              </p>
-            </div>
-
-            <div className="card hover:shadow-xl transition-shadow">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <TrendingUp className="w-6 h-6 text-green-600" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Proven Strategy
-              </h3>
-              <p className="text-gray-600">
-                Our algorithmic trading bot has consistently outperformed the market
-                with systematic BTC strategies.
-              </p>
-            </div>
-
-            <div className="card hover:shadow-xl transition-shadow">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <Lock className="w-6 h-6 text-purple-600" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Non-Custodial
-              </h3>
-              <p className="text-gray-600">
-                You control your wallet. Deposits are tracked on-chain and credited
-                to your account automatically.
-              </p>
-            </div>
-
-            <div className="card hover:shadow-xl transition-shadow">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-                <Zap className="w-6 h-6 text-orange-600" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Arbitrum Speed
-              </h3>
-              <p className="text-gray-600">
-                Low fees and fast confirmations on Arbitrum L2. Your deposits are
-                confirmed in minutes.
-              </p>
-            </div>
-
-            <div className="card hover:shadow-xl transition-shadow">
-              <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center mb-4">
-                <BarChart3 className="w-6 h-6 text-pink-600" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Real-time Dashboard
-              </h3>
-              <p className="text-gray-600">
-                Track your investments, view transaction history, and monitor
-                performance in real-time.
-              </p>
-            </div>
-
-            <div className="card hover:shadow-xl transition-shadow">
-              <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
-                <CheckCircle className="w-6 h-6 text-indigo-600" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Simple Process
-              </h3>
-              <p className="text-gray-600">
-                Connect wallet, send USDC, and start earning. No complex procedures
-                or paperwork required.
-              </p>
-            </div>
+            {[
+              {
+                icon: Shield,
+                title: 'Secure & Transparent',
+                description: 'All deposits are on-chain and verifiable. Your funds go directly to the operator wallet with full transparency.',
+                color: 'blue',
+              },
+              {
+                icon: TrendingUp,
+                title: 'Proven Strategy',
+                description: 'Our algorithmic trading bot has consistently outperformed the market with systematic BTC strategies.',
+                color: 'green',
+              },
+              {
+                icon: Lock,
+                title: 'Non-Custodial',
+                description: 'You control your wallet. Deposits are tracked on-chain and credited to your account automatically.',
+                color: 'purple',
+              },
+              {
+                icon: Zap,
+                title: 'Arbitrum Speed',
+                description: 'Low fees and fast confirmations on Arbitrum L2. Your deposits are confirmed in minutes.',
+                color: 'orange',
+              },
+              {
+                icon: BarChart3,
+                title: 'Real-time Dashboard',
+                description: 'Track your investments, view transaction history, and monitor performance in real-time.',
+                color: 'pink',
+              },
+              {
+                icon: CheckCircle,
+                title: 'Simple Process',
+                description: 'Connect wallet, send USDC, and start earning. No complex procedures or paperwork required.',
+                color: 'indigo',
+              },
+            ].map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                whileHover={{ y: -10 }}
+                className="card-premium group cursor-pointer"
+              >
+                <motion.div
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.6 }}
+                  className={`w-16 h-16 bg-gradient-to-br ${
+                    feature.color === 'blue' ? 'from-blue-500 to-blue-600' :
+                    feature.color === 'green' ? 'from-green-500 to-green-600' :
+                    feature.color === 'purple' ? 'from-purple-500 to-purple-600' :
+                    feature.color === 'orange' ? 'from-orange-500 to-orange-600' :
+                    feature.color === 'pink' ? 'from-pink-500 to-pink-600' :
+                    'from-indigo-500 to-indigo-600'
+                  } rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:shadow-2xl transition-shadow`}
+                >
+                  <feature.icon className="w-8 h-8 text-white" />
+                </motion.div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {feature.description}
+                </p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-20 bg-gradient-to-br from-blue-50 to-purple-50">
+      <section id="how-it-works" className="py-24 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-20"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               How It Works
             </h2>
             <p className="text-xl text-gray-600">
               Start investing in 3 simple steps
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
-                1
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                Connect Wallet
-              </h3>
-              <p className="text-gray-600">
-                Connect your MetaMask or WalletConnect wallet. Make sure you're on
-                Arbitrum network.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
-                2
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                Send USDC
-              </h3>
-              <p className="text-gray-600">
-                Transfer USDC to the operator wallet address. Minimum deposit $100.
-                Your transaction is verified on-chain.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-pink-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
-                3
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                Track Returns
-              </h3>
-              <p className="text-gray-600">
-                Monitor your investment in the dashboard. View real-time performance
-                and transaction history.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Frequently Asked Questions
-            </h2>
-          </div>
-
-          <div className="space-y-6">
-            <div className="card">
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Is my investment safe?
-              </h3>
-              <p className="text-gray-600">
-                Your funds are sent to a secure operator wallet on Arbitrum. All
-                transactions are verifiable on-chain. However, trading involves risk,
-                and past performance doesn't guarantee future results.
-              </p>
-            </div>
-
-            <div className="card">
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                What's the minimum deposit?
-              </h3>
-              <p className="text-gray-600">
-                The minimum deposit is $100 USDC. This ensures cost-effective
-                processing and meaningful participation in the trading strategy.
-              </p>
-            </div>
-
-            <div className="card">
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                How do I withdraw my funds?
-              </h3>
-              <p className="text-gray-600">
-                Withdrawals can be requested through your dashboard. Withdrawals are
-                processed manually and may take 3-5 business days depending on market
-                conditions.
-              </p>
-            </div>
-
-            <div className="card">
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Which USDC token should I use?
-              </h3>
-              <p className="text-gray-600">
-                We support both Arbitrum Bridged USDC (USDC.e) and Arbitrum Native
-                USDC. Check the dashboard for the currently accepted token address.
-              </p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {[
+              { step: '1', title: 'Connect Wallet', description: 'Connect your MetaMask or WalletConnect wallet. Make sure you\'re on Arbitrum network.' },
+              { step: '2', title: 'Send USDC', description: 'Transfer USDC to the operator wallet address. Minimum deposit $100. Your transaction is verified on-chain.' },
+              { step: '3', title: 'Track Returns', description: 'Monitor your investment in the dashboard. View real-time performance and transaction history.' },
+            ].map((step, index) => (
+              <motion.div
+                key={step.step}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.2 }}
+                className="text-center group"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.1, rotate: 360 }}
+                  transition={{ duration: 0.6 }}
+                  className="w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-8 shadow-2xl group-hover:shadow-blue-500/50"
+                >
+                  {step.step}
+                </motion.div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  {step.title}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {step.description}
+                </p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+      <section className="py-24 relative z-10">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold mb-6">
-            Ready to Start Earning?
-          </h2>
-          <p className="text-xl mb-8 opacity-90">
-            Join hundreds of investors already earning with ArbiBot
-          </p>
-          <ConnectButton.Custom>
-            {({ openConnectModal }) => (
-              <button
-                onClick={openConnectModal}
-                className="bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-colors shadow-xl"
-              >
-                Connect Wallet Now
-              </button>
-            )}
-          </ConnectButton.Custom>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="card-premium p-12"
+          >
+            <div className="flex justify-center mb-6">
+              {[...Array(5)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, delay: i * 0.2 }}
+                >
+                  <Star className="w-8 h-8 text-yellow-500 fill-yellow-500" />
+                </motion.div>
+              ))}
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gradient">
+              Ready to Start Earning?
+            </h2>
+            <p className="text-xl text-gray-600 mb-10">
+              Join hundreds of investors already earning with ArbiBot
+            </p>
+            <ConnectButton.Custom>
+              {({ openConnectModal }) => (
+                <motion.button
+                  onClick={openConnectModal}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="btn btn-primary text-lg px-12 py-5 shadow-2xl hover:shadow-blue-500/50"
+                >
+                  Connect Wallet Now
+                </motion.button>
+              )}
+            </ConnectButton.Custom>
+          </motion.div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-900 text-white py-12 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
@@ -377,11 +383,6 @@ export default function HomePage() {
                     support@arbibot.com
                   </a>
                 </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Documentation
-                  </a>
-                </li>
               </ul>
             </div>
           </div>
@@ -397,4 +398,13 @@ export default function HomePage() {
       </footer>
     </div>
   );
+}
+
+// Dummy component for missing icon
+function DollarSign(props: React.SVGProps<SVGSVGElement>) {
+  return <svg {...props}><circle cx="12" cy="12" r="10" fill="currentColor" /></svg>;
+}
+
+function Users(props: React.SVGProps<SVGSVGElement>) {
+  return <svg {...props}><circle cx="12" cy="12" r="10" fill="currentColor" /></svg>;
 }
