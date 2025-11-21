@@ -1,280 +1,435 @@
-# SafeAlert - Emergency Alert System
+# ArbiBot Invest - USDC Investment SaaS Platform
 
-A production-ready Next.js Progressive Web App (PWA) for sending emergency alerts with real-time GPS location via WhatsApp integration.
+A production-ready Next.js SaaS application that enables users to invest USDC on Arbitrum into an automated trading bot. Features wallet authentication, on-chain deposit verification, and a comprehensive investor dashboard.
 
-## Features
+## 🚀 Features
 
-- 🚨 **One-Tap Emergency Alert**: Large, accessible emergency button with pulsing animation
-- 📍 **Real-time GPS Location**: High-accuracy geolocation using browser Geolocation API
-- 🗺️ **Reverse Geocoding**: Converts GPS coordinates to human-readable addresses
-- 📱 **PWA Support**: Installable on mobile devices with offline capabilities
-- 💬 **WhatsApp Integration**: Sends emergency messages via UltraMsg API
-- 🎨 **Beautiful UI**: Clean, minimal design with Tailwind CSS
-- ⚡ **Real-time Feedback**: Loading states, success/error alerts
-- 🔐 **Permission Handling**: Graceful handling of location permissions
+### 🌐 Public Landing Page
+- Modern, responsive design with Tailwind CSS
+- Value proposition and feature showcase
+- FAQ section and trust indicators
+- One-click wallet connection with RainbowKit
 
-## Tech Stack
+### 🔐 Wallet Authentication
+- MetaMask and WalletConnect support via wagmi
+- Signature-based authentication (no passwords)
+- Session management with JWT
+- Automatic account creation on first connect
 
-- **Framework**: Next.js 15.5.5 with App Router
+### 💼 Investor Dashboard
+- Real-time portfolio overview
+- Total invested, current value, and returns
+- Recent deposits and transaction history
+- Performance tracking with YTD returns
+- Interactive charts with Recharts
+
+### 💰 USDC Deposit Flow
+- In-browser USDC transfer using wallet
+- Support for both USDC.e and native USDC on Arbitrum
+- QR code for mobile wallet scanning
+- Manual transaction hash submission
+- Real-time transaction tracking
+
+### ✅ Server-Side Verification
+- On-chain transaction verification via Alchemy/Infura
+- Automatic deposit detection and attribution
+- Configurable confirmation requirements
+- Share calculation based on NAV
+- Duplicate transaction prevention
+
+### 👨‍💼 Admin Dashboard
+- Platform settings management
+- Operator wallet configuration
+- NAV and performance updates
+- Deposit monitoring and approval
+- User statistics and analytics
+
+### ⚖️ Legal & Compliance
+- Comprehensive risk disclosure modal
+- KYC/AML capability (configurable)
+- Terms of service acceptance
+- Jurisdiction warnings
+- Investment disclaimers
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS 4
-- **PWA**: Service Worker with offline support
-- **State Management**: React Hooks
-- **API**: RESTful backend integration
+- **Blockchain**: wagmi 2.x, viem, ethers.js 6
+- **Wallet**: RainbowKit 2.x
+- **Database**: PostgreSQL with Prisma ORM
+- **Auth**: JWT with jose
+- **Charts**: Recharts
+- **UI Components**: Lucide React icons, react-hot-toast
+- **QR Codes**: qrcode.react
 
-## Getting Started
+## 📋 Prerequisites
 
-### Prerequisites
+- Node.js 18+ and npm/yarn
+- PostgreSQL database
+- Alchemy or Infura API key
+- WalletConnect Project ID
+- Operator wallet address on Arbitrum
 
-- Node.js 18+ or Yarn
-- Backend API endpoint (ngrok or production URL)
+## 🏗️ Installation
 
-### Installation
+### 1. Clone and Install Dependencies
 
-1. **Clone the repository**:
-   ```bash
-   git clone <repository-url>
-   cd workspace
-   ```
+```bash
+# Install dependencies
+yarn install
 
-2. **Install dependencies**:
-   ```bash
-   yarn install
-   # or
-   npm install
-   ```
+# or with npm
+npm install
+```
 
-3. **Configure environment variables**:
-   ```bash
-   cp .env.local.example .env.local
-   ```
+### 2. Database Setup
 
-4. **Edit `.env.local`** with your configuration:
-   ```env
-   NEXT_PUBLIC_API_BASE_URL=https://your-ngrok-url.ngrok.io
-   NEXT_PUBLIC_CONTACT_1=+15085140864
-   ```
+```bash
+# Generate Prisma client
+yarn prisma:generate
 
-5. **Generate PWA icons** (optional, for production):
-   ```bash
-   # Visit https://realfavicongenerator.net/
-   # Upload public/icon.svg
-   # Download and extract icon-192.png and icon-512.png to public/
-   
-   # Or use ImageMagick:
-   convert public/icon.svg -resize 192x192 public/icon-192.png
-   convert public/icon.svg -resize 512x512 public/icon-512.png
-   ```
+# Run database migrations
+yarn prisma:migrate
 
-6. **Run the development server**:
-   ```bash
-   yarn dev
-   # or
-   npm run dev
-   ```
+# (Optional) Open Prisma Studio to view data
+yarn prisma:studio
+```
 
-7. **Open your browser**: Navigate to [http://localhost:3000](http://localhost:3000)
+### 3. Environment Configuration
 
-## Usage
+Create a `.env` file in the root directory:
 
-### For Users
+```bash
+# Copy example environment file
+cp .env.example .env
+```
 
-1. **Open the app** in your browser or installed PWA
-2. **Allow location permissions** when prompted
-3. **Wait for location to load** (shown in status card)
-4. **Tap the EMERGENCY button** when you need help
-5. **Alert is sent** with your precise location and address
+Edit `.env` with your configuration:
 
-### For Developers
+```env
+# Database
+DATABASE_URL="postgresql://user:password@localhost:5432/usdc_investment"
 
-#### Project Structure
+# Blockchain RPC (choose one or both)
+ALCHEMY_API_KEY="your_alchemy_api_key"
+INFURA_URL="https://arbitrum-mainnet.infura.io/v3/your_project_id"
+ETHERSCAN_API_KEY="your_arbiscan_api_key"
+
+# Chain Configuration
+NEXT_PUBLIC_ARBITRUM_CHAIN_ID=42161
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID="your_walletconnect_project_id"
+
+# USDC Token (choose one)
+# Bridged USDC (USDC.e)
+NEXT_PUBLIC_USDC_ADDRESS="0xFF970A61A04b1cA14834A43f5DE4533eBDDB5CC8"
+# OR Native USDC
+# NEXT_PUBLIC_USDC_ADDRESS="0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+
+# Admin & Operator Wallets
+ADMIN_WALLET_ADDRESS="0xYourAdminWalletAddress"
+OPERATOR_WALLET_ADDRESS="0xYourOperatorWalletAddress"
+
+# Security
+JWT_SECRET="your_super_secret_jwt_key_minimum_32_characters_long"
+NEXTAUTH_SECRET="your_nextauth_secret_key"
+NEXTAUTH_URL="http://localhost:3000"
+
+# App Configuration
+MINIMUM_DEPOSIT_USDC=100
+REQUIRED_CONFIRMATIONS=5
+
+# Feature Flags
+ENABLE_KYC_REQUIREMENT=false
+ENABLE_EMAIL_NOTIFICATIONS=false
+```
+
+### 4. Get Required API Keys
+
+**WalletConnect Project ID:**
+1. Go to https://cloud.walletconnect.com/
+2. Create a new project
+3. Copy the Project ID
+
+**Alchemy API Key:**
+1. Go to https://www.alchemy.com/
+2. Create a free account
+3. Create a new app for "Arbitrum" network
+4. Copy the API key
+
+**Arbiscan API Key (optional):**
+1. Go to https://arbiscan.io/
+2. Create an account
+3. Generate an API key
+
+### 5. Run Development Server
+
+```bash
+yarn dev
+
+# or with npm
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## 🚀 Deployment
+
+### Vercel Deployment
+
+1. **Push to GitHub**
+```bash
+git add .
+git commit -m "Initial commit"
+git push origin main
+```
+
+2. **Deploy to Vercel**
+- Go to [vercel.com](https://vercel.com)
+- Import your repository
+- Add environment variables from `.env`
+- Deploy
+
+3. **Database Setup**
+- Use Vercel Postgres, Supabase, or Railway for production database
+- Update `DATABASE_URL` in Vercel environment variables
+- Run migrations: `yarn prisma:migrate`
+
+### Environment Variables for Production
+
+Ensure all environment variables are set in your hosting platform:
+- All variables from `.env.example`
+- Use production RPC endpoints (Alchemy/Infura)
+- Set strong, unique `JWT_SECRET` and `NEXTAUTH_SECRET`
+- Update `NEXTAUTH_URL` to your production domain
+
+## 📖 Usage Guide
+
+### For Investors
+
+1. **Connect Wallet**
+   - Visit the landing page
+   - Click "Connect Wallet"
+   - Approve the connection in your wallet
+
+2. **Make a Deposit**
+   - Go to Dashboard → "Make a Deposit"
+   - Enter the amount (minimum $100 USDC)
+   - Approve and send the transaction
+   - Wait for confirmation (usually 1-2 minutes)
+
+3. **Track Your Investment**
+   - View your balance in the Dashboard
+   - Check transaction history in the Deposits page
+   - Monitor performance in the Performance page
+
+### For Administrators
+
+1. **Access Admin Panel**
+   - Connect with the admin wallet address
+   - Navigate to `/admin`
+
+2. **Configure Settings**
+   - Set operator wallet address
+   - Configure token address (USDC.e or native USDC)
+   - Adjust minimum deposit and confirmations
+   - Update NAV and performance metrics
+
+3. **Monitor Deposits**
+   - View all deposits in the admin dashboard
+   - Check pending transactions
+   - Review user statistics
+
+## 🏗️ Architecture
+
+### Database Schema
+
+- **Users**: Wallet address, KYC status, total invested/shares
+- **Deposits**: Transaction tracking, status, confirmations
+- **Sessions**: JWT session management
+- **AppSettings**: Platform configuration
+- **AdminLogs**: Audit trail for admin actions
+
+### API Routes
+
+**Authentication:**
+- `POST /api/auth/nonce` - Get nonce for wallet signature
+- `POST /api/auth/verify` - Verify signature and create session
+- `POST /api/auth/logout` - End session
+
+**User:**
+- `GET /api/user` - Get user profile and stats
+- `GET /api/deposits` - Get user's deposits
+
+**Deposits:**
+- `POST /api/deposits/track` - Track and verify a deposit
+- `GET /api/settings` - Get public settings
+
+**Admin:**
+- `GET /api/admin/settings` - Get admin settings
+- `POST /api/admin/settings` - Update settings
+- `GET /api/admin/deposits` - List all deposits
+- `GET /api/admin/stats` - Get platform statistics
+
+### Security Considerations
+
+1. **Private Keys**: Never expose operator private keys in the frontend
+2. **Transaction Verification**: All deposits are verified on-chain before crediting
+3. **Admin Access**: Restricted to configured admin wallet address
+4. **Rate Limiting**: Implement rate limiting on API routes in production
+5. **Input Validation**: All inputs are validated using Zod schemas
+6. **Session Security**: JWT tokens with httpOnly cookies
+
+## 🔧 Configuration
+
+### Supported USDC Tokens
+
+**Arbitrum Bridged USDC (USDC.e):**
+- Address: `0xFF970A61A04b1cA14834A43f5DE4533eBDDB5CC8`
+- Most commonly used
+- Bridged from Ethereum
+
+**Arbitrum Native USDC:**
+- Address: `0xaf88d065e77c8cC2239327C5EDb3A432268e5831`
+- Native Circle USDC
+- Newer standard
+
+Choose one in your `.env` file via `NEXT_PUBLIC_USDC_ADDRESS`.
+
+### Confirmation Settings
+
+Adjust `REQUIRED_CONFIRMATIONS` based on your security needs:
+- 1-3 confirmations: Fast (1-2 minutes)
+- 5 confirmations: Balanced (recommended)
+- 10+ confirmations: Very secure (slower)
+
+## 🧪 Testing
+
+### Manual Testing Checklist
+
+- [ ] Wallet connection works
+- [ ] User can view dashboard after connecting
+- [ ] Deposit modal displays correct operator address
+- [ ] USDC transfer initiates from wallet
+- [ ] Transaction is tracked and appears in deposits
+- [ ] Admin can access admin panel
+- [ ] Settings can be updated
+- [ ] Disclaimer modal appears on first visit
+
+### Test on Arbitrum Testnet
+
+To test without real funds:
+1. Change chain configuration to Arbitrum Sepolia (testnet)
+2. Get testnet USDC from faucets
+3. Test full deposit flow
+
+## 📝 Important Notes
+
+### Legal Compliance
+
+- **Disclaimers**: The app includes comprehensive risk disclosures
+- **KYC/AML**: Platform supports KYC requirement (configure via admin)
+- **Regulations**: Ensure compliance with local securities laws
+- **Licensing**: May require licensing depending on jurisdiction
+
+### Security Best Practices
+
+1. **Never commit** `.env` file to version control
+2. **Use hardware wallet** for operator/admin wallets
+3. **Enable 2FA** on all service accounts (Alchemy, Vercel, etc.)
+4. **Regular backups** of database
+5. **Monitor** transaction logs for suspicious activity
+6. **Implement** withdrawal approval workflow
+7. **Add** rate limiting and DDoS protection
+
+### Operational Considerations
+
+- **NAV Updates**: Update NAV regularly via admin panel
+- **Withdrawals**: Implement manual withdrawal approval process
+- **Customer Support**: Set up support email/chat
+- **Performance Reporting**: Provide regular performance updates
+- **Liquidity**: Ensure sufficient liquidity for withdrawals
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**"Transaction verification failed"**
+- Ensure transaction is on Arbitrum network
+- Check that USDC token address is correct
+- Verify minimum deposit amount is met
+- Wait for sufficient confirmations
+
+**"Access denied: Admin only"**
+- Verify `ADMIN_WALLET_ADDRESS` in `.env` matches connected wallet
+- Ensure wallet address is lowercase in environment variable
+
+**Database connection error**
+- Check `DATABASE_URL` is correct
+- Ensure PostgreSQL is running
+- Run `yarn prisma:generate` and `yarn prisma:migrate`
+
+**Wallet connection issues**
+- Verify `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` is set
+- Check that you're on Arbitrum network in your wallet
+- Clear browser cache and reconnect
+
+## 📦 Project Structure
 
 ```
 /workspace
+├── prisma/
+│   └── schema.prisma          # Database schema
+├── public/                     # Static assets
 ├── src/
 │   ├── app/
-│   │   ├── layout.tsx        # Root layout with PWA meta tags
-│   │   ├── page.tsx           # Main emergency screen
-│   │   └── globals.css        # Global styles and animations
-│   ├── components/
-│   │   └── PWAInstallPrompt.tsx # PWA installation prompt
-│   ├── hooks/
-│   │   ├── useGeolocation.ts    # Location management hook
-│   │   └── useEmergencyAlert.ts # Alert functionality hook
-│   └── lib/
-│       ├── geolocation.ts       # Location utilities
-│       ├── api.ts               # API client
-│       └── pwa.ts               # PWA utilities
-├── public/
-│   ├── manifest.json          # PWA manifest
-│   ├── sw.js                  # Service worker
-│   └── icon*.png              # PWA icons
-└── scripts/
-    └── generate-icons.js      # Icon generation helper
+│   │   ├── admin/             # Admin dashboard
+│   │   ├── api/               # API routes
+│   │   ├── dashboard/         # User dashboard
+│   │   ├── deposit/           # Deposit page
+│   │   ├── deposits/          # Transaction history
+│   │   ├── performance/       # Performance charts
+│   │   ├── layout.tsx         # Root layout
+│   │   ├── page.tsx           # Landing page
+│   │   └── providers.tsx      # Context providers
+│   ├── components/            # React components
+│   │   ├── DepositModal.tsx
+│   │   ├── DisclaimerModal.tsx
+│   │   └── Navbar.tsx
+│   └── lib/                   # Utilities
+│       ├── auth.ts            # Authentication
+│       ├── blockchain.ts      # Blockchain interactions
+│       ├── config.ts          # Configuration
+│       ├── prisma.ts          # Prisma client
+│       ├── utils.ts           # Helper functions
+│       └── wagmi.ts           # Wagmi configuration
+├── .env.example               # Environment template
+├── package.json
+└── README.md
 ```
 
-#### API Integration
+## 🤝 Support
 
-The app sends POST requests to `{API_BASE_URL}/panic` with the following payload:
+For issues or questions:
+- Email: support@arbibot.com
+- GitHub Issues: [Create an issue]
+- Documentation: This README
 
-```json
-{
-  "contacts": ["+15085140864"],
-  "message": "🚨 EMERGÊNCIA! Preciso de ajuda! Estou em: {address}",
-  "location": {
-    "lat": -23.550520,
-    "lng": -46.633308
-  }
-}
-```
+## ⚠️ Disclaimer
 
-Expected response:
-```json
-{
-  "success": true,
-  "message": "Emergency alert sent successfully"
-}
-```
+This is a financial application that handles real user funds. Use at your own risk. The creators and contributors are not responsible for any financial losses. Always:
 
-#### Custom Hooks
+- Test thoroughly before deploying to production
+- Implement proper security measures
+- Comply with all applicable laws and regulations
+- Provide clear risk disclosures to users
+- Only accept funds you can properly manage and secure
 
-**`useGeolocation(autoFetch?: boolean)`**
-- Manages location state and updates
-- Returns: `{ coordinates, error, loading, accuracy, refreshLocation }`
+## 📄 License
 
-**`useEmergencyAlert()`**
-- Handles emergency alert sending
-- Returns: `{ sendAlert, loading, error, success }`
-
-#### Environment Variables
-
-| Variable | Description | Required | Default |
-|----------|-------------|----------|---------|
-| `NEXT_PUBLIC_API_BASE_URL` | Backend API URL | Yes | - |
-| `NEXT_PUBLIC_CONTACT_1` | Emergency contact number | No | +15085140864 |
-
-## PWA Features
-
-### Installation
-
-The app can be installed on mobile devices:
-
-1. **iOS**: Open in Safari → Share → Add to Home Screen
-2. **Android**: Chrome → Menu → Install App
-3. **Desktop**: Address bar → Install icon
-
-### Offline Support
-
-- Basic offline functionality via Service Worker
-- Cached assets for faster loading
-- Graceful degradation when offline
-
-### Manifest Configuration
-
-See `public/manifest.json` for PWA configuration including:
-- App name and description
-- Icons and theme colors
-- Display mode (standalone)
-- Orientation preferences
-
-## Development
-
-### Build for Production
-
-```bash
-yarn build
-yarn start
-```
-
-### Linting
-
-```bash
-yarn lint
-```
-
-### Testing Locally
-
-1. Use ngrok to expose your backend:
-   ```bash
-   ngrok http 3001
-   ```
-
-2. Update `.env.local` with the ngrok URL
-
-3. Test on your mobile device using the ngrok URL
-
-## Browser Support
-
-- ✅ Chrome/Edge (Desktop & Mobile)
-- ✅ Safari (iOS & macOS)
-- ✅ Firefox (Desktop & Mobile)
-- ⚠️ Requires HTTPS (except localhost)
-- ⚠️ Requires Geolocation API support
-
-## Security Considerations
-
-- Location data is only accessed when user grants permission
-- API requests use HTTPS in production
-- No sensitive data stored locally
-- Service worker caches only public assets
-
-## Troubleshooting
-
-### Location not working
-
-1. Check browser permissions (Settings → Site Settings → Location)
-2. Ensure you're using HTTPS or localhost
-3. Check browser console for errors
-4. Try refreshing location manually
-
-### PWA not installing
-
-1. Ensure HTTPS is enabled (required for PWA)
-2. Check manifest.json is accessible
-3. Verify all icon files exist
-4. Clear browser cache and try again
-
-### API errors
-
-1. Verify `NEXT_PUBLIC_API_BASE_URL` is set correctly
-2. Check backend is running and accessible
-3. Verify CORS is enabled on backend
-4. Check network tab for request details
-
-## Production Deployment
-
-### Vercel (Recommended)
-
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel
-```
-
-Add environment variables in Vercel dashboard.
-
-### Other Platforms
-
-The app can be deployed to any platform supporting Next.js:
-- Netlify
-- AWS Amplify
-- Cloudflare Pages
-- Self-hosted with Docker
-
-## License
-
-MIT License - feel free to use this project for your own emergency alert systems.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## Support
-
-For issues or questions, please open an issue on the repository.
+This project is provided as-is for educational and commercial purposes.
 
 ---
 
-**⚠️ Important**: This is an emergency alert system. Always call local emergency services (911, 112, etc.) for life-threatening emergencies. This app is meant as a supplementary communication tool.
+**Built with ❤️ using Next.js, TypeScript, and Arbitrum**

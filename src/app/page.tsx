@@ -1,224 +1,430 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from 'react';
-import { useGeolocation } from '@/hooks/useGeolocation';
-import { useEmergencyAlert } from '@/hooks/useEmergencyAlert';
-import { formatCoordinates } from '@/lib/geolocation';
-import { registerServiceWorker } from '@/lib/pwa';
-import PWAInstallPrompt from '@/components/PWAInstallPrompt';
+import { Navbar } from '@/components/Navbar';
+import { AnimatedBackground } from '@/components/AnimatedBackground';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useAccount } from 'wagmi';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { motion } from 'framer-motion';
+import { Shield, TrendingUp, Lock, Zap, BarChart3, CheckCircle, ArrowRight, Sparkles, Star, DollarSign, Users } from 'lucide-react';
 
-export default function EmergencyPage() {
-  const { coordinates, error: locationError, loading: locationLoading, accuracy, refreshLocation } = useGeolocation(true);
-  const { sendAlert, loading: alertLoading, error: alertError, success: alertSuccess } = useEmergencyAlert();
-  const [isClient, setIsClient] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertType, setAlertType] = useState<"success" | "error">("success");
-  const [whatsappNumber, setWhatsappNumber] = useState("");
+export default function HomePage() {
+  const { isConnected, address } = useAccount();
+  const router = useRouter();
+  const { authenticate, isAuthenticating } = useAuth();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
-    // Register service worker for PWA
-    registerServiceWorker();
+    setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (alertSuccess) {
-      showNotification("Emergency alert sent successfully! ✓", "success");
+    if (mounted && isConnected && address) {
+      // Authenticate and redirect to dashboard
+      handleAuthentication();
     }
-  }, [alertSuccess]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, address, mounted]);
 
-  useEffect(() => {
-    if (alertError) {
-      showNotification(alertError, "error");
-    }
-  }, [alertError]);
-
-  const showNotification = (message: string, type: "success" | "error") => {
-    setAlertMessage(message);
-    setAlertType(type);
-    setShowAlert(true);
-    setTimeout(() => setShowAlert(false), 5000);
-  };
-
-  const handleEmergencyClick = async () => {
-    if (!coordinates) {
-      showNotification("Unable to get your location. Please try again.", "error");
-      await refreshLocation();
-      return;
-    }
-
-    if (!whatsappNumber || whatsappNumber.trim() === "") {
-      showNotification("Please enter a WhatsApp number first.", "error");
-      return;
-    }
-
-    try {
-      await sendAlert(coordinates, whatsappNumber);
-    } catch (err) {
-      // Error is already handled by the hook
-      console.error("Emergency alert failed:", err);
+  const handleAuthentication = async () => {
+    const success = await authenticate();
+    if (success) {
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 500);
     }
   };
 
-  const getLocationStatus = () => {
-    if (locationLoading) return "Getting location...";
-    if (locationError) return locationError.message;
-    if (coordinates) return formatCoordinates(coordinates);
-    return "Location unavailable";
+  if (!mounted) {
+    return null;
+  }
+
+  if (isAuthenticating) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <div className="w-20 h-20 mx-auto mb-4">
+            <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-blue-600"></div>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Authenticating...</h2>
+          <p className="text-gray-600">Please sign the message in your wallet</p>
+        </motion.div>
+      </div>
+    );
+  }
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
   };
 
-  const getLocationStatusColor = () => {
-    if (locationError) return "text-red-600";
-    if (coordinates) return "text-green-600";
-    return "text-gray-500";
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6 },
+    },
   };
-
-  const isButtonDisabled = alertLoading || locationLoading || !coordinates || !whatsappNumber;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* PWA Install Prompt */}
-      <PWAInstallPrompt />
-      
-      {/* Alert Notification */}
-      {showAlert && (
-        <div
-          className={`fixed top-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-96 p-4 rounded-lg shadow-lg z-50 ${
-            alertType === "success"
-              ? "bg-green-500 text-white"
-              : "bg-red-500 text-white"
-          } animate-slide-in`}
-        >
-          <div className="flex items-center justify-between">
-            <span className="font-medium">{alertMessage}</span>
-            <button
-              onClick={() => setShowAlert(false)}
-              className="ml-4 text-white hover:text-gray-200"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 relative overflow-hidden">
+      <AnimatedBackground />
+      <Navbar />
 
-      {/* Main Container */}
-      <div className="max-w-md w-full">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            Safe<span className="text-red-600">Alert</span>
-          </h1>
-          <p className="text-gray-600">Emergency Alert System</p>
-        </div>
-
-        {/* Status Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-          {/* WhatsApp Number Input */}
-          <div className="mb-4">
-            <label htmlFor="whatsapp" className="block text-sm font-medium text-gray-700 mb-2">
-              WhatsApp Number
-            </label>
-            <input
-              id="whatsapp"
-              type="tel"
-              value={whatsappNumber}
-              onChange={(e) => setWhatsappNumber(e.target.value)}
-              placeholder="+15085140864"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900 placeholder-gray-400"
-              disabled={alertLoading}
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Include country code (e.g., +1 for USA)
-            </p>
-          </div>
-
-          {/* Location Status */}
-          <div className="mb-4 pt-4 border-t border-gray-200">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-700">Location Status</span>
-              {isClient && (
-                <button
-                  onClick={refreshLocation}
-                  disabled={locationLoading}
-                  className="text-xs text-blue-600 hover:text-blue-700 disabled:text-gray-400"
-                >
-                  {locationLoading ? "Updating..." : "Refresh"}
-                </button>
-              )}
-            </div>
-            <p className={`text-sm ${getLocationStatusColor()} break-words`}>
-              {getLocationStatus()}
-            </p>
-            {coordinates && accuracy && (
-              <p className="text-xs text-gray-500 mt-1">
-                Accuracy: ±{Math.round(accuracy)}m
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Emergency Button */}
-        <div className="flex flex-col items-center">
-          <button
-            onClick={handleEmergencyClick}
-            disabled={isButtonDisabled}
-            className={`
-              w-64 h-64 rounded-full shadow-2xl
-              transition-all duration-300 transform
-              ${
-                isButtonDisabled
-                  ? "bg-gray-300 cursor-not-allowed scale-95"
-                  : "bg-red-600 hover:bg-red-700 hover:scale-105 active:scale-95 animate-pulse-slow"
-              }
-              flex flex-col items-center justify-center
-              focus:outline-none focus:ring-4 focus:ring-red-300
-            `}
+      {/* Hero Section */}
+      <section className="pt-20 pb-32 px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={containerVariants}
+            className="text-center"
           >
-            <div className="text-white">
-              {alertLoading ? (
-                <>
-                  <div className="animate-spin rounded-full h-16 w-16 border-4 border-white border-t-transparent mx-auto mb-4"></div>
-                  <span className="text-xl font-bold">SENDING...</span>
-                </>
-              ) : (
-                <>
-                  <div className="text-6xl mb-2">🚨</div>
-                  <span className="text-3xl font-bold tracking-wider">EMERGENCY</span>
-                  {locationLoading && (
-                    <span className="text-xs mt-2 block">Getting location...</span>
-                  )}
-                </>
-              )}
-            </div>
-          </button>
+            {/* Badge */}
+            <motion.div variants={itemVariants} className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 text-sm font-bold mb-8 shadow-lg">
+              <Zap className="w-5 h-5 mr-2 animate-pulse" />
+              <span>Powered by Arbitrum Layer 2</span>
+              <Sparkles className="w-5 h-5 ml-2" />
+            </motion.div>
 
-          {/* Help Text */}
-          <p className="text-center text-sm text-gray-600 mt-6 max-w-xs">
-            {!whatsappNumber
-              ? "Enter a WhatsApp number to get started"
-              : isButtonDisabled && !alertLoading
-              ? "Waiting for location access..."
-              : "Tap to send emergency alert with your current location"}
-          </p>
+            {/* Main Heading */}
+            <motion.h1
+              variants={itemVariants}
+              className="text-5xl md:text-7xl lg:text-8xl font-bold text-gray-900 mb-6"
+            >
+              Invest USDC into
+              <br />
+              <span className="text-gradient block mt-2">
+                Automated Trading
+              </span>
+            </motion.h1>
+
+            {/* Subheading */}
+            <motion.p
+              variants={itemVariants}
+              className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed"
+            >
+              Put your USDC to work with our proven BTC trading bot on Arbitrum.
+              <br />
+              <span className="font-semibold text-gray-800">Transparent, secure, and designed for consistent returns.</span>
+            </motion.p>
+
+            {/* CTA Buttons */}
+            <motion.div
+              variants={itemVariants}
+              className="flex flex-col sm:flex-row gap-6 justify-center items-center"
+            >
+              <ConnectButton.Custom>
+                {({ openConnectModal }) => (
+                  <motion.button
+                    onClick={openConnectModal}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="btn btn-primary text-lg px-10 py-5 shadow-2xl hover:shadow-blue-500/50 flex items-center space-x-2 group"
+                  >
+                    <span>Connect Wallet to Start</span>
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </motion.button>
+                )}
+              </ConnectButton.Custom>
+
+              <motion.a
+                href="#how-it-works"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="btn btn-outline text-lg px-10 py-5 flex items-center space-x-2 group"
+              >
+                <span>Learn How It Works</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </motion.a>
+            </motion.div>
+
+            {/* Stats */}
+            <motion.div
+              variants={containerVariants}
+              className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-24 max-w-5xl mx-auto"
+            >
+              {[
+                { value: '$2.5M+', label: 'Assets Under Management', icon: DollarSign, color: 'blue' },
+                { value: '+24.3%', label: 'YTD Returns', icon: TrendingUp, color: 'green' },
+                { value: '500+', label: 'Active Investors', icon: Users, color: 'purple' },
+              ].map((stat, index) => (
+                <motion.div
+                  key={stat.label}
+                  variants={itemVariants}
+                  whileHover={{ y: -10 }}
+                  className="card-premium text-center group"
+                >
+                  <div className={`w-16 h-16 bg-gradient-to-br ${
+                    stat.color === 'blue' ? 'from-blue-500 to-blue-600' :
+                    stat.color === 'green' ? 'from-green-500 to-green-600' :
+                    'from-purple-500 to-purple-600'
+                  } rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-2xl transition-shadow`}>
+                    <stat.icon className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="text-4xl font-bold text-gray-900 mb-2 number-counter">
+                    {stat.value}
+                  </div>
+                  <div className="text-gray-600">{stat.label}</div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
         </div>
+      </section>
 
-        {/* Instructions */}
-        {locationError?.code === 1 && (
-          <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p className="text-sm text-yellow-800">
-              <strong>Location Access Required:</strong> Please enable location
-              permissions in your browser settings to use this app.
+      {/* Features Section */}
+      <section id="features" className="py-24 bg-white/50 backdrop-blur-sm relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-20"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              Why Choose <span className="text-gradient">ArbiBot</span>?
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Professional-grade trading, accessible to everyone
             </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                icon: Shield,
+                title: 'Secure & Transparent',
+                description: 'All deposits are on-chain and verifiable. Your funds go directly to the operator wallet with full transparency.',
+                color: 'blue',
+              },
+              {
+                icon: TrendingUp,
+                title: 'Proven Strategy',
+                description: 'Our algorithmic trading bot has consistently outperformed the market with systematic BTC strategies.',
+                color: 'green',
+              },
+              {
+                icon: Lock,
+                title: 'Non-Custodial',
+                description: 'You control your wallet. Deposits are tracked on-chain and credited to your account automatically.',
+                color: 'purple',
+              },
+              {
+                icon: Zap,
+                title: 'Arbitrum Speed',
+                description: 'Low fees and fast confirmations on Arbitrum L2. Your deposits are confirmed in minutes.',
+                color: 'orange',
+              },
+              {
+                icon: BarChart3,
+                title: 'Real-time Dashboard',
+                description: 'Track your investments, view transaction history, and monitor performance in real-time.',
+                color: 'pink',
+              },
+              {
+                icon: CheckCircle,
+                title: 'Simple Process',
+                description: 'Connect wallet, send USDC, and start earning. No complex procedures or paperwork required.',
+                color: 'indigo',
+              },
+            ].map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                whileHover={{ y: -10 }}
+                className="card-premium group cursor-pointer"
+              >
+                <motion.div
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.6 }}
+                  className={`w-16 h-16 bg-gradient-to-br ${
+                    feature.color === 'blue' ? 'from-blue-500 to-blue-600' :
+                    feature.color === 'green' ? 'from-green-500 to-green-600' :
+                    feature.color === 'purple' ? 'from-purple-500 to-purple-600' :
+                    feature.color === 'orange' ? 'from-orange-500 to-orange-600' :
+                    feature.color === 'pink' ? 'from-pink-500 to-pink-600' :
+                    'from-indigo-500 to-indigo-600'
+                  } rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:shadow-2xl transition-shadow`}
+                >
+                  <feature.icon className="w-8 h-8 text-white" />
+                </motion.div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {feature.description}
+                </p>
+              </motion.div>
+            ))}
           </div>
-        )}
-      </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section id="how-it-works" className="py-24 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-20"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              How It Works
+            </h2>
+            <p className="text-xl text-gray-600">
+              Start investing in 3 simple steps
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {[
+              { step: '1', title: 'Connect Wallet', description: 'Connect your MetaMask or WalletConnect wallet. Make sure you are on Arbitrum network.' },
+              { step: '2', title: 'Send USDC', description: 'Transfer USDC to the operator wallet address. Minimum deposit $100. Your transaction is verified on-chain.' },
+              { step: '3', title: 'Track Returns', description: 'Monitor your investment in the dashboard. View real-time performance and transaction history.' },
+            ].map((step, index) => (
+              <motion.div
+                key={step.step}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.2 }}
+                className="text-center group"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.1, rotate: 360 }}
+                  transition={{ duration: 0.6 }}
+                  className="w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-8 shadow-2xl group-hover:shadow-blue-500/50"
+                >
+                  {step.step}
+                </motion.div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  {step.title}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {step.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-24 relative z-10">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="card-premium p-12"
+          >
+            <div className="flex justify-center mb-6">
+              {[...Array(5)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, delay: i * 0.2 }}
+                >
+                  <Star className="w-8 h-8 text-yellow-500 fill-yellow-500" />
+                </motion.div>
+              ))}
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gradient">
+              Ready to Start Earning?
+            </h2>
+            <p className="text-xl text-gray-600 mb-10">
+              Join hundreds of investors already earning with ArbiBot
+            </p>
+            <ConnectButton.Custom>
+              {({ openConnectModal }) => (
+                <motion.button
+                  onClick={openConnectModal}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="btn btn-primary text-lg px-12 py-5 shadow-2xl hover:shadow-blue-500/50"
+                >
+                  Connect Wallet Now
+                </motion.button>
+              )}
+            </ConnectButton.Custom>
+          </motion.div>
+        </div>
+      </section>
 
       {/* Footer */}
-      <div className="mt-12 text-center text-xs text-gray-500">
-        <p>Always keep your location services enabled</p>
-        <p className="mt-1">In case of real emergency, call local authorities</p>
-      </div>
+      <footer className="bg-gray-900 text-white py-12 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-xl">AB</span>
+                </div>
+                <span className="font-bold text-xl">ArbiBot</span>
+              </div>
+              <p className="text-gray-400">
+                Automated USDC trading on Arbitrum
+              </p>
+            </div>
+            <div>
+              <h4 className="font-bold mb-4">Legal</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Terms of Service
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Privacy Policy
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-white transition-colors">
+                    Risk Disclosure
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold mb-4">Support</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>
+                  <a href="mailto:support@arbibot.com" className="hover:text-white transition-colors">
+                    support@arbibot.com
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2025 ArbiBot. All rights reserved.</p>
+            <p className="mt-2 text-sm">
+              <strong>Disclaimer:</strong> Trading cryptocurrencies involves risk.
+              You may lose some or all of your investment. Only invest what you can
+              afford to lose.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
