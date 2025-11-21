@@ -6,12 +6,14 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 import { motion } from 'framer-motion';
-import { Shield, TrendingUp, Lock, Zap, BarChart3, CheckCircle, ArrowRight, Sparkles, Star } from 'lucide-react';
+import { Shield, TrendingUp, Lock, Zap, BarChart3, CheckCircle, ArrowRight, Sparkles, Star, DollarSign, Users } from 'lucide-react';
 
 export default function HomePage() {
   const { isConnected, address } = useAccount();
   const router = useRouter();
+  const { authenticate, isAuthenticating } = useAuth();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -20,14 +22,41 @@ export default function HomePage() {
 
   useEffect(() => {
     if (mounted && isConnected && address) {
-      // Redirect to dashboard after connection
-      setTimeout(() => router.push('/dashboard'), 1000);
+      // Authenticate and redirect to dashboard
+      handleAuthentication();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, address, mounted]);
 
+  const handleAuthentication = async () => {
+    const success = await authenticate();
+    if (success) {
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 500);
+    }
+  };
+
   if (!mounted) {
     return null;
+  }
+
+  if (isAuthenticating) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <div className="w-20 h-20 mx-auto mb-4">
+            <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-blue-600"></div>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Authenticating...</h2>
+          <p className="text-gray-600">Please sign the message in your wallet</p>
+        </motion.div>
+      </div>
+    );
   }
 
   const containerVariants = {
@@ -267,7 +296,7 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {[
-              { step: '1', title: 'Connect Wallet', description: 'Connect your MetaMask or WalletConnect wallet. Make sure you\'re on Arbitrum network.' },
+              { step: '1', title: 'Connect Wallet', description: 'Connect your MetaMask or WalletConnect wallet. Make sure you are on Arbitrum network.' },
               { step: '2', title: 'Send USDC', description: 'Transfer USDC to the operator wallet address. Minimum deposit $100. Your transaction is verified on-chain.' },
               { step: '3', title: 'Track Returns', description: 'Monitor your investment in the dashboard. View real-time performance and transaction history.' },
             ].map((step, index) => (
@@ -398,13 +427,4 @@ export default function HomePage() {
       </footer>
     </div>
   );
-}
-
-// Dummy component for missing icon
-function DollarSign(props: React.SVGProps<SVGSVGElement>) {
-  return <svg {...props}><circle cx="12" cy="12" r="10" fill="currentColor" /></svg>;
-}
-
-function Users(props: React.SVGProps<SVGSVGElement>) {
-  return <svg {...props}><circle cx="12" cy="12" r="10" fill="currentColor" /></svg>;
 }
