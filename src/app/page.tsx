@@ -83,8 +83,8 @@ export default function HomePage() {
       <AnimatedBackground />
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="pt-20 pb-32 px-4 sm:px-6 lg:px-8 relative z-10">
+      {/* Hero Section - Mobile-first Premium Design */}
+      <section className="pt-16 sm:pt-20 pb-20 sm:pb-32 px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial="hidden"
@@ -92,39 +92,42 @@ export default function HomePage() {
             variants={containerVariants}
             className="text-center"
           >
-            {/* Badge */}
-            <motion.div variants={itemVariants} className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 text-sm font-bold mb-8 shadow-lg">
-              <Zap className="w-5 h-5 mr-2 animate-pulse" />
-              <span>Powered by Arbitrum Layer 2</span>
-              <Sparkles className="w-5 h-5 ml-2" />
+            {/* Badge - Mobile Optimized */}
+            <motion.div 
+              variants={itemVariants} 
+              className="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 text-xs sm:text-sm font-bold mb-6 sm:mb-8 shadow-lg"
+            >
+              <Zap className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-pulse" />
+              <span>Multi-Chain USDC Deposits</span>
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
             </motion.div>
 
-            {/* Main Heading */}
+            {/* Main Heading - Mobile Optimized */}
             <motion.h1
               variants={itemVariants}
-              className="text-5xl md:text-7xl lg:text-8xl font-bold text-gray-900 mb-6"
+              className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight"
             >
               Invest USDC into
               <br />
-              <span className="text-gradient block mt-2">
+              <span className="text-gradient block mt-1 sm:mt-2">
                 Automated Trading
               </span>
             </motion.h1>
 
-            {/* Subheading */}
+            {/* Subheading - Mobile Optimized */}
             <motion.p
               variants={itemVariants}
-              className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed"
+              className="text-base sm:text-xl md:text-2xl text-gray-600 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed px-2"
             >
-              Put your USDC to work with our proven BTC trading bot on Arbitrum.
-              <br />
-              <span className="font-semibold text-gray-800">Transparent, secure, and designed for consistent returns.</span>
+              Deposit on <strong>Arbitrum</strong> or <strong>Solana</strong>. Mobile-first experience.
+              <br className="hidden sm:block" />
+              <span className="font-semibold text-gray-800">Transparent, secure, and designed for you.</span>
             </motion.p>
 
-            {/* CTA Buttons */}
+            {/* CTA Buttons - Mobile Optimized */}
             <motion.div
               variants={itemVariants}
-              className="flex flex-col sm:flex-row gap-6 justify-center items-center"
+              className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-stretch sm:items-center w-full max-w-lg sm:max-w-none mx-auto"
             >
               <ConnectButton.Custom>
                 {({ openConnectModal }) => (
@@ -132,9 +135,9 @@ export default function HomePage() {
                     onClick={openConnectModal}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="btn btn-primary text-lg px-10 py-5 shadow-2xl hover:shadow-blue-500/50 flex items-center space-x-2 group"
+                    className="btn btn-primary text-base sm:text-lg px-8 sm:px-10 py-4 sm:py-5 shadow-2xl hover:shadow-blue-500/50 flex items-center justify-center space-x-2 group w-full sm:w-auto"
                   >
-                    <span>Connect Wallet to Start</span>
+                    <span>Connect Wallet</span>
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </motion.button>
                 )}
@@ -144,17 +147,17 @@ export default function HomePage() {
                 href="#how-it-works"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="btn btn-outline text-lg px-10 py-5 flex items-center space-x-2 group"
+                className="btn btn-outline text-base sm:text-lg px-8 sm:px-10 py-4 sm:py-5 flex items-center justify-center space-x-2 group w-full sm:w-auto"
               >
-                <span>Learn How It Works</span>
+                <span>How It Works</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </motion.a>
             </motion.div>
 
-            {/* Stats */}
+            {/* Stats - Mobile Optimized */}
             <motion.div
               variants={containerVariants}
-              className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-24 max-w-5xl mx-auto"
+              className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mt-12 sm:mt-24 max-w-5xl mx-auto"
             >
               {[
                 { value: '$2.5M+', label: 'Assets Under Management', icon: DollarSign, color: 'blue' },

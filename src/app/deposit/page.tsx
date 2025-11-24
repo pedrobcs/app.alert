@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/Navbar';
-import { DepositModal } from '@/components/DepositModal';
+import { MultiChainDepositModal } from '@/components/MultiChainDepositModal';
+import { motion } from 'framer-motion';
 
 export default function DepositPage() {
   const { isConnected } = useAccount();
@@ -13,13 +14,8 @@ export default function DepositPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isConnected) {
-      router.push('/');
-      return;
-    }
-
     fetchSettings();
-  }, [isConnected]);
+  }, []);
 
   const fetchSettings = async () => {
     try {
@@ -34,12 +30,21 @@ export default function DepositPage() {
     }
   };
 
-  if (!isConnected || loading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
         <Navbar />
         <div className="flex items-center justify-center min-h-[80vh]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center"
+          >
+            <div className="w-16 h-16 mx-auto mb-4">
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent"></div>
+            </div>
+            <p className="text-gray-600 font-semibold">Loading...</p>
+          </motion.div>
         </div>
       </div>
     );
@@ -49,10 +54,11 @@ export default function DepositPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
       <Navbar />
       {settings && (
-        <DepositModal
+        <MultiChainDepositModal
           isOpen={true}
           onClose={() => router.push('/dashboard')}
           operatorWallet={settings.operatorWallet}
+          solanaOperatorWallet={settings.solanaOperatorWallet || ''}
           tokenSymbol={settings.tokenSymbol}
           minimumDeposit={settings.minimumDeposit}
         />

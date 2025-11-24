@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyUSDCTransfer } from '@/lib/blockchain';
+import { verifySolanaUSDCTransfer } from '@/lib/solana';
 import { getSession } from '@/lib/auth';
 import { APP_CONFIG } from '@/lib/config';
 
@@ -11,7 +12,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { txHash, userAddress } = await request.json();
+    const { txHash, userAddress, chain = 'arbitrum' } = await request.json();
 
     if (!txHash || !userAddress) {
       return NextResponse.json(
@@ -20,10 +21,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify tx hash format
-    if (!/^0x[a-fA-F0-9]{64}$/.test(txHash)) {
+    // Verify tx hash format based on chain
+    const isArbitrum = chain === 'arbitrum';
+    const isValidHash = isArbitrum 
+      ? /^0x[a-fA-F0-9]{64}$/.test(txHash)
+      : /^[1-9A-HJ-NP-Za-km-z]{87,88}$/.test(txHash); // Solana signature format
+
+    if (!isValidHash) {
       return NextResponse.json(
-        { error: 'Invalid transaction hash' },
+        { error: `Invalid ${chain} transaction hash` },
         { status: 400 }
       );
     }
@@ -58,19 +64,44 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Verify transaction on-chain
-    const transfer = await verifyUSDCTransfer(
-      txHash,
-      userAddress,
-      settings.operatorWalletAddress,
-      settings.minimumDeposit
-    );
+    // Verify transaction on-chain based on chain
+    let transfer;
+    let operatorWallet;
+    
+    if (chain === 'arbitrum') {
+      operatorWallet = settings.operatorWalletAddress;
+      transfer = await verifyUSDCTransfer(
+        txHash,
+        userAddress,
+        operatorWallet,
+        settings.minimumDeposit
+      );
+    } else if (chain === 'solana') {
+      operatorWallet = settings.solanaOperatorWallet;
+      if (!operatorWallet) {
+        return NextResponse.json(
+          { error: 'Solana operator wallet not configured' },
+          { status: 500 }
+        );
+      }
+      transfer = await verifySolanaUSDCTransfer(
+        txHash,
+        userAddress,
+        operatorWallet,
+        settings.minimumDeposit
+      );
+    } else {
+      return NextResponse.json(
+        { error: 'Invalid chain specified' },
+        { status: 400 }
+      );
+    }
 
     if (!transfer) {
       return NextResponse.json(
         {
           error:
-            'Transaction verification failed. Ensure the transaction is a USDC transfer to the operator wallet.',
+            `Transaction verification failed on ${chain}. Ensure the transaction is a USDC transfer to the operator wallet.`,
         },
         { status: 400 }
       );
@@ -80,15 +111,16 @@ export async function POST(request: NextRequest) {
     const deposit = await prisma.deposit.create({
       data: {
         userId: user.id,
-        txHash: transfer.hash,
+        txHash: chain === 'arbitrum' ? transfer.hash : transfer.signature,
         fromAddress: transfer.from.toLowerCase(),
         toAddress: transfer.to.toLowerCase(),
-        tokenAddress: transfer.tokenAddress.toLowerCase(),
+        tokenAddress: (chain === 'arbitrum' ? transfer.tokenAddress : transfer.tokenMint).toLowerCase(),
         amount: parseFloat(transfer.tokenAmount),
         amountUSD: parseFloat(transfer.tokenAmount),
         confirmations: transfer.confirmations,
-        blockNumber: BigInt(transfer.blockNumber || 0),
-        timestamp: transfer.timestamp ? new Date(transfer.timestamp * 1000) : null,
+        blockNumber: chain === 'arbitrum' ? BigInt(transfer.blockNumber || 0) : BigInt(0),
+        timestamp: transfer.blockTime ? new Date(transfer.blockTime * 1000) : (transfer.timestamp ? new Date(transfer.timestamp * 1000) : null),
+        chain: chain,
         status:
           transfer.confirmations >= settings.requiredConfirmations
             ? 'CONFIRMED'

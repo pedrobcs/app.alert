@@ -25,6 +25,7 @@ export async function GET() {
 
     return NextResponse.json({
       operatorWallet: settings.operatorWalletAddress,
+      solanaOperatorWallet: settings.solanaOperatorWallet || '',
       tokenAddress: settings.acceptedTokenAddress,
       tokenSymbol: settings.tokenSymbol,
       minimumDeposit: settings.minimumDeposit,
