@@ -59,6 +59,7 @@ model Deposit {
   errorMessage      String?
   creditedAt        DateTime?
   detectedAt        DateTime @default(now())
+  chain             String   @default("arbitrum")
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -67,6 +68,7 @@ model Deposit {
   @@index([txHash])
   @@index([status])
   @@index([fromAddress])
+  @@index([chain])
   @@map("deposits")
 }
 
@@ -89,21 +91,22 @@ model Withdrawal {
 }
 
 model AppSettings {
-  id                      String   @id @default(cuid())
-  operatorWalletAddress   String
-  acceptedTokenAddress    String
-  tokenSymbol             String   @default("USDC")
-  minimumDeposit          Float    @default(100)
-  requiredConfirmations   Int      @default(5)
-  currentNAV              Float    @default(1.0)
-  totalAUM                Float    @default(0)
-  enableKYC               Boolean  @default(false)
-  enableDeposits          Boolean  @default(true)
-  enableWithdrawals       Boolean  @default(false)
-  performanceYTD          Float    @default(0)
-  lastNAVUpdate           DateTime @default(now())
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  id                        String   @id @default(cuid())
+  operatorWalletAddress     String
+  solanaOperatorWallet      String?
+  acceptedTokenAddress      String
+  tokenSymbol               String   @default("USDC")
+  minimumDeposit            Float    @default(100)
+  requiredConfirmations     Int      @default(5)
+  currentNAV                Float    @default(1.0)
+  totalAUM                  Float    @default(0)
+  enableKYC                 Boolean  @default(false)
+  enableDeposits            Boolean  @default(true)
+  enableWithdrawals         Boolean  @default(false)
+  performanceYTD            Float    @default(0)
+  lastNAVUpdate             DateTime @default(now())
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
 
   @@map("app_settings")
 }

@@ -13,9 +13,9 @@ export function Navbar() {
 
   const navLinks = isConnected
     ? [
-        { href: '/dashboard', label: 'Dashboard' },
-        { href: '/deposits', label: 'Deposits' },
-        { href: '/performance', label: 'Performance' },
+        { href: '/dashboard', label: 'Dashboard', icon: '📊' },
+        { href: '/deposits', label: 'Deposits', icon: '💰' },
+        { href: '/performance', label: 'Performance', icon: '📈' },
       ]
     : [];
 
@@ -24,21 +24,23 @@ export function Navbar() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, type: 'spring', bounce: 0.3 }}
-      className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-lg"
+      className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-gray-200/50 shadow-lg"
+      style={{ WebkitBackdropFilter: 'blur(20px)' }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
-          <div className="flex items-center space-x-8">
-            <Link href="/" className="flex items-center space-x-3 group">
+        <div className="flex justify-between items-center h-16 sm:h-20">
+          <div className="flex items-center space-x-4 sm:space-x-8">
+            <Link href="/" className="flex items-center space-x-2 sm:space-x-3 group">
               <motion.div
                 whileHover={{ rotate: 360, scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
                 transition={{ duration: 0.6 }}
-                className="w-12 h-12 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-xl relative overflow-hidden"
+                className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl relative overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
-                <span className="text-white font-bold text-xl relative z-10">AB</span>
+                <span className="text-white font-bold text-lg sm:text-xl relative z-10">AB</span>
               </motion.div>
-              <div>
+              <div className="hidden sm:block">
                 <span className="font-bold text-2xl text-gradient block">
                   ArbiBot
                 </span>
@@ -54,7 +56,7 @@ export function Navbar() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
-                className="hidden md:flex space-x-1"
+                className="hidden sm:flex space-x-1"
               >
                 {navLinks.map((link, index) => (
                   <motion.div
@@ -65,7 +67,7 @@ export function Navbar() {
                   >
                     <Link
                       href={link.href}
-                      className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 relative overflow-hidden group ${
+                      className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 relative overflow-hidden group flex items-center space-x-1 ${
                         pathname === link.href
                           ? 'text-white'
                           : 'text-gray-600 hover:text-gray-900'
@@ -78,6 +80,7 @@ export function Navbar() {
                           transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                         />
                       )}
+                      <span className="relative z-10 hidden sm:inline">{link.icon}</span>
                       <span className="relative z-10">{link.label}</span>
                       
                       {pathname !== link.href && (
@@ -94,18 +97,18 @@ export function Navbar() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
-            className="flex items-center space-x-4"
+            className="flex items-center space-x-2 sm:space-x-4"
           >
             {!isConnected && (
               <Link
                 href="#features"
-                className="hidden sm:block text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                className="hidden md:block text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
               >
                 Features
               </Link>
             )}
-            <div className="connect-button-wrapper">
-              <ConnectButton showBalance={false} />
+            <div className="connect-button-wrapper scale-90 sm:scale-100">
+              <ConnectButton showBalance={false} chainStatus="icon" />
             </div>
           </motion.div>
         </div>
