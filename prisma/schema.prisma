@@ -1,0 +1,139 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String      @id @default(cuid())
+  walletAddress     String      @unique
+  email             String?     @unique
+  nonce             String      @default(cuid())
+  isKycVerified     Boolean     @default(false)
+  kycSubmittedAt    DateTime?
+  totalInvested     Float       @default(0)
+  totalShares       Float       @default(0)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  deposits          Deposit[]
+  withdrawals       Withdrawal[]
+  sessions          Session[]
+
+  @@index([walletAddress])
+  @@map("users")
+}
+
+model Session {
+  id            String   @id @default(cuid())
+  userId        String
+  token         String   @unique
+  expiresAt     DateTime
+  createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("sessions")
+}
+
+model Deposit {
+  id                String   @id @default(cuid())
+  userId            String
+  txHash            String   @unique
+  fromAddress       String
+  toAddress         String
+  tokenAddress      String
+  amount            Float
+  amountUSD         Float    @default(0)
+  shares            Float    @default(0)
+  status            DepositStatus @default(PENDING)
+  confirmations     Int      @default(0)
+  blockNumber       BigInt?
+  timestamp         DateTime?
+  navAtDeposit      Float?
+  errorMessage      String?
+  creditedAt        DateTime?
+  detectedAt        DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([txHash])
+  @@index([status])
+  @@index([fromAddress])
+  @@map("deposits")
+}
+
+model Withdrawal {
+  id                String   @id @default(cuid())
+  userId            String
+  amount            Float
+  shares            Float
+  status            WithdrawalStatus @default(PENDING)
+  txHash            String?
+  processedAt       DateTime?
+  errorMessage      String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@map("withdrawals")
+}
+
+model AppSettings {
+  id                      String   @id @default(cuid())
+  operatorWalletAddress   String
+  acceptedTokenAddress    String
+  tokenSymbol             String   @default("USDC")
+  minimumDeposit          Float    @default(100)
+  requiredConfirmations   Int      @default(5)
+  currentNAV              Float    @default(1.0)
+  totalAUM                Float    @default(0)
+  enableKYC               Boolean  @default(false)
+  enableDeposits          Boolean  @default(true)
+  enableWithdrawals       Boolean  @default(false)
+  performanceYTD          Float    @default(0)
+  lastNAVUpdate           DateTime @default(now())
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@map("app_settings")
+}
+
+model AdminLog {
+  id          String   @id @default(cuid())
+  action      String
+  description String?
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("admin_logs")
+}
+
+enum DepositStatus {
+  PENDING
+  CONFIRMING
+  CONFIRMED
+  CREDITED
+  FAILED
+  REJECTED
+}
+
+enum WithdrawalStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REJECTED
+}
