@@ -1,71 +1,47 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { DashboardLayout } from '@/components/premium/DashboardLayout';
 import { BalanceCard } from '@/components/premium/BalanceCard';
-import { CryptoChartCard } from '@/components/premium/CryptoChartCard';
-import { AIInsights } from '@/components/premium/AIInsights';
+import { LivePriceCard } from '@/components/premium/LivePriceCard';
+import { AIPredictionCard } from '@/components/premium/AIPredictionCard';
+import { SmartAlert } from '@/components/premium/SmartAlert';
+import { AIStatusFooter } from '@/components/premium/AIStatusFooter';
 import { motion } from 'framer-motion';
 import { 
-  ArrowUpRight, 
-  Plus, 
-  TrendingUp, 
-  ExternalLink, 
   Sparkles,
   BarChart3,
-  Clock,
-  Activity
+  Brain,
+  AlertCircle,
+  Lightbulb,
+  ArrowUpRight,
+  Plus,
+  TrendingUp,
 } from 'lucide-react';
 import Link from 'next/link';
-
-interface UserData {
-  address: string;
-  totalBalance: number;
-  totalDeposits: number;
-}
-
-interface Deposit {
-  id: string;
-  amount: number;
-  chain: string;
-  txHash: string;
-  status: string;
-  createdAt: string;
-}
+import { useCryptoPrices } from '@/hooks/useCryptoPrices';
+import { useAIInsights } from '@/hooks/useAIInsights';
+import { useWalletBalance } from '@/hooks/useWalletBalance';
 
 export default function DashboardPage() {
   const { isConnected, address } = useAccount();
   const router = useRouter();
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [deposits, setDeposits] = useState<Deposit[]>([]);
-  const [loading, setLoading] = useState(true);
+  
+  // Real-time data hooks
+  const { prices, loading: pricesLoading } = useCryptoPrices();
+  const { alerts, predictions, insights } = useAIInsights();
+  const { balance } = useWalletBalance();
 
   useEffect(() => {
     if (!isConnected) {
       router.push('/');
       return;
     }
-    fetchUserData();
-  }, [isConnected, address]);
+  }, [isConnected, router]);
 
-  const fetchUserData = async () => {
-    try {
-      const response = await fetch('/api/user');
-      if (response.ok) {
-        const data = await response.json();
-        setUserData(data.user);
-        setDeposits(data.deposits || []);
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
+  if (pricesLoading) {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center min-h-[60vh]">
@@ -78,21 +54,6 @@ export default function DashboardPage() {
       </DashboardLayout>
     );
   }
-
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
-  };
-
-  const getExplorerUrl = (chain: string, txHash: string) => {
-    if (chain === 'SOLANA') {
-      return `https://explorer.solana.com/tx/${txHash}`;
-    }
-    return `https://arbiscan.io/tx/${txHash}`;
-  };
 
   const quickActions = [
     {
@@ -134,7 +95,7 @@ export default function DashboardPage() {
               <Sparkles className="w-4 h-4 text-orange" />
             </motion.div>
             <span className="text-sm font-bold text-orange tracking-wide">
-              DASHBOARD
+              DASHBOARD EM TEMPO REAL
             </span>
           </motion.div>
 
@@ -150,19 +111,19 @@ export default function DashboardPage() {
           </p>
         </motion.div>
 
-        {/* Balance Card - Premium */}
+        {/* Balance Card - Real Data */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
           <BalanceCard 
-            balance={userData?.totalBalance.toFixed(2) || '0.00'}
-            change={12.5}
+            balance={balance?.total || '0.00'}
+            change={parseFloat(balance?.change24h || '0')}
           />
         </motion.div>
 
-        {/* Crypto Charts Section */}
+        {/* Live Crypto Prices Section */}
         <div className="space-y-8">
           {/* Section Header */}
           <motion.div
@@ -179,7 +140,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-title-2 text-white mb-2">Mercado de Criptomoedas</h2>
-                <p className="text-body-2 text-gray-400">Preços atualizados em tempo real</p>
+                <p className="text-body-2 text-gray-400">Preços atualizados a cada 5 segundos</p>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="relative flex h-2 w-2">
@@ -191,62 +152,172 @@ export default function DashboardPage() {
             </div>
           </motion.div>
 
-          {/* Charts Grid */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            <CryptoChartCard ticker="BTC" price="95,420.50" change={2.5} />
-            <CryptoChartCard ticker="ETH" price="3,245.80" change={-1.2} />
-            <CryptoChartCard ticker="SOL" price="142.35" change={5.8} />
-          </motion.div>
+          {/* Live Price Cards Grid */}
+          {prices && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
+              <LivePriceCard
+                symbol={prices.BTC.symbol}
+                name={prices.BTC.name}
+                price={prices.BTC.price}
+                change24h={prices.BTC.change24h}
+                volume24h={prices.BTC.volume24h}
+                marketCap={prices.BTC.marketCap}
+                icon="₿"
+                color="#F7931A"
+                gradient={['#F7931A', '#FFA500']}
+              />
+              <LivePriceCard
+                symbol={prices.ETH.symbol}
+                name={prices.ETH.name}
+                price={prices.ETH.price}
+                change24h={prices.ETH.change24h}
+                volume24h={prices.ETH.volume24h}
+                marketCap={prices.ETH.marketCap}
+                icon="Ξ"
+                color="#627EEA"
+                gradient={['#627EEA', '#8A9FF5']}
+              />
+              <LivePriceCard
+                symbol={prices.SOL.symbol}
+                name={prices.SOL.name}
+                price={prices.SOL.price}
+                change24h={prices.SOL.change24h}
+                volume24h={prices.SOL.volume24h}
+                marketCap={prices.SOL.marketCap}
+                icon="◎"
+                color="#14F195"
+                gradient={['#14F195', '#9945FF']}
+              />
+            </motion.div>
+          )}
         </div>
 
-        {/* AI Insights - Premium */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
-          <AIInsights
-            alerts={[
-              'BTC apresenta forte suporte em $90k',
-              'Volume de ETH aumentou 35% nas últimas 24h',
-            ]}
-            predictions={[
-              'SOL pode atingir $160 nas próximas 48h',
-              'BTC consolidando antes de próximo movimento',
-            ]}
-            insights={[
-              'Diversifique entre múltiplas chains',
-              'Momento ideal para DCA (Dollar Cost Average)',
-            ]}
-          />
-        </motion.div>
+        {/* AI Intelligence Center */}
+        <div className="space-y-8">
+          {/* Section Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+          >
+            <div className="inline-flex items-center space-x-2 glass-card px-6 py-3 rounded-full mb-6">
+              <Brain className="w-4 h-4 text-orange" />
+              <span className="text-sm font-bold text-orange tracking-wide">
+                CENTRO DE INTELIGÊNCIA IA
+              </span>
+            </div>
+            <div>
+              <h2 className="text-title-2 text-white mb-2">Análise em Tempo Real</h2>
+              <p className="text-body-2 text-gray-400">Insights gerados por inteligência artificial</p>
+            </div>
+          </motion.div>
 
-        {/* Quick Actions - Premium Style */}
+          {/* AI Modules Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Smart Alerts */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              className="space-y-4"
+            >
+              <div className="flex items-center space-x-2 mb-4">
+                <AlertCircle className="w-5 h-5 text-orange" />
+                <h3 className="text-lg font-bold text-white">Alertas Inteligentes</h3>
+                <div className="flex-1 flex justify-end">
+                  <span className="px-2 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-xs font-bold text-emerald-500">
+                    EM TEMPO REAL
+                  </span>
+                </div>
+              </div>
+              <div className="space-y-3">
+                {alerts.map((alert) => (
+                  <SmartAlert
+                    key={alert.id}
+                    type={alert.type}
+                    message={alert.message}
+                    severity={alert.severity as 'high' | 'medium' | 'low'}
+                    confidence={alert.confidence}
+                    timestamp={alert.timestamp}
+                  />
+                ))}
+              </div>
+            </motion.div>
+
+            {/* AI Predictions */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+              className="space-y-4"
+            >
+              <div className="flex items-center space-x-2 mb-4">
+                <Brain className="w-5 h-5 text-purple-500" />
+                <h3 className="text-lg font-bold text-white">Previsões IA</h3>
+              </div>
+              <div className="space-y-3">
+                {predictions && Object.entries(predictions).map(([symbol, pred]) => (
+                  <AIPredictionCard
+                    key={symbol}
+                    symbol={symbol}
+                    {...pred}
+                  />
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Strategic Insights */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9 }}
+              className="space-y-4"
+            >
+              <div className="flex items-center space-x-2 mb-4">
+                <Lightbulb className="w-5 h-5 text-blue-500" />
+                <h3 className="text-lg font-bold text-white">Insights Estratégicos</h3>
+              </div>
+              <div className="space-y-3">
+                {insights.map((insight, index) => (
+                  <div key={index} className="glass-card rounded-xl p-4">
+                    <div className="flex items-start space-x-3">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                        insight.priority === 'high' ? 'bg-orange/10 border border-orange/20' :
+                        insight.priority === 'medium' ? 'bg-blue-500/10 border border-blue-500/20' :
+                        'bg-gray-500/10 border border-gray-500/20'
+                      }`}>
+                        <Lightbulb className={`w-5 h-5 ${
+                          insight.priority === 'high' ? 'text-orange' :
+                          insight.priority === 'medium' ? 'text-blue-500' :
+                          'text-gray-500'
+                        }`} strokeWidth={2} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-bold text-white mb-1">{insight.title}</h4>
+                        <p className="text-xs text-gray-400 leading-relaxed mb-2">
+                          {insight.description}
+                        </p>
+                        <span className="text-xs font-semibold text-orange">{insight.action}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
         <div className="space-y-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-          >
-            <div className="inline-flex items-center space-x-2 glass-card px-6 py-3 rounded-full mb-6">
-              <Activity className="w-4 h-4 text-orange" />
-              <span className="text-sm font-bold text-orange tracking-wide">
-                AÇÕES RÁPIDAS
-              </span>
-            </div>
-            <h2 className="text-title-2 text-white mb-2">O que fazer agora?</h2>
-            <p className="text-body-2 text-gray-400">Gerencie seus investimentos rapidamente</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
+            transition={{ delay: 1 }}
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
           >
             {quickActions.map((action, index) => {
@@ -255,15 +326,11 @@ export default function DashboardPage() {
               return (
                 <Link key={index} href={action.href}>
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.8 + index * 0.1 }}
                     whileHover={{ y: -6, scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="group h-full"
+                    className="group"
                   >
                     <div className="glass-card rounded-2xl p-8 overflow-hidden relative h-full">
-                      {/* Animated Glow */}
                       <motion.div
                         animate={{
                           opacity: [0.1, 0.2, 0.1],
@@ -310,7 +377,6 @@ export default function DashboardPage() {
                         <ArrowUpRight className="w-6 h-6 text-gray-600 group-hover:text-orange transition-colors" strokeWidth={2} />
                       </div>
 
-                      {/* Bottom Glow */}
                       <motion.div
                         initial={{ scaleX: 0 }}
                         whileHover={{ scaleX: 1 }}
@@ -328,110 +394,14 @@ export default function DashboardPage() {
           </motion.div>
         </div>
 
-        {/* Recent Deposits - Premium Table */}
-        {deposits.length > 0 && (
-          <div className="space-y-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9 }}
-            >
-              <div className="inline-flex items-center space-x-2 glass-card px-6 py-3 rounded-full mb-6">
-                <Clock className="w-4 h-4 text-orange" />
-                <span className="text-sm font-bold text-orange tracking-wide">
-                  HISTÓRICO
-                </span>
-              </div>
-              <h2 className="text-title-2 text-white mb-2">Depósitos Recentes</h2>
-              <p className="text-body-2 text-gray-400">Seus últimos {deposits.length} depósitos</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1 }}
-              className="glass-card rounded-2xl overflow-hidden"
-            >
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-white/5">
-                      <th className="text-left p-6 text-sm font-bold text-gray-400 uppercase tracking-wide">
-                        Data
-                      </th>
-                      <th className="text-left p-6 text-sm font-bold text-gray-400 uppercase tracking-wide">
-                        Valor
-                      </th>
-                      <th className="text-left p-6 text-sm font-bold text-gray-400 uppercase tracking-wide">
-                        Chain
-                      </th>
-                      <th className="text-left p-6 text-sm font-bold text-gray-400 uppercase tracking-wide">
-                        Status
-                      </th>
-                      <th className="text-right p-6 text-sm font-bold text-gray-400 uppercase tracking-wide">
-                        Ação
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {deposits.slice(0, 5).map((deposit, index) => (
-                      <motion.tr
-                        key={deposit.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 1 + index * 0.05 }}
-                        className="border-b border-white/5 hover:bg-white/[0.02] transition-all duration-300 group"
-                      >
-                        <td className="p-6">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 rounded-xl bg-orange/10 border border-orange/20 flex items-center justify-center">
-                              <Clock className="w-5 h-5 text-orange" strokeWidth={2} />
-                            </div>
-                            <span className="text-sm font-medium text-gray-300 group-hover:text-white transition-colors">
-                              {formatDate(deposit.createdAt)}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="p-6">
-                          <div className="text-lg font-bold text-white">
-                            ${deposit.amount.toFixed(2)}
-                          </div>
-                          <div className="text-xs text-gray-500">USDC</div>
-                        </td>
-                        <td className="p-6">
-                          <span className={`inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold ${
-                            deposit.chain === 'SOLANA' 
-                              ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' 
-                              : 'bg-blue-500/10 text-blue-500 border border-blue-500/20'
-                          }`}>
-                            {deposit.chain}
-                          </span>
-                        </td>
-                        <td className="p-6">
-                          <span className="inline-flex items-center px-4 py-2 bg-emerald-500/10 text-emerald-500 rounded-xl text-xs font-bold border border-emerald-500/20">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2" />
-                            {deposit.status}
-                          </span>
-                        </td>
-                        <td className="p-6 text-right">
-                          <a
-                            href={getExplorerUrl(deposit.chain, deposit.txHash)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center space-x-2 text-orange hover:text-orange-light text-sm font-bold transition-colors group/link"
-                          >
-                            <span>Ver Transação</span>
-                            <ExternalLink className="w-4 h-4 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" strokeWidth={2} />
-                          </a>
-                        </td>
-                      </motion.tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </motion.div>
-          </div>
-        )}
+        {/* AI Status Footer */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.1 }}
+        >
+          <AIStatusFooter />
+        </motion.div>
       </div>
     </DashboardLayout>
   );

@@ -1,13 +1,12 @@
 {
-  "name": "ArbiBot - Investimentos Inteligentes",
+  "name": "ArbiBot Investment Platform",
   "short_name": "ArbiBot",
-  "description": "Plataforma premium de investimentos em criptomoedas com IA. Multi-chain support (Arbitrum + Solana).",
+  "description": "Plataforma de investimentos em criptomoedas com IA",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
+  "background_color": "#0A0A0A",
   "theme_color": "#E35404",
-  "orientation": "portrait",
-  "scope": "/",
+  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -22,46 +21,46 @@
       "purpose": "any maskable"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/icon-512.png",
-      "type": "image/png",
-      "sizes": "512x512",
-      "form_factor": "narrow"
-    },
-    {
-      "src": "/icon-512.png",
-      "type": "image/png",
-      "sizes": "512x512",
-      "form_factor": "wide"
-    }
-  ],
+  "categories": ["finance", "business"],
   "shortcuts": [
     {
       "name": "Dashboard",
       "short_name": "Dashboard",
-      "description": "Acessar seu dashboard",
+      "description": "Ver painel principal",
       "url": "/dashboard",
-      "icons": [
-        {
-          "src": "/icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Depositar",
+      "name": "Novo Depósito",
       "short_name": "Depositar",
       "description": "Fazer novo depósito",
       "url": "/deposit",
-      "icons": [
-        {
-          "src": "/icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ],
-  "categories": ["finance", "business"],
-  "prefer_related_applications": false
+  "screenshots": [
+    {
+      "src": "/screenshot-desktop.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "splash_pages": null,
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "scope": "/",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "edge_side_panel": {
+    "preferred_width": 480
+  }
 }
