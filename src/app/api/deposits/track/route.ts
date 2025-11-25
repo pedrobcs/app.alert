@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyUSDCTransfer } from '@/lib/blockchain';
+import { verifySolanaUSDCTransfer } from '@/lib/solana';
 import { getSession } from '@/lib/auth';
-import { APP_CONFIG } from '@/lib/config';
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { txHash, userAddress } = await request.json();
+    const { txHash, userAddress, chain = 'arbitrum' } = await request.json();
 
     if (!txHash || !userAddress) {
       return NextResponse.json(
@@ -20,10 +20,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify tx hash format
-    if (!/^0x[a-fA-F0-9]{64}$/.test(txHash)) {
+    // Verify hash format based on chain
+    const isArbitrum = chain === 'arbitrum';
+    const isSolana = chain === 'solana';
+
+    if (isArbitrum && !/^0x[a-fA-F0-9]{64}$/.test(txHash)) {
       return NextResponse.json(
-        { error: 'Invalid transaction hash' },
+        { error: 'Invalid Arbitrum transaction hash' },
+        { status: 400 }
+      );
+    }
+
+    if (isSolana && !/^[1-9A-HJ-NP-Za-km-z]{87,88}$/.test(txHash)) {
+      return NextResponse.json(
+        { error: 'Invalid Solana transaction signature' },
         { status: 400 }
       );
     }
@@ -40,11 +50,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get app settings for operator wallet
+    // Get app settings
     const settings = await prisma.appSettings.findFirst();
     if (!settings) {
       return NextResponse.json(
         { error: 'App settings not configured' },
+        { status: 500 }
+      );
+    }
+
+    // Check if chain is enabled
+    if (isSolana && !settings.enableSolanaDeposits) {
+      return NextResponse.json(
+        { error: 'Solana deposits are not enabled' },
+        { status: 400 }
+      );
+    }
+
+    // Get operator wallet for the chain
+    const operatorWallet = isSolana 
+      ? settings.solanaWalletAddress 
+      : settings.operatorWalletAddress;
+
+    if (!operatorWallet) {
+      return NextResponse.json(
+        { error: `${chain} operator wallet not configured` },
         { status: 500 }
       );
     }
@@ -58,19 +88,43 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Verify transaction on-chain
-    const transfer = await verifyUSDCTransfer(
-      txHash,
-      userAddress,
-      settings.operatorWalletAddress,
-      settings.minimumDeposit
-    );
+    // Verify transaction on-chain based on chain type
+    let transfer: any = null;
+
+    if (isArbitrum) {
+      transfer = await verifyUSDCTransfer(
+        txHash,
+        userAddress,
+        operatorWallet,
+        settings.minimumDeposit
+      );
+    } else if (isSolana) {
+      const solanaTransfer = await verifySolanaUSDCTransfer(
+        txHash,
+        userAddress,
+        operatorWallet,
+        settings.minimumDeposit
+      );
+
+      if (solanaTransfer && solanaTransfer.status === 'success') {
+        // Convert Solana transfer format to match Arbitrum format
+        transfer = {
+          hash: solanaTransfer.signature,
+          from: solanaTransfer.from || userAddress,
+          to: solanaTransfer.to || operatorWallet,
+          tokenAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', // USDC on Solana
+          tokenAmount: solanaTransfer.amount,
+          confirmations: solanaTransfer.confirmations,
+          blockNumber: solanaTransfer.slot,
+          timestamp: solanaTransfer.blockTime,
+        };
+      }
+    }
 
     if (!transfer) {
       return NextResponse.json(
         {
-          error:
-            'Transaction verification failed. Ensure the transaction is a USDC transfer to the operator wallet.',
+          error: `Transaction verification failed on ${chain}. Ensure it's a USDC transfer to the operator wallet.`,
         },
         { status: 400 }
       );
@@ -89,6 +143,7 @@ export async function POST(request: NextRequest) {
         confirmations: transfer.confirmations,
         blockNumber: BigInt(transfer.blockNumber || 0),
         timestamp: transfer.timestamp ? new Date(transfer.timestamp * 1000) : null,
+        chain: isSolana ? 'SOLANA' : 'ARBITRUM',
         status:
           transfer.confirmations >= settings.requiredConfirmations
             ? 'CONFIRMED'
@@ -128,6 +183,7 @@ export async function POST(request: NextRequest) {
         status: deposit.status,
         confirmations: deposit.confirmations,
         txHash: deposit.txHash,
+        chain: deposit.chain,
       },
     });
   } catch (error) {

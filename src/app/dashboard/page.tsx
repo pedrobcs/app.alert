@@ -1,373 +1,124 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Navbar } from '@/components/Navbar';
-import { StatCard } from '@/components/StatCard';
-import { LoadingScreen } from '@/components/LoadingScreen';
-import { AnimatedBackground } from '@/components/AnimatedBackground';
-import { formatUSDC, formatPercentage } from '@/lib/utils';
-import {
-  TrendingUp,
-  Wallet,
-  Activity,
-  DollarSign,
-  ArrowUpRight,
-  Sparkles,
-  ExternalLink,
-} from 'lucide-react';
-import toast from 'react-hot-toast';
-import Link from 'next/link';
-
-interface UserData {
-  user: {
-    walletAddress: string;
-    totalInvested: number;
-    totalShares: number;
-    currentValue: number;
-    returns: number;
-    returnsPercentage: number;
-    isKycVerified: boolean;
-  };
-  recentDeposits: Array<{
-    id: string;
-    amount: number;
-    status: string;
-    createdAt: string;
-    txHash: string;
-  }>;
-  settings: {
-    operatorWallet: string;
-    tokenAddress: string;
-    tokenSymbol: string;
-    minimumDeposit: number;
-    currentNAV: number;
-    performanceYTD: number;
-  } | null;
-}
+import { InstitutionalSidebar } from '@/components/dashboard/InstitutionalSidebar';
+import { Header } from '@/components/dashboard/Header';
+import { BalanceCard } from '@/components/dashboard/BalanceCard';
+import { ProfessionalChart } from '@/components/dashboard/ProfessionalChart';
+import { SwapWidget } from '@/components/dashboard/SwapWidget';
+import { CryptoAssetsTable } from '@/components/dashboard/CryptoAssetsTable';
+import { AIInsightsSection } from '@/components/dashboard/AIInsightsSection';
+import { useWalletBalance } from '@/hooks/useWalletBalance';
 
 export default function DashboardPage() {
-  const { address, isConnected } = useAccount();
+  const { isConnected } = useAccount();
   const router = useRouter();
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { balance, loading } = useWalletBalance();
 
   useEffect(() => {
     if (!isConnected) {
       router.push('/');
       return;
     }
+  }, [isConnected, router]);
 
-    fetchUserData();
-  }, [isConnected, address]);
-
-  const fetchUserData = async () => {
-    try {
-      const res = await fetch('/api/user');
-      if (!res.ok) {
-        throw new Error('Failed to fetch user data');
-      }
-      const data = await res.json();
-      setUserData(data);
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-      toast.error('Failed to load dashboard data');
-    } finally {
-      setTimeout(() => setLoading(false), 800); // Smooth transition
-    }
-  };
-
-  if (!isConnected) {
-    return null;
-  }
-
-  if (loading) {
-    return <LoadingScreen />;
-  }
-
-  if (!userData) {
+  if (loading || !balance) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-        <Navbar />
-        <AnimatedBackground />
-        <div className="flex items-center justify-center min-h-[80vh]">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center"
-          >
-            <p className="text-xl text-gray-600 mb-4">Failed to load dashboard</p>
-            <button onClick={fetchUserData} className="btn btn-primary">
-              Retry
-            </button>
-          </motion.div>
-        </div>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+          className="w-16 h-16 border-4 border-orange border-t-transparent rounded-full"
+        />
       </div>
     );
   }
 
-  const { user, recentDeposits, settings } = userData;
-  const isPositiveReturn = user.returns >= 0;
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 relative overflow-hidden">
-      <AnimatedBackground />
-      <Navbar />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
-        {/* Welcome Section */}
+    <div className="min-h-screen bg-black text-white">
+      {/* Animated Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-12"
-        >
-          <div className="flex items-center space-x-3 mb-3">
-            <motion.div
-              animate={{ rotate: [0, 10, -10, 0] }}
-              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-            >
-              <Sparkles className="w-8 h-8 text-yellow-500" />
-            </motion.div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gradient">
-              Welcome back!
-            </h1>
-          </div>
-          <p className="text-gray-600 text-lg">
-            Your portfolio is {isPositiveReturn ? 'growing' : 'performing'} 📈
-          </p>
-        </motion.div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <StatCard
-            icon={Wallet}
-            label="Total Invested"
-            value={formatUSDC(user.totalInvested)}
-            color="blue"
-            delay={0}
-          />
-
-          <StatCard
-            icon={DollarSign}
-            label="Current Value"
-            value={formatUSDC(user.currentValue)}
-            color="purple"
-            delay={100}
-          />
-
-          <StatCard
-            icon={isPositiveReturn ? TrendingUp : TrendingUp}
-            label="Total Returns"
-            value={formatUSDC(user.returns)}
-            change={formatPercentage(user.returnsPercentage)}
-            isPositive={isPositiveReturn}
-            color={isPositiveReturn ? 'green' : 'red'}
-            delay={200}
-          />
-
-          <StatCard
-            icon={Activity}
-            label="YTD Performance"
-            value={formatPercentage(settings?.performanceYTD || 0)}
-            color="orange"
-            delay={300}
-          />
-        </div>
-
-        {/* Action Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            whileHover={{ scale: 1.02 }}
-          >
-            <Link
-              href="/deposit"
-              className="card-premium hover:shadow-2xl cursor-pointer group block h-full"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center space-x-2 mb-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-green-500/50 transition-shadow">
-                      <ArrowUpRight className="w-6 h-6 text-white" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900">
-                      Make a Deposit
-                    </h3>
-                  </div>
-                  <p className="text-gray-600">
-                    Send USDC to grow your investment
-                  </p>
-                </div>
-                <motion.div
-                  animate={{ x: [0, 10, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
-                  <ArrowUpRight className="w-10 h-10 text-green-600 group-hover:text-green-700 transition-colors" />
-                </motion.div>
-              </div>
-            </Link>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            whileHover={{ scale: 1.02 }}
-          >
-            <Link
-              href="/deposits"
-              className="card-premium hover:shadow-2xl cursor-pointer group block h-full"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center space-x-2 mb-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-purple-500/50 transition-shadow">
-                      <Activity className="w-6 h-6 text-white" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900">
-                      View History
-                    </h3>
-                  </div>
-                  <p className="text-gray-600">
-                    See all your transactions
-                  </p>
-                </div>
-                <motion.div
-                  animate={{ x: [0, 10, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
-                >
-                  <ArrowUpRight className="w-10 h-10 text-purple-600 group-hover:text-purple-700 transition-colors" />
-                </motion.div>
-              </div>
-            </Link>
-          </motion.div>
-        </div>
-
-        {/* Recent Deposits */}
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.02, 0.04, 0.02],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute top-0 left-1/4 w-96 h-96 bg-orange rounded-full blur-3xl"
+        />
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="card-premium"
-        >
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">
-              Recent Deposits
-            </h2>
-            <Link
-              href="/deposits"
-              className="text-blue-600 hover:text-blue-700 font-semibold flex items-center space-x-1 group"
-            >
-              <span>View All</span>
-              <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-            </Link>
-          </div>
+          animate={{
+            scale: [1.2, 1, 1.2],
+            opacity: [0.01, 0.03, 0.01],
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-dark rounded-full blur-3xl"
+        />
+      </div>
 
-          {recentDeposits.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-16"
-            >
-              <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Wallet className="w-12 h-12 text-blue-600" />
+      {/* Grid Pattern */}
+      <div 
+        className="fixed inset-0 opacity-[0.015] pointer-events-none"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(227, 84, 4, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(227, 84, 4, 0.1) 1px, transparent 1px)
+          `,
+          backgroundSize: '50px 50px',
+        }}
+      />
+
+      {/* Sidebar */}
+      <InstitutionalSidebar />
+
+      {/* Main Content */}
+      <div className="lg:ml-72 flex flex-col min-h-screen">
+        <Header />
+        
+        <main className="flex-1 p-6 lg:p-8">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="space-y-8"
+          >
+            {/* Balance Card */}
+            <BalanceCard
+              balance={balance.total}
+              change24h={parseFloat(balance.change24h)}
+            />
+
+            {/* Main Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Chart - 2 columns */}
+              <div className="lg:col-span-2">
+                <ProfessionalChart />
               </div>
-              <p className="text-gray-600 mb-6 text-lg">No deposits yet</p>
-              <Link href="/deposit" className="btn btn-primary">
-                Make Your First Deposit
-              </Link>
-            </motion.div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b-2 border-gray-200">
-                    <th className="text-left py-4 px-4 text-sm font-bold text-gray-700 uppercase tracking-wider">
-                      Date
-                    </th>
-                    <th className="text-left py-4 px-4 text-sm font-bold text-gray-700 uppercase tracking-wider">
-                      Amount
-                    </th>
-                    <th className="text-left py-4 px-4 text-sm font-bold text-gray-700 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="text-left py-4 px-4 text-sm font-bold text-gray-700 uppercase tracking-wider">
-                      Transaction
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentDeposits.map((deposit, index) => (
-                    <motion.tr
-                      key={deposit.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.4, delay: 0.7 + index * 0.1 }}
-                      className="border-b border-gray-100 hover:bg-blue-50/50 transition-colors"
-                    >
-                      <td className="py-4 px-4 text-sm text-gray-900 font-medium">
-                        {new Date(deposit.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="py-4 px-4">
-                        <span className="text-lg font-bold text-gray-900">
-                          {formatUSDC(deposit.amount)}
-                        </span>
-                      </td>
-                      <td className="py-4 px-4">
-                        <motion.span
-                          initial={{ scale: 0.8 }}
-                          animate={{ scale: 1 }}
-                          transition={{ delay: 0.8 + index * 0.1 }}
-                          className={`inline-flex items-center px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider ${
-                            deposit.status === 'CREDITED'
-                              ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow-lg shadow-green-500/50'
-                              : deposit.status === 'CONFIRMED'
-                              ? 'bg-gradient-to-r from-blue-400 to-blue-500 text-white shadow-lg shadow-blue-500/50'
-                              : 'bg-gradient-to-r from-yellow-400 to-amber-500 text-white shadow-lg shadow-yellow-500/50'
-                          }`}
-                        >
-                          {deposit.status}
-                        </motion.span>
-                      </td>
-                      <td className="py-4 px-4">
-                        <a
-                          href={`https://arbiscan.io/tx/${deposit.txHash}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center space-x-1 text-blue-600 hover:text-blue-700 font-semibold group"
-                        >
-                          <span>View</span>
-                          <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                        </a>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
+
+              {/* Swap Widget - 1 column */}
+              <div>
+                <SwapWidget />
+              </div>
             </div>
-          )}
-        </motion.div>
 
-        {/* Performance Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 1 }}
-          className="mt-8 text-center"
-        >
-          <Link
-            href="/performance"
-            className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors group"
-          >
-            <span className="text-sm font-medium">View Detailed Performance</span>
-            <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-          </Link>
-        </motion.div>
+            {/* AI Insights */}
+            <AIInsightsSection />
+
+            {/* Assets Table */}
+            <CryptoAssetsTable />
+          </motion.div>
+        </main>
       </div>
     </div>
   );

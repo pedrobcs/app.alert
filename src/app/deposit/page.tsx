@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/Navbar';
-import { DepositModal } from '@/components/DepositModal';
+import { DepositModalMultiChain } from '@/components/DepositModalMultiChain';
+import { AnimatedBackground } from '@/components/AnimatedBackground';
 
 export default function DepositPage() {
   const { isConnected } = useAccount();
@@ -36,23 +37,26 @@ export default function DepositPage() {
 
   if (!isConnected || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 relative overflow-hidden">
+        <AnimatedBackground />
         <Navbar />
         <div className="flex items-center justify-center min-h-[80vh]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="spinner"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 relative overflow-hidden">
+      <AnimatedBackground />
       <Navbar />
       {settings && (
-        <DepositModal
+        <DepositModalMultiChain
           isOpen={true}
           onClose={() => router.push('/dashboard')}
           operatorWallet={settings.operatorWallet}
+          solanaWallet={settings.solanaWalletAddress}
           tokenSymbol={settings.tokenSymbol}
           minimumDeposit={settings.minimumDeposit}
         />
