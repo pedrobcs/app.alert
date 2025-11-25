@@ -32,7 +32,10 @@ export function useAuth() {
       const { nonce, message } = await nonceRes.json();
 
       // Step 2: Sign the message
-      const signature = await signMessageAsync({ message });
+      const signature = await signMessageAsync({ 
+        message,
+        account: address as `0x${string}`,
+      } as any);
 
       // Step 3: Verify signature with server
       const verifyRes = await fetch('/api/auth/verify', {

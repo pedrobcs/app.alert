@@ -3,10 +3,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   
-  // Webpack configuration to handle Solana dependencies
+  // Webpack configuration for Node.js modules in browser
   webpack: (config, { isServer }) => {
-    // Fixes for Solana Web3.js in browser
     if (!isServer) {
+      // Polyfills for Node.js modules
       config.resolve.fallback = {
         ...config.resolve.fallback,
         fs: false,
@@ -16,23 +16,8 @@ const nextConfig: NextConfig = {
       };
     }
 
-    // Ignore warnings from Solana wallet adapters
-    config.ignoreWarnings = [
-      { module: /node_modules\/@solana/ },
-      { module: /node_modules\/@coral-xyz/ },
-    ];
-
     return config;
   },
-
-  // Transpile Solana packages for better compatibility
-  transpilePackages: [
-    '@solana/wallet-adapter-base',
-    '@solana/wallet-adapter-react',
-    '@solana/wallet-adapter-react-ui',
-    '@solana/wallet-adapter-wallets',
-    '@solana/web3.js',
-  ],
 
   // Environment variables available in browser
   env: {

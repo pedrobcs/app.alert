@@ -94,7 +94,7 @@ export function DepositModalMultiChain({
         abi: ERC20_ABI,
         functionName: 'transfer',
         args: [operatorWallet as `0x${string}`, amountWei],
-      });
+      } as any);
     } catch (err) {
       console.error('Transfer error:', err);
       toast.error('Failed to initiate transfer');
