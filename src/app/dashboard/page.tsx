@@ -658,7 +658,9 @@ export default function DashboardPage() {
                     {user.isKycVerified ? 'Verified identity' : 'Pending verification'}
                   </p>
                   <p className="text-sm text-gray-500">
-                    {user.isKycVerified ? 'You're cleared for unlimited deposits.' : 'Complete verification to unlock higher limits.'}
+                    {user.isKycVerified
+                      ? "You're cleared for unlimited deposits."
+                      : 'Complete verification to unlock higher limits.'}
                   </p>
                 </div>
                 <div
