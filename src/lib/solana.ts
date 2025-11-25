@@ -1,15 +1,9 @@
-import { Connection, PublicKey, ParsedTransactionWithMeta, ParsedInstruction } from '@solana/web3.js';
+// Solana blockchain interactions
+// Uses dynamic imports to avoid SSR issues
 
-// Solana RPC Configuration
 export const SOLANA_RPC_ENDPOINT = process.env.SOLANA_RPC_ENDPOINT || 'https://api.mainnet-beta.solana.com';
 export const USDC_MINT_ADDRESS = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'; // USDC on Solana mainnet
 export const USDC_DECIMALS = 6;
-
-// Get Solana connection
-export function getSolanaConnection(): Connection {
-  const rpcEndpoint = process.env.SOLANA_RPC_ENDPOINT || SOLANA_RPC_ENDPOINT;
-  return new Connection(rpcEndpoint, 'confirmed');
-}
 
 export interface SolanaTransactionDetails {
   signature: string;
@@ -22,12 +16,23 @@ export interface SolanaTransactionDetails {
   status: 'success' | 'failed' | null;
 }
 
+// Get Solana connection (server-side only)
+export async function getSolanaConnection() {
+  if (typeof window !== 'undefined') {
+    throw new Error('getSolanaConnection should only be called server-side');
+  }
+  
+  const { Connection } = await import('@solana/web3.js');
+  const rpcEndpoint = process.env.SOLANA_RPC_ENDPOINT || SOLANA_RPC_ENDPOINT;
+  return new Connection(rpcEndpoint, 'confirmed');
+}
+
 // Verify a Solana transaction
 export async function verifySolanaTransaction(
   signature: string
 ): Promise<SolanaTransactionDetails | null> {
   try {
-    const connection = getSolanaConnection();
+    const connection = await getSolanaConnection();
     const tx = await connection.getParsedTransaction(signature, {
       maxSupportedTransactionVersion: 0,
     });
@@ -64,7 +69,7 @@ export async function verifySolanaUSDCTransfer(
   minimumAmount: number = 0
 ): Promise<SolanaTransactionDetails | null> {
   try {
-    const connection = getSolanaConnection();
+    const connection = await getSolanaConnection();
     const tx = await connection.getParsedTransaction(signature, {
       maxSupportedTransactionVersion: 0,
     });
@@ -84,27 +89,20 @@ export async function verifySolanaUSDCTransfer(
     
     for (const instruction of instructions) {
       if ('parsed' in instruction && instruction.program === 'spl-token') {
-        const parsed = instruction.parsed as ParsedInstruction;
+        const parsed = instruction.parsed as any;
         
         if (parsed.type === 'transfer' || parsed.type === 'transferChecked') {
-          const info = parsed.info as any;
+          const info = parsed.info;
           
-          // Get the token account info to verify it's USDC
-          const sourceTokenAccount = info.source;
-          const destinationTokenAccount = info.destination;
-          
-          // For now, accept the transfer if amounts match
-          // In production, you'd want to verify the mint address is USDC
+          // Get the amount
           const amount = info.amount || info.tokenAmount?.amount;
           
           if (amount) {
             transferAmount = parseInt(amount) / Math.pow(10, USDC_DECIMALS);
-            
-            // Get the authority (owner) addresses
             fromAddress = info.authority || expectedFrom;
-            toAddress = expectedTo; // We'd need to query the destination token account's owner
+            toAddress = expectedTo;
             
-            // Check if this is the transfer we're looking for
+            // Check if amount meets minimum
             if (transferAmount >= minimumAmount) {
               transferFound = true;
               break;
@@ -140,7 +138,8 @@ export async function verifySolanaUSDCTransfer(
 // Get USDC balance for a Solana address
 export async function getSolanaUSDCBalance(address: string): Promise<number> {
   try {
-    const connection = getSolanaConnection();
+    const { PublicKey } = await import('@solana/web3.js');
+    const connection = await getSolanaConnection();
     const publicKey = new PublicKey(address);
     
     // Get token accounts for this wallet filtered by USDC mint
@@ -172,7 +171,8 @@ export async function scanSolanaRecentTransfers(
   limit: number = 10
 ): Promise<Array<{ from: string; amount: string; signature: string; timestamp: number | null }>> {
   try {
-    const connection = getSolanaConnection();
+    const { PublicKey } = await import('@solana/web3.js');
+    const connection = await getSolanaConnection();
     const publicKey = new PublicKey(toAddress);
     
     // Get recent signatures
@@ -190,10 +190,10 @@ export async function scanSolanaRecentTransfers(
       // Parse for USDC transfers
       for (const instruction of tx.transaction.message.instructions) {
         if ('parsed' in instruction && instruction.program === 'spl-token') {
-          const parsed = instruction.parsed as ParsedInstruction;
+          const parsed = instruction.parsed as any;
           
           if (parsed.type === 'transfer' || parsed.type === 'transferChecked') {
-            const info = parsed.info as any;
+            const info = parsed.info;
             const amount = info.amount || info.tokenAmount?.amount;
             
             if (amount) {
@@ -218,8 +218,9 @@ export async function scanSolanaRecentTransfers(
 }
 
 // Validate Solana address
-export function isValidSolanaAddress(address: string): boolean {
+export async function isValidSolanaAddress(address: string): Promise<boolean> {
   try {
+    const { PublicKey } = await import('@solana/web3.js');
     new PublicKey(address);
     return true;
   } catch {
