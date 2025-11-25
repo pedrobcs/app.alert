@@ -1,57 +1,46 @@
 {
-  "name": "ArbiBot - Multi-Chain USDC Investment",
+  "name": "ArbiBot - Investimentos Inteligentes",
   "short_name": "ArbiBot",
-  "description": "Premium automated USDC trading on Arbitrum & Solana. Invest, track, and grow your portfolio.",
+  "description": "Plataforma premium de investimentos em criptomoedas com IA. Multi-chain support (Arbitrum + Solana).",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FFFFFF",
-  "theme_color": "#007AFF",
-  "orientation": "portrait-primary",
+  "background_color": "#000000",
+  "theme_color": "#E35404",
+  "orientation": "portrait",
   "scope": "/",
-  "categories": ["finance", "productivity"],
-  "dir": "ltr",
-  "lang": "en",
-  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     }
   ],
   "screenshots": [
     {
       "src": "/icon-512.png",
-      "sizes": "512x512",
       "type": "image/png",
-      "form_factor": "narrow",
-      "label": "ArbiBot Dashboard"
+      "sizes": "512x512",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "form_factor": "wide"
     }
   ],
   "shortcuts": [
     {
       "name": "Dashboard",
       "short_name": "Dashboard",
-      "description": "View your investment portfolio",
+      "description": "Acessar seu dashboard",
       "url": "/dashboard",
       "icons": [
         {
@@ -61,9 +50,9 @@
       ]
     },
     {
-      "name": "Make Deposit",
-      "short_name": "Deposit",
-      "description": "Deposit USDC to your account",
+      "name": "Depositar",
+      "short_name": "Depositar",
+      "description": "Fazer novo depósito",
       "url": "/deposit",
       "icons": [
         {
@@ -73,13 +62,6 @@
       ]
     }
   ],
-  "share_target": {
-    "action": "/",
-    "method": "GET",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url"
-    }
-  }
+  "categories": ["finance", "business"],
+  "prefer_related_applications": false
 }

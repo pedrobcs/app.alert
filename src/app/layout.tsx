@@ -6,13 +6,13 @@ import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 import { PWAUpdatePrompt } from '@/components/PWAUpdatePrompt';
 
 export const metadata: Metadata = {
-  title: 'ArbiBot - Multi-Chain USDC Investment',
-  description: 'Premium automated USDC trading on Arbitrum & Solana. Invest, track, and grow your portfolio with our proven trading bot.',
-  keywords: 'USDC, Arbitrum, Solana, DeFi, Trading Bot, Crypto Investment, Multi-Chain',
+  title: 'ArbiBot - Investimentos Inteligentes',
+  description: 'Plataforma premium de investimentos em criptomoedas com IA. Multi-chain support (Arbitrum + Solana). Design Apple-inspired.',
+  keywords: 'USDC, Arbitrum, Solana, DeFi, Trading Bot, Crypto Investment, Multi-Chain, IA, PWA',
   applicationName: 'ArbiBot',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
+    statusBarStyle: 'black-translucent',
     title: 'ArbiBot',
   },
   formatDetection: {
@@ -32,18 +32,18 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: 'ArbiBot',
-    title: 'ArbiBot - Multi-Chain USDC Investment',
-    description: 'Premium automated USDC trading on Arbitrum & Solana',
+    title: 'ArbiBot - Investimentos Inteligentes',
+    description: 'Plataforma premium de investimentos com IA e multi-chain',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'ArbiBot - Multi-Chain USDC Investment',
-    description: 'Premium automated USDC trading on Arbitrum & Solana',
+    title: 'ArbiBot - Investimentos Inteligentes',
+    description: 'Plataforma premium com IA e multi-chain',
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: '#007AFF',
+  themeColor: '#E35404',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -57,15 +57,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <head>
         {/* PWA Meta Tags */}
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#007AFF" />
+        <meta name="theme-color" content="#E35404" />
         
         {/* iOS Specific */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="ArbiBot" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
         <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png" />
@@ -75,7 +75,7 @@ export default function RootLayout({
         <link rel="apple-touch-startup-image" href="/icon-512.png" />
         
         {/* Microsoft */}
-        <meta name="msapplication-TileColor" content="#007AFF" />
+        <meta name="msapplication-TileColor" content="#E35404" />
         <meta name="msapplication-tap-highlight" content="no" />
       </head>
       <body className="antialiased">
