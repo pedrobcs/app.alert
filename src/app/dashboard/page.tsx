@@ -245,6 +245,8 @@ export default function DashboardPage() {
         CONFIRMED: 'bg-blue-50 text-blue-700 border-blue-100',
         PENDING: 'bg-amber-50 text-amber-700 border-amber-100',
       };
+  const resolveStatusStyle = (status: string) =>
+    statusPillStyles[status as keyof typeof statusPillStyles];
 
   const utilization =
     user.totalInvested > 0
@@ -688,7 +690,7 @@ export default function DashboardPage() {
                 <span
                   className={cn(
                     'px-3 py-1 rounded-full text-xs font-semibold tracking-[0.2em] border',
-                    statusPillStyles[latestDeposit.status] ??
+                    resolveStatusStyle(latestDeposit.status) ??
                       (themeIsDark
                         ? 'border-white/20 text-white/70'
                         : 'border-slate-200 text-gray-600'),
@@ -1082,7 +1084,7 @@ export default function DashboardPage() {
                         <span
                           className={cn(
                             'inline-flex items-center rounded-full px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em]',
-                            statusPillStyles[deposit.status] ??
+                            resolveStatusStyle(deposit.status) ??
                               (themeIsDark
                                 ? 'border border-white/20 text-white/70'
                                 : 'border border-slate-200 text-gray-600'),
