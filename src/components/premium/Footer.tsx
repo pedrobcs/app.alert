@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Wallet, Twitter, Github, Mail } from 'lucide-react';
+import { Zap, Twitter, Github, Mail, ExternalLink } from 'lucide-react';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -19,45 +19,45 @@ export function Footer() {
       { label: 'Blog', href: '#' },
     ],
     legal: [
-      { label: 'Termos', href: '#' },
+      { label: 'Termos de Uso', href: '#' },
       { label: 'Privacidade', href: '#' },
       { label: 'Segurança', href: '#' },
     ],
   };
 
   const socials = [
-    { icon: Twitter, href: '#', label: 'Twitter' },
-    { icon: Github, href: '#', label: 'GitHub' },
-    { icon: Mail, href: '#', label: 'Email' },
+    { icon: Twitter, href: '#', label: 'Twitter', color: '#1DA1F2' },
+    { icon: Github, href: '#', label: 'GitHub', color: '#fff' },
+    { icon: Mail, href: '#', label: 'Email', color: '#EA4335' },
   ];
 
   return (
-    <footer className="relative bg-black border-t border-white/10">
-      {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-t from-orange/5 to-transparent pointer-events-none" />
+    <footer className="relative bg-black border-t border-white/5">
+      {/* Decorative Gradient */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-orange/50 to-transparent" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8">
-          {/* Brand */}
-          <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center space-x-2 group mb-6">
+      <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
+        {/* Main Footer Content */}
+        <div className="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12">
+          {/* Brand Section */}
+          <div className="lg:col-span-5">
+            <Link href="/" className="inline-flex items-center space-x-3 group mb-6">
               <motion.div
-                whileHover={{ rotate: 360 }}
-                transition={{ duration: 0.6 }}
-                className="relative"
+                whileHover={{ rotate: 360, scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 200 }}
+                className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange to-orange-dark flex items-center justify-center shadow-orange"
               >
-                <div className="absolute inset-0 bg-orange blur-lg opacity-50" />
-                <Wallet className="w-8 h-8 text-orange relative z-10" strokeWidth={1.5} />
+                <Zap className="w-6 h-6 text-white" strokeWidth={2.5} fill="currentColor" />
               </motion.div>
-              <span className="text-2xl font-bold text-white">
-                ArbiBot<span className="text-orange">.</span>
-              </span>
+              <span className="text-2xl font-bold text-white">ArbiBot</span>
             </Link>
-            <p className="text-gray-400 text-sm leading-relaxed mb-6 max-w-sm">
+            <p className="text-gray-400 leading-relaxed mb-6 max-w-sm">
               Plataforma premium de investimentos em criptomoedas com IA.
               Maximize seus retornos com tecnologia de ponta.
             </p>
-            <div className="flex items-center space-x-4">
+            
+            {/* Social Links */}
+            <div className="flex items-center space-x-3">
               {socials.map((social) => {
                 const Icon = social.icon;
                 return (
@@ -66,74 +66,91 @@ export function Footer() {
                     href={social.href}
                     whileHover={{ scale: 1.1, y: -2 }}
                     whileTap={{ scale: 0.95 }}
-                    className="p-2 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-colors"
+                    className="w-11 h-11 glass-card rounded-xl flex items-center justify-center group hover:border-white/20 transition-all"
                     aria-label={social.label}
                   >
-                    <Icon className="w-5 h-5 text-gray-400" />
+                    <Icon className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" strokeWidth={2} />
                   </motion.a>
                 );
               })}
             </div>
           </div>
 
-          {/* Links */}
-          <div>
-            <h3 className="text-white font-semibold mb-4 text-sm">Produto</h3>
-            <ul className="space-y-3">
-              {links.product.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-gray-400 hover:text-orange transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Links Sections */}
+          <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
+            {/* Product */}
+            <div>
+              <h3 className="text-sm font-bold text-white mb-4 uppercase tracking-wide">
+                Produto
+              </h3>
+              <ul className="space-y-3">
+                {links.product.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-gray-400 hover:text-orange transition-colors inline-flex items-center group"
+                    >
+                      <span>{link.label}</span>
+                      <ExternalLink className="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          <div>
-            <h3 className="text-white font-semibold mb-4 text-sm">Empresa</h3>
-            <ul className="space-y-3">
-              {links.company.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-gray-400 hover:text-orange transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+            {/* Company */}
+            <div>
+              <h3 className="text-sm font-bold text-white mb-4 uppercase tracking-wide">
+                Empresa
+              </h3>
+              <ul className="space-y-3">
+                {links.company.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-gray-400 hover:text-orange transition-colors inline-flex items-center group"
+                    >
+                      <span>{link.label}</span>
+                      <ExternalLink className="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          <div>
-            <h3 className="text-white font-semibold mb-4 text-sm">Legal</h3>
-            <ul className="space-y-3">
-              {links.legal.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-gray-400 hover:text-orange transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            {/* Legal */}
+            <div>
+              <h3 className="text-sm font-bold text-white mb-4 uppercase tracking-wide">
+                Legal
+              </h3>
+              <ul className="space-y-3">
+                {links.legal.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-gray-400 hover:text-orange transition-colors inline-flex items-center group"
+                    >
+                      <span>{link.label}</span>
+                      <ExternalLink className="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-16 pt-8 border-t border-white/10">
-          <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+        <div className="py-8 border-t border-white/5">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-gray-500">
               © {currentYear} ArbiBot. Todos os direitos reservados.
             </p>
             <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <div className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </div>
               <span className="text-sm text-gray-500">
                 Todos os sistemas operacionais
               </span>
@@ -141,6 +158,9 @@ export function Footer() {
           </div>
         </div>
       </div>
+
+      {/* Background Decoration */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-orange/30 to-transparent" />
     </footer>
   );
 }

@@ -2,112 +2,138 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Premium Black + Orange Theme */
-:root {
-  --color-black: #000000;
-  --color-orange: #E35404;
-  --color-orange-light: #FF6B1A;
-  --color-orange-dark: #C44803;
-  --color-gray-950: #0A0A0A;
-  
-  --shadow-orange: 0 10px 40px rgba(227, 84, 4, 0.3);
-  --shadow-orange-glow: 0 0 30px rgba(227, 84, 4, 0.5);
-}
+/* ============================================
+   APPLE PREMIUM DESIGN SYSTEM
+   Black (#000000) + Orange (#E35404)
+   ============================================ */
 
 * {
-  box-sizing: border-box;
-  padding: 0;
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-  background-color: #000000;
-  color: #ffffff;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 
-    'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+html {
+  scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
 }
 
-/* Custom Scrollbar - Apple Style */
+body {
+  background-color: #000000;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* ============================================
+   PREMIUM APPLE SCROLLBAR
+   ============================================ */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(0, 0, 0, 0.1);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  background: rgba(227, 84, 4, 0.3);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(227, 84, 4, 0.5);
+  background: rgba(227, 84, 4, 0.6);
+  background-clip: padding-box;
 }
 
-/* Text Selection */
+/* ============================================
+   SELECTION & FOCUS
+   ============================================ */
 ::selection {
-  background-color: rgba(227, 84, 4, 0.3);
-  color: #ffffff;
+  background: rgba(227, 84, 4, 0.25);
+  color: white;
 }
 
-/* Premium Animations */
-@keyframes glow-pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
+:focus-visible {
+  outline: 2px solid rgba(227, 84, 4, 0.5);
+  outline-offset: 4px;
+  border-radius: 8px;
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-@keyframes slide-up {
-  0% {
-    transform: translateY(20px);
+/* ============================================
+   PREMIUM ANIMATIONS
+   ============================================ */
+@keyframes fade-in-up {
+  from {
     opacity: 0;
+    transform: translateY(30px);
   }
-  100% {
-    transform: translateY(0);
+  to {
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
 @keyframes fade-in {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes scale-in {
-  0% {
-    transform: scale(0.9);
+  from {
     opacity: 0;
+    transform: scale(0.95);
   }
-  100% {
-    transform: scale(1);
+  to {
     opacity: 1;
+    transform: scale(1);
   }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(227, 84, 4, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(227, 84, 4, 0.6);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ============================================
+   UTILITY ANIMATIONS
+   ============================================ */
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .animate-glow-pulse {
@@ -118,60 +144,302 @@ body {
   animation: float 3s ease-in-out infinite;
 }
 
-.animate-slide-up {
-  animation: slide-up 0.5s ease-out;
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
 }
 
-.animate-fade-in {
-  animation: fade-in 0.3s ease-out;
+.animate-gradient {
+  animation: gradient-shift 3s ease infinite;
+  background-size: 200% 200%;
 }
 
-.animate-scale-in {
-  animation: scale-in 0.3s ease-out;
+/* ============================================
+   APPLE GLASS MORPHISM
+   ============================================ */
+.glass-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Utility Classes */
-.safe-area-inset-top {
+.glass-card:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  border-color: rgba(227, 84, 4, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(227, 84, 4, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================
+   PREMIUM BUTTONS
+   ============================================ */
+.btn-primary {
+  position: relative;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #E35404, #C44803);
+  color: white;
+  font-weight: 600;
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 4px 12px rgba(227, 84, 4, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  letter-spacing: -0.02em;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 
+    0 8px 24px rgba(227, 84, 4, 0.5),
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-secondary {
+  position: relative;
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-weight: 600;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  transition: all 0.3s ease;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   TYPOGRAPHY - APPLE STYLE
+   ============================================ */
+.text-display-1 {
+  font-size: 3.75rem;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  tracking-tight: true;
+}
+
+.text-display-2 {
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+
+.text-title-1 {
+  font-size: 2.25rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.text-title-2 {
+  font-size: 1.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+
+.text-body-1 {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+}
+
+.text-body-2 {
+  font-size: 1rem;
+  line-height: 1.6;
+  letter-spacing: -0.005em;
+}
+
+/* ============================================
+   PREMIUM GRADIENTS
+   ============================================ */
+.gradient-orange {
+  background: linear-gradient(135deg, #E35404 0%, #FF6B1A 50%, #E35404 100%);
+  background-size: 200% 200%;
+}
+
+.gradient-text-orange {
+  background-image: linear-gradient(135deg, #FF6B1A 0%, #E35404 50%, #FF6B1A 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.gradient-shine::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.gradient-shine:hover::before {
+  left: 100%;
+}
+
+/* ============================================
+   PREMIUM SHADOWS
+   ============================================ */
+.shadow-soft {
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.1),
+    0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.shadow-medium {
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.15),
+    0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-large {
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.25),
+    0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.shadow-orange {
+  box-shadow: 
+    0 10px 40px rgba(227, 84, 4, 0.4),
+    0 4px 12px rgba(227, 84, 4, 0.2);
+}
+
+.shadow-orange-glow {
+  box-shadow: 
+    0 0 40px rgba(227, 84, 4, 0.6),
+    0 0 80px rgba(227, 84, 4, 0.3);
+}
+
+/* ============================================
+   INTERACTIVE ELEMENTS
+   ============================================ */
+.interactive {
+  transition: all 0.3s ease;
+  will-change: transform;
+}
+
+.interactive:hover {
+  transform: translateY(-4px);
+}
+
+.interactive:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ============================================
+   GRID BACKGROUND
+   ============================================ */
+.grid-background {
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* ============================================
+   MOBILE OPTIMIZATIONS
+   ============================================ */
+@media (max-width: 768px) {
+  .text-display-1 {
+    font-size: 2.25rem;
+  }
+  
+  .text-display-2 {
+    font-size: 1.875rem;
+  }
+  
+  .text-title-1 {
+    font-size: 1.5rem;
+  }
+  
+  .glass-card {
+    backdrop-filter: blur(16px) saturate(180%);
+  }
+}
+
+@media (min-width: 768px) {
+  .text-display-1 {
+    font-size: 4.5rem;
+  }
+  .text-display-2 {
+    font-size: 3.75rem;
+  }
+  .text-title-1 {
+    font-size: 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-display-1 {
+    font-size: 6rem;
+  }
+  .text-display-2 {
+    font-size: 4.5rem;
+  }
+}
+
+/* ============================================
+   SAFE AREAS (iOS)
+   ============================================ */
+.safe-top {
   padding-top: env(safe-area-inset-top);
 }
 
-.safe-area-inset-bottom {
+.safe-bottom {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* Touch-friendly tap targets (44px minimum) */
-.tap-target {
-  min-height: 44px;
-  min-width: 44px;
-}
-
-/* Prevent text size adjustment on orientation change */
-html {
-  -webkit-text-size-adjust: 100%;
-}
-
-/* Better tap highlighting */
-* {
-  -webkit-tap-highlight-color: rgba(227, 84, 4, 0.2);
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Focus styles for accessibility */
-*:focus-visible {
-  outline: 2px solid var(--color-orange);
-  outline-offset: 2px;
-}
-
-/* Hide focus for mouse users */
-*:focus:not(:focus-visible) {
-  outline: none;
-}
-
-/* Reduce motion for users who prefer it */
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -179,91 +447,31 @@ html {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
   }
 }
 
-/* Dark mode optimizations */
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-}
-
-/* Print styles */
-@media print {
-  body {
-    background: white;
-    color: black;
-  }
-  
-  .no-print {
-    display: none !important;
-  }
-}
-
-/* PWA specific styles */
-@media (display-mode: standalone) {
-  body {
-    user-select: none;
-    -webkit-user-select: none;
-  }
-  
-  /* Safe area for notch/dynamic island */
-  .safe-top {
-    padding-top: max(env(safe-area-inset-top), 1rem);
-  }
-  
-  .safe-bottom {
-    padding-bottom: max(env(safe-area-inset-bottom), 1rem);
-  }
-}
-
-/* Loading states */
+/* ============================================
+   LOADING STATES
+   ============================================ */
 .skeleton {
+  position: relative;
+  overflow: hidden;
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 0.5rem;
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  border-radius: 0.75rem;
 }
 
-.shimmer {
+.skeleton::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.05) 0%,
-    rgba(255, 255, 255, 0.1) 50%,
-    rgba(255, 255, 255, 0.05) 100%
+    transparent,
+    rgba(255, 255, 255, 0.05),
+    transparent
   );
-  background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-/* Mobile optimizations */
-@media (max-width: 768px) {
-  .text-hero {
-    font-size: 2.25rem;
-  }
-  
-  .text-display {
-    font-size: 1.875rem;
-  }
-  
-  .text-title {
-    font-size: 1.25rem;
-  }
-}
-
-/* Tablet optimizations */
-@media (min-width: 768px) and (max-width: 1024px) {
-  .text-hero {
-    font-size: 3.75rem;
-  }
 }
