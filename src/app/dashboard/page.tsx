@@ -258,21 +258,21 @@ export default function DashboardPage() {
       label: 'Desk utilization',
       value: `${utilization}%`,
       meta: 'Live coverage',
-      accent: 'from-sky-500 to-cyan-400',
+      accent: 'from-[#ff6a00] to-[#ff9a3c]',
       icon: Radar,
     },
     {
       label: 'Signal strength',
       value: '98.2%',
       meta: 'AI confidence',
-      accent: 'from-purple-500 to-pink-500',
+      accent: 'from-[#ff8031] to-[#ffd399]',
       icon: Cpu,
     },
     {
       label: 'Latency',
       value: '31ms',
       meta: 'Global route',
-      accent: 'from-emerald-500 to-lime-400',
+      accent: 'from-[#f97316] to-[#facc15]',
       icon: Globe2,
     },
   ];
@@ -282,21 +282,21 @@ export default function DashboardPage() {
       title: 'Instant deposit',
       description: 'Fund the vault with guided settlement.',
       href: '/deposit',
-      accent: 'from-sky-500/90 via-blue-500/90 to-indigo-500/90',
+      accent: 'from-[#ff6a00]/90 via-[#ff8533]/90 to-[#ffaf5a]/90',
       icon: DollarSign,
     },
     {
       title: 'Statement vault',
       description: 'Audit every movement with receipts.',
       href: '/deposits',
-      accent: 'from-purple-500/90 via-pink-500/80 to-rose-500/80',
+      accent: 'from-[#ff4d4d]/90 via-[#ff7846]/80 to-[#ffbf3f]/80',
       icon: Zap,
     },
     {
       title: 'Performance lab',
       description: 'Drill into NAV, YTD & sharpe curves.',
       href: '/performance',
-      accent: 'from-emerald-500/90 via-lime-500/80 to-green-400/80',
+      accent: 'from-[#14b8a6]/90 via-[#0ea5e9]/80 to-[#60a5fa]/80',
       icon: LineChart,
     },
   ];
@@ -372,21 +372,21 @@ export default function DashboardPage() {
       value: utilization / 100,
       valueLabel: `${utilization}%`,
       meta: formatUSDC(user.currentValue),
-      accent: 'from-indigo-500 via-blue-500 to-cyan-400',
+      accent: 'from-[#ff6a00] via-[#ff8533] to-[#ffb347]',
     },
     {
       label: 'Cash buffer',
       value: 0.32,
       valueLabel: '32%',
       meta: 'Ready liquidity',
-      accent: 'from-emerald-500 to-lime-400',
+      accent: 'from-[#f97316] to-[#facc15]',
     },
     {
       label: 'AI uptime',
       value: 0.97,
       valueLabel: '97%',
       meta: 'Guardian online',
-      accent: 'from-fuchsia-500 to-purple-500',
+      accent: 'from-[#c084fc] to-[#f472b6]',
     },
   ];
 
@@ -455,264 +455,63 @@ export default function DashboardPage() {
       <AnimatedBackground />
       <Navbar />
 
-      <main className="max-w-7xl mx-auto px-6 lg:px-10 py-12 relative z-10 space-y-10">
-        <section className="grid grid-cols-12 gap-8">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className={cn(
-              'col-span-12 xl:col-span-8 rounded-[36px] p-10 relative overflow-hidden border backdrop-blur-2xl',
-              themeIsDark
-                ? 'bg-gradient-to-br from-[#111325]/95 via-[#0c0f1e]/90 to-[#05060d]/95 border-white/10 text-white shadow-[0_45px_120px_rgba(1,2,8,0.9)]'
-                : 'bg-gradient-to-br from-white/95 via-white/90 to-slate-50/90 border-white/60 text-gray-900 shadow-[0_45px_90px_rgba(15,15,30,0.15)]',
-            )}
-          >
-            <div className="absolute inset-0 pointer-events-none">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.5 }}
-                transition={{ duration: 1.2 }}
-                className={cn(
-                  'absolute right-[-80px] top-[-120px] w-[320px] h-[320px] blur-[120px]',
-                  themeIsDark
-                    ? 'bg-[radial-gradient(circle,_rgba(56,189,248,0.4),_transparent)]'
-                    : 'bg-[radial-gradient(circle,_rgba(59,130,246,0.3),_transparent)]',
-                )}
-              />
-            </div>
-            <div className="relative z-10 space-y-8">
-              <div className="flex flex-col gap-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div
-                      className={cn(
-                        'flex items-center gap-3 text-[11px] uppercase tracking-[0.5em]',
-                        themeIsDark ? 'text-white/60' : 'text-gray-500',
-                      )}
-                    >
-                      <Sparkles className="w-4 h-4" />
-                      Mission control
-                    </div>
-                    <h1 className="mt-4 text-4xl 2xl:text-5xl font-semibold leading-tight">
-                      {formatAddress(user.walletAddress)} desk
-                    </h1>
-                    <p className={cn('mt-3 text-lg max-w-2xl', textMuted)}>
-                      Your capital is {isPositiveReturn ? 'compounding' : 'stabilizing'} across the
-                      ArbiBot CRM core. This panel mirrors an Apple-grade command center so every
-                      action feels luxurious yet surgical.
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={cn(
-                        'px-3 py-1 rounded-full text-xs font-semibold tracking-[0.3em]',
-                        themeIsDark ? 'bg-white/10 text-white/70' : 'bg-black/5 text-gray-600',
-                      )}
-                    >
-                      LIVE
-                    </span>
-                    <button
-                      type="button"
-                      onClick={toggleTheme}
-                      className={cn(
-                        'rounded-full p-3 border transition-all duration-500',
-                        themeIsDark
-                          ? 'border-white/10 bg-white/5 text-amber-200 hover:bg-white/10'
-                          : 'border-slate-200 bg-white text-slate-900 hover:bg-slate-50',
-                      )}
-                      aria-label="Toggle dashboard theme"
-                    >
-                      <motion.div
-                        key={theme}
-                        initial={{ rotate: -30, opacity: 0 }}
-                        animate={{ rotate: 0, opacity: 1 }}
-                        transition={{ duration: 0.4 }}
-                      >
-                        {themeIsDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                      </motion.div>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div className={cn('rounded-2xl border px-6 py-4', softPanelClass)}>
-                    <p className={cn('text-xs uppercase tracking-[0.4em]', textSoft)}>Net change</p>
-                    <p className="mt-2 text-3xl font-semibold">{formattedNetChange}</p>
-                    <p
-                      className={cn(
-                        'text-sm font-semibold mt-1',
-                        netChange >= 0 ? 'text-emerald-400' : 'text-rose-400',
-                      )}
-                    >
-                      {formatPercentage(netChangePercentage)}
-                    </p>
-                  </div>
-                  <div className={cn('rounded-2xl border px-6 py-4', softPanelClass)}>
-                    <p className={cn('text-xs uppercase tracking-[0.4em]', textSoft)}>
-                      Current value
-                    </p>
-                    <p className="mt-2 text-3xl font-semibold">{formatUSDC(user.currentValue)}</p>
-                    <p className={cn('text-sm mt-1', textMuted)}>
-                      Marked {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {heroBadges.map((badge) => (
-                    <div
-                      key={badge.label}
-                      className={cn(
-                        'rounded-3xl border px-5 py-4 flex flex-col gap-2',
-                        softPanelClass,
-                      )}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div
-                          className={cn(
-                            'w-10 h-10 rounded-2xl bg-gradient-to-br flex items-center justify-center text-white shadow-lg',
-                            badge.accent,
-                          )}
-                        >
-                          <badge.icon className="w-5 h-5" />
-                        </div>
-                        <span className={cn('text-xs font-semibold', textMuted)}>{badge.meta}</span>
-                      </div>
-                      <p className="text-2xl font-semibold">{badge.value}</p>
-                      <p className={cn('text-sm uppercase tracking-[0.3em]', textSoft)}>
-                        {badge.label}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex flex-wrap gap-3">
-                  <span
-                    className={cn(
-                      'inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold border',
-                      user.isKycVerified
-                        ? themeIsDark
-                          ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200'
-                          : 'border-emerald-100 bg-emerald-50 text-emerald-700'
-                        : themeIsDark
-                        ? 'border-amber-500/40 bg-amber-500/10 text-amber-200'
-                        : 'border-amber-100 bg-amber-50 text-amber-700',
-                    )}
-                  >
-                    <ShieldCheck className="w-4 h-4" />
-                    {user.isKycVerified ? 'KYC verified' : 'KYC pending'}
-                  </span>
-                  <span
-                    className={cn(
-                      'inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm border',
-                      softPanelClass,
-                    )}
-                  >
-                    <Wallet className="w-4 h-4" />
-                    {formatAddress(user.walletAddress)}
-                  </span>
-                  {settings?.tokenSymbol && (
-                    <span
-                      className={cn(
-                        'inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm border',
-                        softPanelClass,
-                      )}
-                    >
-                      <Activity className="w-4 h-4" />
-                      Token: {settings.tokenSymbol}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className={cn(
-              'col-span-12 xl:col-span-4 rounded-[36px] p-8 border space-y-6',
-              solidPanelClass,
-            )}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className={cn('text-xs uppercase tracking-[0.4em]', textSoft)}>Live systems</p>
-                <h3 className="mt-3 text-2xl font-semibold">Neural vitals</h3>
-              </div>
-              <div className="rounded-2xl bg-white/10 p-3">
-                <Radar className="w-5 h-5" />
-              </div>
-            </div>
-
-            <div className="space-y-5">
-              {signalPulses.map((pulse) => (
-                <div key={pulse.label} className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className={cn('font-semibold uppercase tracking-[0.3em]', textSoft)}>
-                      {pulse.label}
-                    </span>
-                    <span className="font-semibold">{pulse.valueLabel}</span>
-                  </div>
-                  <div className={cn('h-2 rounded-full overflow-hidden', themeIsDark ? 'bg-white/10' : 'bg-black/5')}>
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${pulse.value * 100}%` }}
-                      transition={{ duration: 0.8 }}
-                      className={cn('h-full rounded-full bg-gradient-to-r', pulse.accent)}
-                    />
-                  </div>
-                  <p className={cn('text-xs uppercase tracking-[0.3em]', textMuted)}>
-                    {pulse.meta}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            <div
-              className={cn(
-                'rounded-3xl border px-5 py-4 space-y-3 transition-colors',
-                themeIsDark
-                  ? 'border-white/10 bg-white/5'
-                  : 'border-black/5 bg-white/80 shadow-lg shadow-black/5',
-              )}
-            >
-              <p className={cn('text-xs uppercase tracking-[0.4em]', textSoft)}>Latest move</p>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-2xl font-semibold">
-                    {formatUSDC(latestDeposit.amount)}
-                  </p>
-                  <p className={cn('text-sm', textMuted)}>{formatDate(latestDeposit.createdAt)}</p>
-                </div>
-                <span
-                  className={cn(
-                    'px-3 py-1 rounded-full text-xs font-semibold tracking-[0.2em] border',
-                    resolveStatusStyle(latestDeposit.status) ??
-                      (themeIsDark
-                        ? 'border-white/20 text-white/70'
-                        : 'border-slate-200 text-gray-600'),
-                  )}
-                >
-                  {latestDeposit.status}
-                </span>
-              </div>
-              <Link
-                href="/deposit"
-                className={cn(
-                  'inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-semibold justify-center transition-all',
-                  themeIsDark
-                    ? 'bg-white text-slate-900 hover:bg-slate-100'
-                    : 'bg-slate-900 text-white hover:bg-slate-800',
-                )}
-              >
-                Boost desk
+      <main className="max-w-7xl mx-auto px-6 lg:px-10 py-16 relative z-10 space-y-14">
+        <section className="text-center space-y-8">
+          <p className="text-[11px] uppercase tracking-[0.8em] text-white/60 flex items-center justify-center gap-2">
+            <Sparkles className="w-4 h-4 text-[#ff9a3c]" />
+            ArbiBot Intelligence Core
+          </p>
+          <h1 className="text-4xl md:text-5xl font-semibold text-white">
+            Easier &amp; Smarter Capital Deployment
+          </h1>
+          <p className="max-w-2xl mx-auto text-base text-white/70 leading-relaxed">
+            Monitoring {formatUSDC(user.currentValue)} across {formatUSDC(user.totalInvested)} deployed.
+            Your desk stays matte-black, minimal, and laser precise while ArbiBot streams every metric in real-time.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link href="/deposit" className="cta-button">
+              Deploy capital
+              <span className="cta-button-icon">
                 <ArrowUpRight className="w-4 h-4" />
-              </Link>
+              </span>
+            </Link>
+            <Link href="/performance" className="btn-ghost">
+              Performance deck
+              <ArrowUpRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <div className="neon-slider">
+            <div className="slider-node text-white">
+              <Sparkles className="w-5 h-5" />
             </div>
-          </motion.div>
+            <div className="neon-slider-track">
+              <div className="neon-slider-glow" />
+            </div>
+            <div className="slider-node text-white">
+              <Globe2 className="w-5 h-5" />
+            </div>
+          </div>
+        </section>
+
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {heroBadges.map((badge, index) => (
+            <motion.div
+              key={badge.label}
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 * index }}
+              className="glow-card p-5 space-y-4"
+            >
+              <div className="flex items-center justify-between">
+                <div className={cn('w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg', badge.accent)}>
+                  <badge.icon className="w-6 h-6" />
+                </div>
+                <span className="text-xs uppercase tracking-[0.4em] text-white/60">{badge.meta}</span>
+              </div>
+              <p className="text-3xl font-semibold text-white">{badge.value}</p>
+              <p className="text-sm uppercase tracking-[0.4em] text-white/50">{badge.label}</p>
+            </motion.div>
+          ))}
         </section>
 
         <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
@@ -725,12 +524,7 @@ export default function DashboardPage() {
               className={cn('rounded-[28px] border p-6 backdrop-blur-xl', panelBaseClass)}
             >
               <div className="flex items-center justify-between">
-                <div
-                  className={cn(
-                    'rounded-2xl p-3',
-                    themeIsDark ? 'bg-white/10' : 'bg-slate-900/5',
-                  )}
-                >
+                <div className="rounded-2xl p-3 bg-white/5">
                   <stat.icon className="w-5 h-5" />
                 </div>
                 <span
@@ -752,110 +546,97 @@ export default function DashboardPage() {
           ))}
         </section>
 
-        <section className="grid grid-cols-12 gap-8">
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className={cn('col-span-12 lg:col-span-7 rounded-[32px] border p-8', panelBaseClass)}
+            transition={{ duration: 0.6 }}
+            className={cn('lg:col-span-7 rounded-[32px] border p-8 space-y-6', panelBaseClass)}
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className={cn('text-xs uppercase tracking-[0.4em]', textSoft)}>Cadence</p>
-                <h3 className="mt-3 text-2xl font-semibold">Portfolio rhythm</h3>
+                <p className={cn('text-xs uppercase tracking-[0.4em]', textSoft)}>Bot telemetry</p>
+                <h3 className="mt-3 text-2xl font-semibold text-white">Neural vitals</h3>
                 <p className={cn('text-sm', textMuted)}>
-                  Normalized against the last {depositSource.length} deposits
+                  Desk utilization lives at {utilization}% with automated safeguards on standby.
                 </p>
               </div>
-              <Link
-                href="/performance"
-                className={cn(
-                  'inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold border',
-                  themeIsDark ? 'border-white/10 hover:bg-white/5' : 'border-black/5 hover:bg-black/5',
-                )}
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="rounded-full border border-white/15 p-2 text-white/70 hover:text-white transition"
               >
-                Detailed view
-                <ArrowUpRight className="w-4 h-4" />
-              </Link>
+                {themeIsDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
             </div>
 
-            <div className="mt-10">
-              <div className="flex items-end gap-4 h-52">
-                {sparklineBars.map((bar, idx) => (
-                  <div key={bar.id} className="flex-1 flex flex-col items-center gap-3">
-                    <motion.div
-                      initial={{ height: 0 }}
-                      animate={{ height: `${bar.height}%` }}
-                      transition={{ delay: 0.2 + idx * 0.1, duration: 0.6 }}
-                      className={cn(
-                        'w-full rounded-3xl flex items-end justify-center',
-                        themeIsDark
-                          ? 'bg-gradient-to-t from-slate-800 to-blue-500 shadow-[0_25px_45px_rgba(5,8,25,0.65)]'
-                          : 'bg-gradient-to-t from-blue-100 to-blue-500 shadow-inner',
-                      )}
-                    >
-                      <span className="mb-4 text-xs font-semibold text-white drop-shadow-lg">
-                        {bar.amount}
-                      </span>
-                    </motion.div>
-                    <div className="text-center">
-                      <p className="text-xs font-semibold">{bar.label}</p>
-                      <p className={cn('text-[11px] uppercase tracking-[0.3em]', textSoft)}>
-                        {bar.status}
-                      </p>
-                    </div>
+            <div className="space-y-5">
+              {signalPulses.map((pulse) => (
+                <div key={pulse.label} className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-semibold uppercase tracking-[0.3em] text-white/60">
+                      {pulse.label}
+                    </span>
+                    <span className="font-semibold">{pulse.valueLabel}</span>
                   </div>
-                ))}
+                  <div className="h-2 rounded-full overflow-hidden bg-white/10">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${pulse.value * 100}%` }}
+                      transition={{ duration: 0.8 }}
+                      className={cn('h-full rounded-full bg-gradient-to-r', pulse.accent)}
+                    />
+                  </div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-white/50">{pulse.meta}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="rounded-2xl border border-white/10 px-5 py-4 flex items-center justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.4em] text-white/50">Latest deposit</p>
+                <p className="text-2xl font-semibold text-white">{formatUSDC(latestDeposit.amount)}</p>
+                <p className="text-sm text-white/60">{formatDate(latestDeposit.createdAt)}</p>
               </div>
-              <p className={cn('mt-6 text-sm', textMuted)}>
-                Each bar mirrors a deposit event. Heights scale to the largest inflow for a clean,
-                desktop-first visualization.
-              </p>
+              <span
+                className={cn(
+                  'px-3 py-1 rounded-full text-xs font-semibold tracking-[0.2em] border',
+                  resolveStatusStyle(latestDeposit.status) ?? 'border-white/20 text-white/70',
+                )}
+              >
+                {latestDeposit.status}
+              </span>
             </div>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className={cn('col-span-12 lg:col-span-5 rounded-[32px] border p-8 space-y-4', panelBaseClass)}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className={cn('lg:col-span-5 rounded-[32px] border p-8 space-y-5', panelBaseClass)}
           >
             <div className="flex items-center justify-between">
               <div>
                 <p className={cn('text-xs uppercase tracking-[0.4em]', textSoft)}>Flight deck</p>
-                <h3 className="mt-3 text-2xl font-semibold">Quick actions</h3>
+                <h3 className="mt-3 text-2xl font-semibold text-white">Quick actions</h3>
               </div>
             </div>
             {actionShortcuts.map((action) => (
               <Link
                 key={action.title}
                 href={action.href}
-                className={cn(
-                  'group block rounded-3xl border px-5 py-4 transition-all duration-300',
-                  themeIsDark
-                    ? 'border-white/10 bg-white/5 hover:bg-white/10'
-                    : 'border-slate-200 bg-white/90 hover:-translate-y-1 hover:shadow-xl',
-                )}
+                className="group block rounded-3xl border border-white/10 bg-white/5 px-5 py-4 transition duration-300 hover:bg-white/10"
               >
                 <div className="flex items-center gap-4">
-                  <div
-                    className={cn(
-                      'rounded-2xl bg-gradient-to-br p-3 text-white shadow-lg',
-                      action.accent,
-                    )}
-                  >
+                  <div className={cn('rounded-2xl bg-gradient-to-br p-3 text-white shadow-lg', action.accent)}>
                     <action.icon className="w-5 h-5" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-lg font-semibold">{action.title}</p>
-                    <p className={cn('text-sm', textMuted)}>{action.description}</p>
+                    <p className="text-lg font-semibold text-white">{action.title}</p>
+                    <p className="text-sm text-white/60">{action.description}</p>
                   </div>
-                  <motion.div
-                    initial={{ x: 0 }}
-                    whileHover={{ x: 6 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <ArrowUpRight className={cn('w-5 h-5', textMuted)} />
+                  <motion.div initial={{ x: 0 }} whileHover={{ x: 6 }} transition={{ duration: 0.3 }}>
+                    <ArrowUpRight className="w-5 h-5 text-white/60 group-hover:text-white" />
                   </motion.div>
                 </div>
               </Link>
@@ -865,17 +646,17 @@ export default function DashboardPage() {
 
         <section className="grid grid-cols-12 gap-8">
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.15 }}
+            transition={{ duration: 0.6, delay: 0.05 }}
             className={cn('col-span-12 lg:col-span-5 rounded-[32px] border p-8', panelBaseClass)}
           >
             <div className="flex items-center justify-between">
               <div>
                 <p className={cn('text-xs uppercase tracking-[0.4em]', textSoft)}>Alpha feed</p>
-                <h3 className="mt-3 text-2xl font-semibold">Signal stream</h3>
+                <h3 className="mt-3 text-2xl font-semibold text-white">Signal stream</h3>
               </div>
-              <Signal className="w-5 h-5" />
+              <Signal className="w-5 h-5 text-white/70" />
             </div>
             <ul className="mt-6 space-y-4">
               {alphaSignals.map((signal, idx) => (
@@ -883,23 +664,15 @@ export default function DashboardPage() {
                   key={signal.title}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1 * idx }}
-                  className={cn(
-                    'rounded-3xl border px-4 py-4 flex items-center gap-4',
-                    themeIsDark ? 'border-white/10 bg-white/5' : 'border-slate-100 bg-white',
-                  )}
+                  transition={{ delay: 0.08 * idx }}
+                  className="rounded-3xl border border-white/10 bg-white/5 px-4 py-4 flex items-center gap-4"
                 >
-                  <div
-                    className={cn(
-                      'px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-[0.3em]',
-                      themeIsDark ? 'bg-white/10 text-white/80' : 'bg-slate-900/5 text-gray-600',
-                    )}
-                  >
+                  <div className="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-[0.3em] text-white/70 bg-white/10">
                     {signal.chip}
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold">{signal.title}</p>
-                    <p className={cn('text-sm', textMuted)}>{signal.subtitle}</p>
+                    <p className="font-semibold text-white">{signal.title}</p>
+                    <p className="text-sm text-white/60">{signal.subtitle}</p>
                   </div>
                   <div className="text-right">
                     <p
@@ -910,9 +683,7 @@ export default function DashboardPage() {
                     >
                       {signal.delta}
                     </p>
-                    <p className={cn('text-xs uppercase tracking-[0.3em]', textSoft)}>
-                      {signal.status}
-                    </p>
+                    <p className="text-xs uppercase tracking-[0.3em] text-white/50">{signal.status}</p>
                   </div>
                 </motion.li>
               ))}
@@ -920,34 +691,26 @@ export default function DashboardPage() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
             className={cn('col-span-12 lg:col-span-3 rounded-[32px] border p-8 space-y-4', panelBaseClass)}
           >
             <div className="flex items-center justify-between">
               <div>
                 <p className={cn('text-xs uppercase tracking-[0.4em]', textSoft)}>Global mesh</p>
-                <h3 className="mt-3 text-xl font-semibold">Node coverage</h3>
+                <h3 className="mt-3 text-xl font-semibold text-white">Node coverage</h3>
               </div>
-              <Globe2 className="w-5 h-5" />
+              <Globe2 className="w-5 h-5 text-white/70" />
             </div>
             {globalNodes.map((node) => (
-              <div
-                key={node.region}
-                className={cn(
-                  'rounded-2xl border px-4 py-3 flex items-center justify-between',
-                  themeIsDark ? 'border-white/10 bg-white/5' : 'border-slate-100 bg-white',
-                )}
-              >
+              <div key={node.region} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 flex items-center justify-between">
                 <div>
-                  <p className="font-semibold">{node.region}</p>
-                  <p className={cn('text-xs uppercase tracking-[0.3em]', textSoft)}>
-                    {node.latency}
-                  </p>
+                  <p className="font-semibold text-white">{node.region}</p>
+                  <p className="text-xs uppercase tracking-[0.3em] text-white/60">{node.latency}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-semibold">{node.load}</p>
+                  <p className="text-lg font-semibold text-white">{node.load}</p>
                   <p className={cn('text-xs', node.delta.startsWith('+') ? 'text-emerald-400' : 'text-rose-400')}>
                     {node.delta}
                   </p>
@@ -957,17 +720,17 @@ export default function DashboardPage() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.25 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
             className={cn('col-span-12 lg:col-span-4 rounded-[32px] border p-8 space-y-4', panelBaseClass)}
           >
             <div className="flex items-center justify-between">
               <div>
                 <p className={cn('text-xs uppercase tracking-[0.4em]', textSoft)}>Timeline</p>
-                <h3 className="mt-3 text-2xl font-semibold">Mission log</h3>
+                <h3 className="mt-3 text-2xl font-semibold text-white">Mission log</h3>
               </div>
-              <Layers className="w-5 h-5" />
+              <Layers className="w-5 h-5 text-white/70" />
             </div>
             <div className="space-y-5">
               {missionTimeline.map((event, idx) => (
@@ -975,26 +738,18 @@ export default function DashboardPage() {
                   key={event.time}
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1 * idx }}
-                  className={cn(
-                    'rounded-2xl border px-4 py-3 flex items-center gap-4',
-                    themeIsDark ? 'border-white/10 bg-white/5' : 'border-slate-100 bg-white',
-                  )}
+                  transition={{ delay: 0.08 * idx }}
+                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 flex items-center gap-4"
                 >
-                  <div
-                    className={cn(
-                      'w-10 h-10 rounded-2xl flex items-center justify-center',
-                      themeIsDark ? 'bg-white/10' : 'bg-slate-900/5',
-                    )}
-                  >
-                    <Timer className="w-5 h-5" />
+                  <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-white/10">
+                    <Timer className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold">{event.title}</p>
-                    <p className={cn('text-sm', textMuted)}>{event.detail}</p>
+                    <p className="font-semibold text-white">{event.title}</p>
+                    <p className="text-sm text-white/60">{event.detail}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs uppercase tracking-[0.3em]">{event.time}</p>
+                    <p className="text-xs uppercase tracking-[0.3em] text-white/50">{event.time}</p>
                     <p
                       className={cn(
                         'text-sm font-semibold',
@@ -1016,45 +771,32 @@ export default function DashboardPage() {
 
         <section className="grid grid-cols-12 gap-8">
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
             className={cn('col-span-12 xl:col-span-8 rounded-[32px] border p-8', panelBaseClass)}
           >
             <div className="flex items-center justify-between">
               <div>
                 <p className={cn('text-xs uppercase tracking-[0.4em]', textSoft)}>Ledger</p>
-                <h3 className="mt-3 text-2xl font-semibold">Recent deposits</h3>
+                <h3 className="mt-3 text-2xl font-semibold text-white">Recent deposits</h3>
               </div>
               <Link
                 href="/deposits"
-                className={cn(
-                  'inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold border',
-                  themeIsDark ? 'border-white/10 hover:bg-white/5' : 'border-black/5 hover:bg-black/5',
-                )}
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-white/80 hover:text-white hover:border-white/40 transition"
               >
                 View all
                 <ArrowUpRight className="w-4 h-4" />
               </Link>
             </div>
             {isUsingMockDeposits && (
-              <p className={cn('mt-2 text-xs uppercase tracking-[0.3em]', textMuted)}>
+              <p className="mt-2 text-xs uppercase tracking-[0.3em] text-white/60">
                 Previewing mock ledger flow until live deposits arrive.
               </p>
             )}
-            <div
-              className={cn(
-                'mt-8 overflow-hidden rounded-3xl border backdrop-blur-xl',
-                themeIsDark ? 'border-white/10 bg-white/5' : 'border-white/80 bg-white/90',
-              )}
-            >
-              <table className="w-full text-sm">
-                <thead
-                  className={cn(
-                    'text-left text-[11px] uppercase tracking-[0.4em]',
-                    themeIsDark ? 'bg-white/5 text-white/60' : 'bg-slate-50 text-gray-500',
-                  )}
-                >
+            <div className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl">
+              <table className="w-full text-sm text-white/80">
+                <thead className="text-left text-[11px] uppercase tracking-[0.4em] text-white/60 bg-white/5">
                   <tr>
                     <th className="px-6 py-4">Date</th>
                     <th className="px-6 py-4">Amount</th>
@@ -1062,21 +804,18 @@ export default function DashboardPage() {
                     <th className="px-6 py-4">Transaction</th>
                   </tr>
                 </thead>
-                <tbody className={themeIsDark ? 'divide-white/5' : 'divide-slate-100'}>
+                <tbody className="divide-y divide-white/5">
                   {tableDeposits.map((deposit, index) => (
                     <motion.tr
                       key={deposit.id}
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 * index }}
-                      className={cn(
-                        'text-sm',
-                        themeIsDark ? 'text-slate-200' : 'text-gray-800',
-                      )}
+                      transition={{ delay: 0.08 * index }}
+                      className="text-sm"
                     >
-                      <td className="px-6 py-5 font-semibold">{formatDate(deposit.createdAt)}</td>
+                      <td className="px-6 py-5 font-semibold text-white">{formatDate(deposit.createdAt)}</td>
                       <td className="px-6 py-5">
-                        <span className="text-lg font-semibold">
+                        <span className="text-lg font-semibold text-white">
                           {formatUSDC(deposit.amount)}
                         </span>
                       </td>
@@ -1084,10 +823,7 @@ export default function DashboardPage() {
                         <span
                           className={cn(
                             'inline-flex items-center rounded-full px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em]',
-                            resolveStatusStyle(deposit.status) ??
-                              (themeIsDark
-                                ? 'border border-white/20 text-white/70'
-                                : 'border border-slate-200 text-gray-600'),
+                            resolveStatusStyle(deposit.status) ?? 'border border-white/20 text-white/70',
                           )}
                         >
                           {deposit.status}
@@ -1098,10 +834,7 @@ export default function DashboardPage() {
                           href={getArbiscanLink(deposit.txHash)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={cn(
-                            'inline-flex items-center gap-1 font-semibold',
-                            themeIsDark ? 'text-sky-300 hover:text-white' : 'text-slate-900 hover:text-blue-600',
-                          )}
+                          className="inline-flex items-center gap-1 font-semibold text-[#ff9a3c] hover:text-white"
                         >
                           View on-chain
                           <ExternalLink className="w-4 h-4" />
@@ -1115,27 +848,22 @@ export default function DashboardPage() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.25 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
             className={cn('col-span-12 xl:col-span-4 rounded-[32px] border p-8 space-y-5', panelBaseClass)}
           >
             <div>
               <p className={cn('text-xs uppercase tracking-[0.4em]', textSoft)}>System health</p>
-              <h3 className="mt-3 text-2xl font-semibold">Session brief</h3>
+              <h3 className="mt-3 text-2xl font-semibold text-white">Session brief</h3>
             </div>
-            <div
-              className={cn(
-                'rounded-2xl border px-4 py-4 flex items-center justify-between',
-                themeIsDark ? 'border-white/10 bg-white/5' : 'border-slate-100 bg-white',
-              )}
-            >
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 flex items-center justify-between">
               <div>
-                <p className={cn('text-xs uppercase tracking-[0.4em]', textSoft)}>Compliance</p>
-                <p className="mt-2 text-lg font-semibold">
+                <p className="text-xs uppercase tracking-[0.4em] text-white/60">Compliance</p>
+                <p className="mt-2 text-lg font-semibold text-white">
                   {user.isKycVerified ? 'Identity verified' : 'Verification pending'}
                 </p>
-                <p className={cn('text-sm', textMuted)}>
+                <p className="text-sm text-white/60">
                   {user.isKycVerified
                     ? "You're cleared for unlimited deposits."
                     : 'Complete verification to unlock higher limits.'}
@@ -1144,59 +872,40 @@ export default function DashboardPage() {
               <div
                 className={cn(
                   'rounded-2xl p-4',
-                  user.isKycVerified
-                    ? themeIsDark
-                      ? 'bg-emerald-500/15 text-emerald-200'
-                      : 'bg-emerald-50 text-emerald-600'
-                    : themeIsDark
-                    ? 'bg-amber-500/15 text-amber-200'
-                    : 'bg-amber-50 text-amber-600',
+                  user.isKycVerified ? 'bg-emerald-500/15 text-emerald-200' : 'bg-amber-500/15 text-amber-200',
                 )}
               >
                 <ShieldCheck className="w-6 h-6" />
               </div>
             </div>
 
-            <div
-              className={cn(
-                'rounded-2xl border px-4 py-4 space-y-3',
-                themeIsDark ? 'border-white/10 bg-white/5' : 'border-slate-100 bg-white',
-              )}
-            >
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 space-y-3">
               <div className="flex items-center justify-between text-sm">
-                <span className={textMuted}>Latest deposit</span>
-                <span className={textSoft}>{formatDate(latestDeposit.createdAt)}</span>
+                <span className="text-white/60">Latest deposit</span>
+                <span className="text-white/50">{formatDate(latestDeposit.createdAt)}</span>
               </div>
-              <p className="text-2xl font-semibold">{formatUSDC(latestDeposit.amount)}</p>
-              <p className={cn('text-sm', textMuted)}>Status: {latestDeposit.status}</p>
+              <p className="text-2xl font-semibold text-white">{formatUSDC(latestDeposit.amount)}</p>
+              <p className="text-sm text-white/60">Status: {latestDeposit.status}</p>
               <a
                 href={getArbiscanLink(latestDeposit.txHash)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={cn(
-                  'inline-flex items-center gap-2 text-sm font-semibold',
-                  themeIsDark ? 'text-sky-300 hover:text-white' : 'text-blue-600',
-                )}
+                className="inline-flex items-center gap-2 text-sm font-semibold text-[#ff9a3c]"
               >
                 Inspect on-chain
                 <ExternalLink className="w-4 h-4" />
               </a>
             </div>
 
-            <div
-              className={cn(
-                'rounded-2xl border px-4 py-4 space-y-2',
-                themeIsDark ? 'border-white/10 bg-white/5' : 'border-slate-100 bg-white',
-              )}
-            >
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className={textMuted}>Token</span>
-                <span className={textSoft}>NAV {settings?.currentNAV ?? '—'}</span>
+                <span className="text-white/60">Token</span>
+                <span className="text-white/50">NAV {settings?.currentNAV ?? '—'}</span>
               </div>
-              <p className="text-lg font-semibold">
+              <p className="text-lg font-semibold text-white">
                 {settings?.tokenSymbol || 'Token TBD'}
               </p>
-              <p className={cn('text-sm', textMuted)}>Precision-mapped to Arbitrum.</p>
+              <p className="text-sm text-white/60">Precision-mapped to Arbitrum.</p>
             </div>
           </motion.div>
         </section>
