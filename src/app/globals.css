@@ -13,12 +13,23 @@
 }
 
 :root {
+  --background: #f5f5f7;
+  --foreground: #0f1117;
+  --muted: #5f6272;
+  --grid-dot: rgba(15, 17, 23, 0.08);
+  --neon-start: #ff6a00;
+  --neon-end: #ff9a3c;
+  --glow-a: rgba(255, 106, 0, 0.08);
+  --glow-b: rgba(255, 154, 60, 0.12);
+}
+
+.dark {
   --background: #030303;
   --foreground: #f5f5f5;
   --muted: #cfcfcf;
   --grid-dot: rgba(255, 255, 255, 0.08);
-  --neon-start: #ff6a00;
-  --neon-end: #ff9a3c;
+  --glow-a: rgba(255, 106, 0, 0.25);
+  --glow-b: rgba(255, 154, 60, 0.18);
 }
 
 body {
@@ -46,8 +57,8 @@ body::after {
   content: '';
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle at 20% 20%, rgba(255, 106, 0, 0.25), transparent 45%),
-    radial-gradient(circle at 80% 0%, rgba(255, 154, 60, 0.18), transparent 50%);
+  background: radial-gradient(circle at 20% 20%, var(--glow-a), transparent 45%),
+    radial-gradient(circle at 80% 0%, var(--glow-b), transparent 50%);
   mix-blend-mode: screen;
   pointer-events: none;
   z-index: -3;
@@ -59,17 +70,32 @@ body::after {
 
 /* Core theme helpers */
 .glass-panel {
-  background: rgba(14, 14, 14, 0.85);
-  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--background) 90%, transparent);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 32px;
   box-shadow:
-    0 25px 70px rgba(0, 0, 0, 0.65),
+    0 25px 70px rgba(0, 0, 0, 0.2),
     0 0 0 1px rgba(255, 255, 255, 0.03) inset;
   backdrop-filter: blur(24px);
 }
 
+.dark .glass-panel {
+  background: rgba(14, 14, 14, 0.85);
+  box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+}
+
 .glow-card {
   border-radius: 28px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: color-mix(in srgb, var(--background) 98%, #0b0b0b 2%);
+  box-shadow:
+    0 15px 25px rgba(15, 15, 15, 0.08),
+    0 0 20px rgba(255, 154, 60, 0.12);
+}
+
+.dark .glow-card {
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: radial-gradient(circle at 20% 20%, rgba(255, 106, 0, 0.14), transparent 55%),
     rgba(10, 10, 10, 0.9);
@@ -391,10 +417,10 @@ body::after {
 .card {
   border-radius: 24px;
   padding: 1.5rem;
-  border: 1px solid var(--color-border);
-  background: rgba(8, 8, 8, 0.9);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: color-mix(in srgb, var(--background) 95%, #0b0b0b 5%);
   box-shadow:
-    0 18px 45px rgba(0, 0, 0, 0.65),
+    0 18px 35px rgba(15, 15, 15, 0.09),
     0 0 0 1px rgba(255, 255, 255, 0.02) inset;
   transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
@@ -402,27 +428,44 @@ body::after {
 .card:hover {
   transform: translateY(-6px);
   box-shadow:
-    0 25px 60px rgba(0, 0, 0, 0.75),
+    0 25px 50px rgba(15, 15, 15, 0.15),
     0 0 35px rgba(255, 122, 24, 0.08);
+}
+
+.dark .card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(8, 8, 8, 0.9);
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(255, 255, 255, 0.02) inset;
 }
 
 .card-premium {
   border-radius: 28px;
   padding: 1.8rem;
+  background: radial-gradient(circle at top, rgba(255, 122, 24, 0.08), transparent 55%),
+    color-mix(in srgb, var(--background) 96%, #050505 4%);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow:
+    0 30px 60px rgba(15, 15, 15, 0.12),
+    0 0 35px rgba(255, 154, 60, 0.12);
+  backdrop-filter: blur(18px);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.dark .card-premium {
+  border: 1px solid rgba(255, 255, 255, 0.08);
   background: radial-gradient(circle at top, rgba(255, 122, 24, 0.12), transparent 55%),
     rgba(10, 10, 10, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow:
     0 30px 70px rgba(0, 0, 0, 0.65),
     0 0 35px rgba(255, 154, 60, 0.18);
-  backdrop-filter: blur(18px);
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
 
 .card-premium:hover {
   transform: translateY(-8px);
   box-shadow:
-    0 40px 80px rgba(0, 0, 0, 0.75),
+    0 40px 80px rgba(0, 0, 0, 0.2),
     0 0 45px rgba(255, 154, 60, 0.3);
 }
 
@@ -464,6 +507,12 @@ body::after {
 }
 
 .btn-secondary {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--foreground);
+  border: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+.dark .btn-secondary {
   background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -475,9 +524,14 @@ body::after {
 }
 
 .btn-outline {
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  color: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.2);
+  color: var(--foreground);
   background: transparent;
+}
+
+.dark .btn-outline {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #ffffff;
 }
 
 .btn-outline:hover {
