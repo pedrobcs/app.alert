@@ -5,24 +5,46 @@ import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { motion } from 'framer-motion';
-import { Shield, TrendingUp, Lock, Zap, BarChart3, CheckCircle, ArrowRight, Sparkles, Star, DollarSign, Users } from 'lucide-react';
+import {
+  Shield,
+  TrendingUp,
+  Lock,
+  Zap,
+  BarChart3,
+  CheckCircle,
+  ArrowRight,
+  Sparkles,
+  Star,
+  DollarSign,
+  Users,
+  Wallet,
+} from 'lucide-react';
 
 export default function HomePage() {
   const { isConnected, address } = useAccount();
   const router = useRouter();
   const { authenticate, isAuthenticating } = useAuth();
   const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(max-width: 640px)');
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
+  useEffect(() => {
     if (mounted && isConnected && address) {
-      // Authenticate and redirect to dashboard
       handleAuthentication();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -37,394 +59,280 @@ export default function HomePage() {
     }
   };
 
+  const mobileHighlights = useMemo(
+    () => [
+      { title: 'Daily P/L', value: '+$18.4k', accent: 'from-[#ff6a00] to-[#ff9a3c]' },
+      { title: 'Win rate', value: '68%', accent: 'from-emerald-400 to-emerald-500' },
+      { title: 'Bot status', value: 'Live signal', accent: 'from-sky-400 to-indigo-500' },
+    ],
+    [],
+  );
+
   if (!mounted) {
     return null;
   }
 
   if (isAuthenticating) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
-          <div className="w-20 h-20 mx-auto mb-4">
-            <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-blue-600"></div>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Authenticating...</h2>
-          <p className="text-gray-600">Please sign the message in your wallet</p>
+      <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] flex items-center justify-center">
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
+          <div className="mx-auto mb-6 h-20 w-20 rounded-full border-4 border-white/10 border-b-[#ff9a3c] animate-spin" />
+          <h2 className="text-2xl font-semibold">Authenticating...</h2>
+          <p className="text-[var(--muted)]">Please sign the message in your wallet</p>
         </motion.div>
       </div>
     );
   }
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6 },
-    },
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 relative overflow-hidden">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] relative overflow-hidden">
       <AnimatedBackground />
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="pt-20 pb-32 px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={containerVariants}
-            className="text-center"
-          >
-            {/* Badge */}
-            <motion.div variants={itemVariants} className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 text-sm font-bold mb-8 shadow-lg">
-              <Zap className="w-5 h-5 mr-2 animate-pulse" />
-              <span>Powered by Arbitrum Layer 2</span>
-              <Sparkles className="w-5 h-5 ml-2" />
-            </motion.div>
+      <main className="relative z-10 px-4 sm:px-6 lg:px-8">
+        {/* Hero */}
+        <section className="mx-auto max-w-6xl pt-24 pb-24 text-center">
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+            {isMobile && (
+              <motion.div
+                className="absolute left-1/2 top-32 -z-10 h-64 w-64 -translate-x-1/2 rounded-full bg-gradient-to-br from-[#ff6a00]/40 to-[#ff9a3c]/30 blur-[90px]"
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 0.9, scale: 1 }}
+                transition={{ duration: 1.1, ease: 'easeOut' }}
+              />
+            )}
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-2 text-xs uppercase tracking-[0.6em] text-[var(--muted)]">
+              <Sparkles className="h-4 w-4 text-[#ff9a3c]" />
+              Arbitrum Layer 2 Desk
+            </div>
+            <h1 className="mt-8 text-4xl font-semibold leading-tight text-[var(--foreground)] sm:text-5xl md:text-6xl">
+              Easier, smarter USDC deployment into
+              <span className="block text-gradient">automated trading intelligence</span>
+            </h1>
+            <p className="mx-auto mt-6 max-w-3xl text-lg text-[var(--muted)]">
+              Connect, fund, and monitor a premium BTC trading bot that mirrors the same aesthetic and data discipline you see across the ArbiBot dashboard.
+            </p>
 
-            {/* Main Heading */}
-            <motion.h1
-              variants={itemVariants}
-              className="text-5xl md:text-7xl lg:text-8xl font-bold text-gray-900 mb-6"
-            >
-              Invest USDC into
-              <br />
-              <span className="text-gradient block mt-2">
-                Automated Trading
-              </span>
-            </motion.h1>
-
-            {/* Subheading */}
-            <motion.p
-              variants={itemVariants}
-              className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed"
-            >
-              Put your USDC to work with our proven BTC trading bot on Arbitrum.
-              <br />
-              <span className="font-semibold text-gray-800">Transparent, secure, and designed for consistent returns.</span>
-            </motion.p>
-
-            {/* CTA Buttons */}
-            <motion.div
-              variants={itemVariants}
-              className="flex flex-col sm:flex-row gap-6 justify-center items-center"
-            >
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <ConnectButton.Custom>
                 {({ openConnectModal }) => (
-                  <motion.button
-                    onClick={openConnectModal}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="btn btn-primary text-lg px-10 py-5 shadow-2xl hover:shadow-blue-500/50 flex items-center space-x-2 group"
-                  >
-                    <span>Connect Wallet to Start</span>
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </motion.button>
+                  <button onClick={openConnectModal} className="cta-button text-base">
+                    Connect wallet to start
+                    <span className="cta-button-icon">
+                      <ArrowRight className="h-4 w-4" />
+                    </span>
+                  </button>
                 )}
               </ConnectButton.Custom>
+              <a href="#features" className="btn-ghost text-sm">
+                Explore capabilities
+                <ArrowRight className="h-4 w-4" />
+              </a>
+            </div>
 
-              <motion.a
-                href="#how-it-works"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="btn btn-outline text-lg px-10 py-5 flex items-center space-x-2 group"
-              >
-                <span>Learn How It Works</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </motion.a>
-            </motion.div>
-
-            {/* Stats */}
-            <motion.div
-              variants={containerVariants}
-              className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-24 max-w-5xl mx-auto"
-            >
+            <div className="mt-16 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
               {[
-                { value: '$2.5M+', label: 'Assets Under Management', icon: DollarSign, color: 'blue' },
-                { value: '+24.3%', label: 'YTD Returns', icon: TrendingUp, color: 'green' },
-                { value: '500+', label: 'Active Investors', icon: Users, color: 'purple' },
-              ].map((stat, index) => (
-                <motion.div
-                  key={stat.label}
-                  variants={itemVariants}
-                  whileHover={{ y: -10 }}
-                  className="card-premium text-center group"
-                >
-                  <div className={`w-16 h-16 bg-gradient-to-br ${
-                    stat.color === 'blue' ? 'from-blue-500 to-blue-600' :
-                    stat.color === 'green' ? 'from-green-500 to-green-600' :
-                    'from-purple-500 to-purple-600'
-                  } rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-2xl transition-shadow`}>
-                    <stat.icon className="w-8 h-8 text-white" />
+                { value: '$2.5M+', label: 'Assets under automation', icon: DollarSign },
+                { value: '+24.3%', label: 'Year-to-date P/L', icon: TrendingUp },
+                { value: '500+', label: 'Active investors', icon: Users },
+              ].map((stat) => (
+                <div key={stat.label} className="glow-card text-left p-6">
+                  <div className="flex items-center gap-3 text-[var(--muted)]">
+                    <stat.icon className="h-5 w-5" />
+                    {stat.label}
                   </div>
-                  <div className="text-4xl font-bold text-gray-900 mb-2 number-counter">
-                    {stat.value}
-                  </div>
-                  <div className="text-gray-600">{stat.label}</div>
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="py-24 bg-white/50 backdrop-blur-sm relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-20"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Why Choose <span className="text-gradient">ArbiBot</span>?
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Professional-grade trading, accessible to everyone
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Shield,
-                title: 'Secure & Transparent',
-                description: 'All deposits are on-chain and verifiable. Your funds go directly to the operator wallet with full transparency.',
-                color: 'blue',
-              },
-              {
-                icon: TrendingUp,
-                title: 'Proven Strategy',
-                description: 'Our algorithmic trading bot has consistently outperformed the market with systematic BTC strategies.',
-                color: 'green',
-              },
-              {
-                icon: Lock,
-                title: 'Non-Custodial',
-                description: 'You control your wallet. Deposits are tracked on-chain and credited to your account automatically.',
-                color: 'purple',
-              },
-              {
-                icon: Zap,
-                title: 'Arbitrum Speed',
-                description: 'Low fees and fast confirmations on Arbitrum L2. Your deposits are confirmed in minutes.',
-                color: 'orange',
-              },
-              {
-                icon: BarChart3,
-                title: 'Real-time Dashboard',
-                description: 'Track your investments, view transaction history, and monitor performance in real-time.',
-                color: 'pink',
-              },
-              {
-                icon: CheckCircle,
-                title: 'Simple Process',
-                description: 'Connect wallet, send USDC, and start earning. No complex procedures or paperwork required.',
-                color: 'indigo',
-              },
-            ].map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                whileHover={{ y: -10 }}
-                className="card-premium group cursor-pointer"
-              >
-                <motion.div
-                  whileHover={{ rotate: 360 }}
-                  transition={{ duration: 0.6 }}
-                  className={`w-16 h-16 bg-gradient-to-br ${
-                    feature.color === 'blue' ? 'from-blue-500 to-blue-600' :
-                    feature.color === 'green' ? 'from-green-500 to-green-600' :
-                    feature.color === 'purple' ? 'from-purple-500 to-purple-600' :
-                    feature.color === 'orange' ? 'from-orange-500 to-orange-600' :
-                    feature.color === 'pink' ? 'from-pink-500 to-pink-600' :
-                    'from-indigo-500 to-indigo-600'
-                  } rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:shadow-2xl transition-shadow`}
-                >
-                  <feature.icon className="w-8 h-8 text-white" />
-                </motion.div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {feature.description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section id="how-it-works" className="py-24 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-20"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              How It Works
-            </h2>
-            <p className="text-xl text-gray-600">
-              Start investing in 3 simple steps
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {[
-              { step: '1', title: 'Connect Wallet', description: 'Connect your MetaMask or WalletConnect wallet. Make sure you are on Arbitrum network.' },
-              { step: '2', title: 'Send USDC', description: 'Transfer USDC to the operator wallet address. Minimum deposit $100. Your transaction is verified on-chain.' },
-              { step: '3', title: 'Track Returns', description: 'Monitor your investment in the dashboard. View real-time performance and transaction history.' },
-            ].map((step, index) => (
-              <motion.div
-                key={step.step}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                className="text-center group"
-              >
-                <motion.div
-                  whileHover={{ scale: 1.1, rotate: 360 }}
-                  transition={{ duration: 0.6 }}
-                  className="w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-8 shadow-2xl group-hover:shadow-blue-500/50"
-                >
-                  {step.step}
-                </motion.div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  {step.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {step.description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-24 relative z-10">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="card-premium p-12"
-          >
-            <div className="flex justify-center mb-6">
-              {[...Array(5)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 2, repeat: Infinity, delay: i * 0.2 }}
-                >
-                  <Star className="w-8 h-8 text-yellow-500 fill-yellow-500" />
-                </motion.div>
+                  <p className="mt-3 text-3xl font-semibold">{stat.value}</p>
+                </div>
               ))}
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gradient">
-              Ready to Start Earning?
-            </h2>
-            <p className="text-xl text-gray-600 mb-10">
-              Join hundreds of investors already earning with ArbiBot
+
+            {isMobile && <MobileShowcase highlights={mobileHighlights} />}
+          </motion.div>
+        </section>
+
+        {/* Features */}
+        <section id="features" className="mx-auto max-w-6xl py-20">
+          <div className="text-center">
+            <p className="text-xs uppercase tracking-[0.5em] text-[var(--muted)]">Why ArbiBot</p>
+            <h2 className="mt-4 text-3xl font-semibold sm:text-4xl">Enterprise precision, investor accessibility</h2>
+            <p className="mt-3 text-[var(--muted)]">Every element of the platform mirrors the CRM dashboard you saw—glass, glow, and actionable data.</p>
+          </div>
+          <div className="mt-12 grid gap-6 md:grid-cols-2">
+            {[
+              { icon: Shield, title: 'Secure & transparent', description: 'On-chain deposits with live tracking and notarized vault balances.' },
+              { icon: Zap, title: 'Arbitrum velocity', description: 'Ultra-low fees and instant confirmations keep capital nimble.' },
+              { icon: BarChart3, title: 'Live CRM dashboard', description: 'Same premium dashboard theme with KPIs, charts, and tables.' },
+              { icon: Lock, title: 'Non-custodial oversight', description: 'You retain control while ArbiBot automates execution.' },
+              { icon: TrendingUp, title: 'Quant playbooks', description: 'Adaptive strategies with momentum, carry, and hedging layers.' },
+              { icon: CheckCircle, title: 'Frictionless flow', description: 'Connect, deposit, and monitor—all inside one polished surface.' },
+            ].map((feature) => (
+              <div key={feature.title} className="glass-panel p-6">
+                <feature.icon className="h-6 w-6 text-[#ff9a3c]" />
+                <h3 className="mt-4 text-2xl font-semibold">{feature.title}</h3>
+                <p className="mt-2 text-[var(--muted)]">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* How it works */}
+        <section id="how-it-works" className="mx-auto max-w-6xl py-20">
+          <div className="text-center">
+            <p className="text-xs uppercase tracking-[0.5em] text-[var(--muted)]">Workflow</p>
+            <h2 className="mt-4 text-3xl font-semibold sm:text-4xl">Three curated steps</h2>
+          </div>
+          <div className="mt-12 grid gap-8 md:grid-cols-3">
+            {[
+              { step: '01', title: 'Connect wallet', description: 'Switch to Arbitrum and prepare USDC for automated deployment.' },
+              { step: '02', title: 'Send capital', description: 'Transfer USDC to the operator wallet—instant ledger updates inside the CRM.' },
+              { step: '03', title: 'Monitor & adjust', description: 'Review KPIs, withdraw, or add more liquidity from the same dashboard.' },
+            ].map((item) => (
+              <div key={item.step} className="glow-card p-6 text-center">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-lg font-semibold">
+                  {item.step}
+                </div>
+                <h3 className="mt-4 text-2xl font-semibold">{item.title}</h3>
+                <p className="mt-2 text-[var(--muted)]">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Wallet snippet */}
+        <section className="mx-auto max-w-6xl pb-20">
+          <div className="glass-panel grid items-center gap-10 p-8 md:grid-cols-2">
+            <div>
+              <p className="text-xs uppercase tracking-[0.5em] text-[var(--muted)]">Operator wallet</p>
+              <h2 className="mt-3 text-3xl font-semibold">USDC desk overview</h2>
+              <p className="mt-3 text-[var(--muted)]">
+                Deposits settle to a multi-sig wallet. Credits appear instantly in your CRM dashboard with the same neon aesthetic.
+              </p>
+              <div className="mt-6 flex items-center gap-4 text-sm text-[var(--muted)]">
+                <div className="flex items-center gap-2">
+                  <Wallet className="h-4 w-4 text-[#ff9a3c]" />
+                  0x91c...4af
+                </div>
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-emerald-400" />
+                  NAV synced hourly
+                </div>
+              </div>
+            </div>
+            <div className="glow-card p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.4em] text-[var(--muted)]">Available balance</p>
+                  <h3 className="mt-2 text-3xl font-semibold">$1,120,450</h3>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+                  <Zap className="h-5 w-5 text-[#ff9a3c]" />
+                </div>
+              </div>
+              <div className="mt-6 grid grid-cols-3 gap-3 text-sm">
+                {[
+                  { label: 'Deposits', value: '$2.45M', tone: 'text-emerald-400' },
+                  { label: 'Withdrawals', value: '$645K', tone: 'text-rose-400' },
+                  { label: 'Pending', value: '$24.5K', tone: 'text-[#ff9a3c]' },
+                ].map((item) => (
+                  <div key={item.label} className="rounded-2xl border border-black/5 bg-white/90 p-3 text-[var(--muted)] dark:border-white/10 dark:bg-white/5">
+                    <p>{item.label}</p>
+                    <p className={`mt-1 text-lg font-semibold ${item.tone}`}>{item.value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="mx-auto max-w-4xl pb-24">
+          <div className="glass-panel p-10 text-center">
+            <div className="flex justify-center gap-2">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="h-6 w-6 text-[#ff9a3c]" />
+              ))}
+            </div>
+            <h2 className="mt-6 text-3xl font-semibold">Bring your USDC into the same experience</h2>
+            <p className="mt-3 text-[var(--muted)]">
+              The home, onboarding, and dashboard surfaces now share one neon CRM aesthetic—connect once and operate with confidence.
             </p>
             <ConnectButton.Custom>
               {({ openConnectModal }) => (
-                <motion.button
-                  onClick={openConnectModal}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="btn btn-primary text-lg px-12 py-5 shadow-2xl hover:shadow-blue-500/50"
-                >
-                  Connect Wallet Now
-                </motion.button>
+                <button onClick={openConnectModal} className="cta-button mt-8">
+                  Connect wallet now
+                  <span className="cta-button-icon">
+                    <ArrowRight className="h-4 w-4" />
+                  </span>
+                </button>
               )}
             </ConnectButton.Custom>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">AB</span>
-                </div>
-                <span className="font-bold text-xl">ArbiBot</span>
-              </div>
-              <p className="text-gray-400">
-                Automated USDC trading on Arbitrum
-              </p>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4">Legal</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Terms of Service
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Risk Disclosure
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4">Support</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <a href="mailto:support@arbibot.com" className="hover:text-white transition-colors">
-                    support@arbibot.com
-                  </a>
-                </li>
-              </ul>
-            </div>
           </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 ArbiBot. All rights reserved.</p>
-            <p className="mt-2 text-sm">
-              <strong>Disclaimer:</strong> Trading cryptocurrencies involves risk.
-              You may lose some or all of your investment. Only invest what you can
-              afford to lose.
-            </p>
+        </section>
+      </main>
+
+      <footer className="bg-black/90 text-white/70">
+        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+          <div className="grid gap-8 sm:grid-cols-3">
+            <div>
+              <p className="text-sm">ArbiBot • Automated trading intelligence on Arbitrum.</p>
+            </div>
+            <div>
+              <p className="text-sm">support@arbibot.com</p>
+            </div>
+            <div className="text-sm">
+              <p>© {new Date().getFullYear()} ArbiBot. Trading crypto involves risk.</p>
+            </div>
           </div>
         </div>
       </footer>
+    </div>
+  );
+}
+
+interface MobileShowcaseProps {
+  highlights: { title: string; value: string; accent: string }[];
+}
+
+function MobileShowcase({ highlights }: MobileShowcaseProps) {
+  return (
+    <div className="mt-12 space-y-4 sm:hidden">
+      <motion.div
+        className="mx-auto flex w-full max-w-xs items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left text-xs uppercase tracking-[0.4em] text-[var(--muted)]"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <span>Live CRM sync</span>
+        <span className="flex items-center gap-2 text-[#ff9a3c]">
+          • now
+          <motion.span
+            className="inline-block h-2 w-2 rounded-full bg-[#ff9a3c]"
+            animate={{ opacity: [0.3, 1, 0.3] }}
+            transition={{ repeat: Infinity, duration: 1.4 }}
+          />
+        </span>
+      </motion.div>
+
+      <div className="relative h-60">
+        {highlights.map((card, idx) => (
+          <motion.div
+            key={card.title}
+            className="absolute left-1/2 w-56 -translate-x-1/2 rounded-3xl border border-white/10 bg-white/5 p-4 text-left shadow-[0_20px_50px_rgba(0,0,0,0.35)]"
+            style={{ top: `${idx * 28}px` }}
+            initial={{ opacity: 0, y: 30, rotate: idx === 1 ? -2 : 2 }}
+            animate={{ opacity: 1, y: [0, -6, 0], rotate: idx === 1 ? [-2, 0, -2] : [2, 0, 2] }}
+            transition={{ duration: 3 + idx, delay: idx * 0.2, repeat: Infinity, repeatType: 'mirror' }}
+          >
+            <div
+              className={`inline-flex items-center rounded-2xl bg-gradient-to-r ${card.accent} px-3 py-1 text-xs font-semibold text-black`}
+            >
+              {card.title}
+            </div>
+            <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">{card.value}</p>
+            <p className="text-xs text-[var(--muted)]">Synced from trading bot core</p>
+          </motion.div>
+        ))}
+      </div>
     </div>
   );
 }
