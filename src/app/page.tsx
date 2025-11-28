@@ -5,7 +5,7 @@ import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { motion } from 'framer-motion';
 import {
@@ -28,9 +28,19 @@ export default function HomePage() {
   const router = useRouter();
   const { authenticate, isAuthenticating } = useAuth();
   const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(max-width: 640px)');
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
   }, []);
 
   useEffect(() => {
@@ -48,6 +58,15 @@ export default function HomePage() {
       }, 500);
     }
   };
+
+  const mobileHighlights = useMemo(
+    () => [
+      { title: 'Daily P/L', value: '+$18.4k', accent: 'from-[#ff6a00] to-[#ff9a3c]' },
+      { title: 'Win rate', value: '68%', accent: 'from-emerald-400 to-emerald-500' },
+      { title: 'Bot status', value: 'Live signal', accent: 'from-sky-400 to-indigo-500' },
+    ],
+    [],
+  );
 
   if (!mounted) {
     return null;
@@ -74,6 +93,14 @@ export default function HomePage() {
         {/* Hero */}
         <section className="mx-auto max-w-6xl pt-24 pb-24 text-center">
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+            {isMobile && (
+              <motion.div
+                className="absolute left-1/2 top-32 -z-10 h-64 w-64 -translate-x-1/2 rounded-full bg-gradient-to-br from-[#ff6a00]/40 to-[#ff9a3c]/30 blur-[90px]"
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 0.9, scale: 1 }}
+                transition={{ duration: 1.1, ease: 'easeOut' }}
+              />
+            )}
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-2 text-xs uppercase tracking-[0.6em] text-[var(--muted)]">
               <Sparkles className="h-4 w-4 text-[#ff9a3c]" />
               Arbitrum Layer 2 Desk
@@ -118,6 +145,8 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
+
+            {isMobile && <MobileShowcase highlights={mobileHighlights} />}
           </motion.div>
         </section>
 
@@ -256,6 +285,54 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+    </div>
+  );
+}
+
+interface MobileShowcaseProps {
+  highlights: { title: string; value: string; accent: string }[];
+}
+
+function MobileShowcase({ highlights }: MobileShowcaseProps) {
+  return (
+    <div className="mt-12 space-y-4 sm:hidden">
+      <motion.div
+        className="mx-auto flex w-full max-w-xs items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left text-xs uppercase tracking-[0.4em] text-[var(--muted)]"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <span>Live CRM sync</span>
+        <span className="flex items-center gap-2 text-[#ff9a3c]">
+          • now
+          <motion.span
+            className="inline-block h-2 w-2 rounded-full bg-[#ff9a3c]"
+            animate={{ opacity: [0.3, 1, 0.3] }}
+            transition={{ repeat: Infinity, duration: 1.4 }}
+          />
+        </span>
+      </motion.div>
+
+      <div className="relative h-60">
+        {highlights.map((card, idx) => (
+          <motion.div
+            key={card.title}
+            className="absolute left-1/2 w-56 -translate-x-1/2 rounded-3xl border border-white/10 bg-white/5 p-4 text-left shadow-[0_20px_50px_rgba(0,0,0,0.35)]"
+            style={{ top: `${idx * 28}px` }}
+            initial={{ opacity: 0, y: 30, rotate: idx === 1 ? -2 : 2 }}
+            animate={{ opacity: 1, y: [0, -6, 0], rotate: idx === 1 ? [-2, 0, -2] : [2, 0, 2] }}
+            transition={{ duration: 3 + idx, delay: idx * 0.2, repeat: Infinity, repeatType: 'mirror' }}
+          >
+            <div
+              className={`inline-flex items-center rounded-2xl bg-gradient-to-r ${card.accent} px-3 py-1 text-xs font-semibold text-black`}
+            >
+              {card.title}
+            </div>
+            <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">{card.value}</p>
+            <p className="text-xs text-[var(--muted)]">Synced from trading bot core</p>
+          </motion.div>
+        ))}
+      </div>
     </div>
   );
 }
