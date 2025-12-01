@@ -23,6 +23,7 @@ model User {
   deposits          Deposit[]
   withdrawals       Withdrawal[]
   sessions          Session[]
+  strategyPlans     StrategyPlan[]
 
   @@index([walletAddress])
   @@map("users")
