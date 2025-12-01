@@ -29,7 +29,11 @@
     "react-hot-toast": "^2.4.1",
     "zod": "^3.23.0",
     "date-fns": "^3.6.0",
-    "lucide-react": "^0.436.0"
+    "lucide-react": "^0.436.0",
+    "@react-native-async-storage/async-storage": "^1.23.1",
+    "pino-pretty": "^11.3.0",
+    "fastestsmallesttextencoderdecoder": "^1.0.22",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "typescript": "^5",

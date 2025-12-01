@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/Navbar';
@@ -45,16 +45,7 @@ export default function AdminPage() {
     performanceYTD: 0,
   });
 
-  useEffect(() => {
-    if (!isConnected) {
-      router.push('/');
-      return;
-    }
-
-    checkAdminAccess();
-  }, [isConnected, address]);
-
-  const checkAdminAccess = async () => {
+  const checkAdminAccess = useCallback(async () => {
     try {
       // Check if user is admin
       const adminAddress = process.env.NEXT_PUBLIC_ADMIN_WALLET_ADDRESS?.toLowerCase();
@@ -73,7 +64,16 @@ export default function AdminPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [address, router]);
+
+  useEffect(() => {
+    if (!isConnected) {
+      router.push('/');
+      return;
+    }
+
+    checkAdminAccess();
+  }, [isConnected, router, checkAdminAccess]);
 
   const fetchSettings = async () => {
     try {

@@ -85,7 +85,7 @@ interface WorkspaceSummary {
 }
 
 export default function DashboardPage() {
-  const { address, isConnected } = useAccount();
+  const { isConnected } = useAccount();
   const router = useRouter();
   const [workspace, setWorkspace] = useState<WorkspaceSummary | null>(null);
   const [loading, setLoading] = useState(true);

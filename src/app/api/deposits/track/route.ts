@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyUSDCTransfer } from '@/lib/blockchain';
 import { getSession } from '@/lib/auth';
-import { APP_CONFIG } from '@/lib/config';
 
 export async function POST(request: NextRequest) {
   try {

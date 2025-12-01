@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSession, isAdmin } from '@/lib/auth';
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const session = await getSession();
     if (!session || !(await isAdmin(session.walletAddress))) {
