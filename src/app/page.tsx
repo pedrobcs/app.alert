@@ -8,7 +8,23 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { motion } from 'framer-motion';
-import { Shield, TrendingUp, Lock, Zap, BarChart3, CheckCircle, ArrowRight, Sparkles, Star, DollarSign, Users } from 'lucide-react';
+import {
+  Shield,
+  TrendingUp,
+  Zap,
+  BarChart3,
+  CheckCircle,
+  ArrowRight,
+  Sparkles,
+  Star,
+  Gauge,
+  Radar,
+  NotebookPen,
+  Brain,
+  Layers3,
+  Target,
+  Compass,
+} from 'lucide-react';
 
 export default function HomePage() {
   const { isConnected, address } = useAccount();
@@ -95,7 +111,7 @@ export default function HomePage() {
             {/* Badge */}
             <motion.div variants={itemVariants} className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 text-sm font-bold mb-8 shadow-lg">
               <Zap className="w-5 h-5 mr-2 animate-pulse" />
-              <span>Powered by Arbitrum Layer 2</span>
+              <span>Purpose-built for discretionary futures teams</span>
               <Sparkles className="w-5 h-5 ml-2" />
             </motion.div>
 
@@ -104,10 +120,10 @@ export default function HomePage() {
               variants={itemVariants}
               className="text-5xl md:text-7xl lg:text-8xl font-bold text-gray-900 mb-6"
             >
-              Invest USDC into
+              Command crypto futures
               <br />
               <span className="text-gradient block mt-2">
-                Automated Trading
+                with a copilot
               </span>
             </motion.h1>
 
@@ -116,9 +132,9 @@ export default function HomePage() {
               variants={itemVariants}
               className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed"
             >
-              Put your USDC to work with our proven BTC trading bot on Arbitrum.
+              FuturesPilot pairs contextual research, funding analytics, and reusable playbooks so you can move from thesis to execution without juggling spreadsheets or screenshots.
               <br />
-              <span className="font-semibold text-gray-800">Transparent, secure, and designed for consistent returns.</span>
+              <span className="font-semibold text-gray-800">No live trading—just clarity, structure, and better decisions.</span>
             </motion.p>
 
             {/* CTA Buttons */}
@@ -134,19 +150,19 @@ export default function HomePage() {
                     whileTap={{ scale: 0.95 }}
                     className="btn btn-primary text-lg px-10 py-5 shadow-2xl hover:shadow-blue-500/50 flex items-center space-x-2 group"
                   >
-                    <span>Connect Wallet to Start</span>
+                    <span>Launch Workspace</span>
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </motion.button>
                 )}
               </ConnectButton.Custom>
 
               <motion.a
-                href="#how-it-works"
+                href="#capabilities"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="btn btn-outline text-lg px-10 py-5 flex items-center space-x-2 group"
               >
-                <span>Learn How It Works</span>
+                <span>See the capabilities</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </motion.a>
             </motion.div>
@@ -157,9 +173,9 @@ export default function HomePage() {
               className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-24 max-w-5xl mx-auto"
             >
               {[
-                { value: '$2.5M+', label: 'Assets Under Management', icon: DollarSign, color: 'blue' },
-                { value: '+24.3%', label: 'YTD Returns', icon: TrendingUp, color: 'green' },
-                { value: '500+', label: 'Active Investors', icon: Users, color: 'purple' },
+                { value: '54', label: 'Perp markets tracked live', icon: Radar, color: 'blue' },
+                { value: '18 hrs', label: 'Funding horizon simulated', icon: Gauge, color: 'green' },
+                { value: '92%', label: 'Playbooks with guardrails', icon: Shield, color: 'purple' },
               ].map((stat, index) => (
                 <motion.div
                   key={stat.label}
@@ -186,7 +202,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-24 bg-white/50 backdrop-blur-sm relative z-10">
+      <section id="capabilities" className="py-24 bg-white/50 backdrop-blur-sm relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -196,49 +212,49 @@ export default function HomePage() {
             className="text-center mb-20"
           >
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Why Choose <span className="text-gradient">ArbiBot</span>?
+              Why futures teams choose <span className="text-gradient">FuturesPilot</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Professional-grade trading, accessible to everyone
+              Replace screenshots and chat threads with a structured workflow that keeps research, risk, and execution aligned.
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                icon: Shield,
-                title: 'Secure & Transparent',
-                description: 'All deposits are on-chain and verifiable. Your funds go directly to the operator wallet with full transparency.',
+                icon: NotebookPen,
+                title: 'Strategy Playbooks',
+                description: 'Codify directional or market-neutral ideas with entry math, invalidation, liquidity plan, and kill-switch conditions.',
                 color: 'blue',
               },
               {
-                icon: TrendingUp,
-                title: 'Proven Strategy',
-                description: 'Our algorithmic trading bot has consistently outperformed the market with systematic BTC strategies.',
+                icon: Gauge,
+                title: 'Funding Radar',
+                description: 'Live premium curves, per-exchange funding, and basis alerts surfaced as narratives instead of raw numbers.',
                 color: 'green',
               },
               {
-                icon: Lock,
-                title: 'Non-Custodial',
-                description: 'You control your wallet. Deposits are tracked on-chain and credited to your account automatically.',
+                icon: Brain,
+                title: 'Context Co-Pilot',
+                description: 'LLM summaries that merge funding data, positioning, and your own notes to highlight what changed in the last session.',
                 color: 'purple',
               },
               {
-                icon: Zap,
-                title: 'Arbitrum Speed',
-                description: 'Low fees and fast confirmations on Arbitrum L2. Your deposits are confirmed in minutes.',
+                icon: Layers3,
+                title: 'Scenario Matrix',
+                description: 'Stress-test plays with instant best/base/worst case PnL and required capital by venue.',
                 color: 'orange',
               },
               {
                 icon: BarChart3,
-                title: 'Real-time Dashboard',
-                description: 'Track your investments, view transaction history, and monitor performance in real-time.',
+                title: 'Desk Telemetry',
+                description: 'Understand total notional, margin at risk, and upcoming unlocks across the entire team.',
                 color: 'pink',
               },
               {
                 icon: CheckCircle,
-                title: 'Simple Process',
-                description: 'Connect wallet, send USDC, and start earning. No complex procedures or paperwork required.',
+                title: 'Execution Guardrails',
+                description: 'A pre-trade checklist that enforces risk, liquidity, and narrative alignment before anything goes live.',
                 color: 'indigo',
               },
             ].map((feature, index) => (
@@ -290,15 +306,15 @@ export default function HomePage() {
               How It Works
             </h2>
             <p className="text-xl text-gray-600">
-              Start investing in 3 simple steps
+              Move from hunch to green-lit play without leaving the workspace.
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {[
-              { step: '1', title: 'Connect Wallet', description: 'Connect your MetaMask or WalletConnect wallet. Make sure you are on Arbitrum network.' },
-              { step: '2', title: 'Send USDC', description: 'Transfer USDC to the operator wallet address. Minimum deposit $100. Your transaction is verified on-chain.' },
-              { step: '3', title: 'Track Returns', description: 'Monitor your investment in the dashboard. View real-time performance and transaction history.' },
+              { step: '1', title: 'Connect & sync context', description: 'Authenticate with your wallet to unlock your private workspace, set preferred exchanges, and import any existing notes.' },
+              { step: '2', title: 'Build the playbook', description: 'Document the trade idea with entry plan, invalidation, liquidity venues, and risk budget so the whole desk can align.' },
+              { step: '3', title: 'Monitor the signals', description: 'Let Funding Radar, Desk Telemetry, and scenario alerts nudge you when the setup is ripe or needs to be shelved.' },
             ].map((step, index) => (
               <motion.div
                 key={step.step}
@@ -348,10 +364,10 @@ export default function HomePage() {
               ))}
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gradient">
-              Ready to Start Earning?
+              Spin up your futures cockpit
             </h2>
             <p className="text-xl text-gray-600 mb-10">
-              Join hundreds of investors already earning with ArbiBot
+              Align research, risk, and execution in one view—without running live capital through the platform.
             </p>
             <ConnectButton.Custom>
               {({ openConnectModal }) => (
@@ -361,7 +377,7 @@ export default function HomePage() {
                   whileTap={{ scale: 0.95 }}
                   className="btn btn-primary text-lg px-12 py-5 shadow-2xl hover:shadow-blue-500/50"
                 >
-                  Connect Wallet Now
+                  Launch FuturesPilot
                 </motion.button>
               )}
             </ConnectButton.Custom>
@@ -376,12 +392,12 @@ export default function HomePage() {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">AB</span>
+                  <span className="text-white font-bold text-xl">FP</span>
                 </div>
-                <span className="font-bold text-xl">ArbiBot</span>
+                <span className="font-bold text-xl">FuturesPilot</span>
               </div>
               <p className="text-gray-400">
-                Automated USDC trading on Arbitrum
+                Intelligence and workflow OS for crypto futures teams.
               </p>
             </div>
             <div>
@@ -416,11 +432,9 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 ArbiBot. All rights reserved.</p>
+            <p>&copy; 2025 FuturesPilot. All rights reserved.</p>
             <p className="mt-2 text-sm">
-              <strong>Disclaimer:</strong> Trading cryptocurrencies involves risk.
-              You may lose some or all of your investment. Only invest what you can
-              afford to lose.
+              <strong>Disclaimer:</strong> FuturesPilot provides research workflow software only. It does not execute trades or custody assets. Use the insights at your own discretion and comply with regulations in your jurisdiction.
             </p>
           </div>
         </div>

@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       nonce: user.nonce,
-      message: `Sign this message to authenticate with ArbiBot:\n\nNonce: ${user.nonce}\nWallet: ${normalizedAddress}`,
+      message: `Sign this message to access your FuturesPilot workspace.\n\nNonce: ${user.nonce}\nWallet: ${normalizedAddress}`,
     });
   } catch (error) {
     console.error('Nonce generation error:', error);

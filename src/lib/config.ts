@@ -25,8 +25,8 @@ export const ERC20_ABI = [
 ] as const;
 
 export const APP_CONFIG = {
-  name: 'ArbiBot Invest',
-  description: 'Invest USDC into an automated BTC trading bot on Arbitrum',
+  name: 'FuturesPilot',
+  description: 'Intelligence and workflow copilot for discretionary crypto futures teams',
   minimumDeposit: parseFloat(process.env.MINIMUM_DEPOSIT_USDC || '100'),
   requiredConfirmations: parseInt(process.env.REQUIRED_CONFIRMATIONS || '5'),
 };

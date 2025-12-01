@@ -63,6 +63,26 @@ export function StatCard({
     let current = 0;
     let step = 0;
 
+    const formatAnimatedValue = (num: number) => {
+      if (value.includes('$')) {
+        return `$${Math.floor(num).toLocaleString()}`;
+      }
+
+      if (value.toLowerCase().includes('bps')) {
+        return `${num.toFixed(1)} bps`;
+      }
+
+      if (value.includes('%')) {
+        return `${num.toFixed(2)}%`;
+      }
+
+      if (value.includes('.')) {
+        return num.toFixed(1);
+      }
+
+      return Math.floor(num).toString();
+    };
+
     const timer = setInterval(() => {
       current += increment;
       step++;
@@ -71,12 +91,7 @@ export function StatCard({
         setDisplayValue(value);
         clearInterval(timer);
       } else {
-        const formatted = value.includes('$')
-          ? `$${Math.floor(current).toLocaleString()}`
-          : value.includes('%')
-          ? `${current.toFixed(2)}%`
-          : Math.floor(current).toString();
-        setDisplayValue(formatted);
+        setDisplayValue(formatAnimatedValue(current));
       }
     }, duration / steps);
 

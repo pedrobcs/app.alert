@@ -13,9 +13,9 @@ export function Navbar() {
 
   const navLinks = isConnected
     ? [
-        { href: '/dashboard', label: 'Dashboard' },
-        { href: '/deposits', label: 'Deposits' },
-        { href: '/performance', label: 'Performance' },
+        { href: '/dashboard', label: 'Workspace' },
+        { href: '/strategies', label: 'Playbooks' },
+        { href: '/intelligence', label: 'Intelligence' },
       ]
     : [];
 
@@ -36,15 +36,15 @@ export function Navbar() {
                 className="w-12 h-12 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-xl relative overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
-                <span className="text-white font-bold text-xl relative z-10">AB</span>
+                <span className="text-white font-bold text-xl relative z-10">FP</span>
               </motion.div>
               <div>
                 <span className="font-bold text-2xl text-gradient block">
-                  ArbiBot
+                  FuturesPilot
                 </span>
                 <span className="text-xs text-gray-500 flex items-center">
                   <Sparkles className="w-3 h-3 mr-1" />
-                  Premium Trading
+                  Futures Copilot
                 </span>
               </div>
             </Link>
@@ -98,10 +98,10 @@ export function Navbar() {
           >
             {!isConnected && (
               <Link
-                href="#features"
+                href="#capabilities"
                 className="hidden sm:block text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
               >
-                Features
+                Capabilities
               </Link>
             )}
             <div className="connect-button-wrapper">
