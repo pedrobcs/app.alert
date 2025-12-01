@@ -22,8 +22,6 @@ import {
   NotebookPen,
   Brain,
   Layers3,
-  Target,
-  Compass,
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -176,7 +174,7 @@ export default function HomePage() {
                 { value: '54', label: 'Perp markets tracked live', icon: Radar, color: 'blue' },
                 { value: '18 hrs', label: 'Funding horizon simulated', icon: Gauge, color: 'green' },
                 { value: '92%', label: 'Playbooks with guardrails', icon: Shield, color: 'purple' },
-              ].map((stat, index) => (
+              ].map((stat) => (
                 <motion.div
                   key={stat.label}
                   variants={itemVariants}

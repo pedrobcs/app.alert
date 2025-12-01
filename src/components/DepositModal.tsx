@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { X, Copy, ExternalLink, QrCode, CheckCircle2, AlertCircle } from 'lucide-react';
 import { getArbiscanAddressLink } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -69,55 +69,60 @@ export function DepositModal({
   };
 
   // Track transaction when it's confirmed
-  const trackTransaction = async (txHash: string) => {
-    if (!address || trackingTx || txTracked) return;
+  const trackTransaction = useCallback(
+    async (txHash: string) => {
+      if (!address || trackingTx || txTracked) return;
 
-    try {
-      setTrackingTx(true);
-      
-      toast.loading('Tracking your deposit...', { id: 'tracking' });
+      try {
+        setTrackingTx(true);
 
-      const res = await fetch('/api/deposits/track', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          txHash,
-          userAddress: address,
-        }),
-      });
+        toast.loading('Tracking your deposit...', { id: 'tracking' });
 
-      const data = await res.json();
+        const res = await fetch('/api/deposits/track', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            txHash,
+            userAddress: address,
+          }),
+        });
 
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to track deposit');
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Failed to track deposit');
+        }
+
+        toast.success('Deposit tracked successfully!', { id: 'tracking' });
+        setTxTracked(true);
+
+        // Redirect to deposits page after a short delay
+        setTimeout(() => {
+          window.location.href = '/deposits';
+        }, 2000);
+      } catch (error) {
+        console.error('Track error:', error);
+        const message =
+          error instanceof Error ? error.message : 'Failed to track deposit';
+        toast.error(message, { id: 'tracking' });
+
+        // Still close modal but show manual tracking option
+        setTimeout(() => {
+          onClose();
+        }, 3000);
+      } finally {
+        setTrackingTx(false);
       }
-
-      toast.success('Deposit tracked successfully!', { id: 'tracking' });
-      setTxTracked(true);
-      
-      // Redirect to deposits page after a short delay
-      setTimeout(() => {
-        window.location.href = '/deposits';
-      }, 2000);
-    } catch (err: any) {
-      console.error('Track error:', err);
-      toast.error(err.message || 'Failed to track deposit', { id: 'tracking' });
-      
-      // Still close modal but show manual tracking option
-      setTimeout(() => {
-        onClose();
-      }, 3000);
-    } finally {
-      setTrackingTx(false);
-    }
-  };
+    },
+    [address, trackingTx, txTracked, onClose]
+  );
 
   // Auto-track when transaction is confirmed
   useEffect(() => {
-    if (isSuccess && hash && !trackingTx && !txTracked) {
+    if (isSuccess && hash) {
       trackTransaction(hash);
     }
-  }, [isSuccess, hash]);
+  }, [isSuccess, hash, trackTransaction]);
 
   // Reset state when modal closes
   useEffect(() => {

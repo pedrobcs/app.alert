@@ -29,7 +29,7 @@ export function useAuth() {
         throw new Error('Failed to get authentication nonce');
       }
 
-      const { nonce, message } = await nonceRes.json();
+      const { message } = await nonceRes.json();
 
       // Step 2: Sign the message
       const signature = await signMessageAsync({ message });
@@ -49,19 +49,22 @@ export function useAuth() {
         throw new Error('Authentication failed');
       }
 
-      const { user } = await verifyRes.json();
+      await verifyRes.json();
 
       toast.success('Successfully authenticated!');
       return true;
-    } catch (error: any) {
+    } catch (error) {
       console.error('Authentication error:', error);
-      
-      if (error.message.includes('User rejected')) {
+
+      const errorMessage =
+        error instanceof Error ? error.message : 'Authentication failed';
+
+      if (errorMessage.includes('User rejected')) {
         toast.error('Signature request rejected');
       } else {
         toast.error('Authentication failed. Please try again.');
       }
-      
+
       return false;
     } finally {
       setIsAuthenticating(false);

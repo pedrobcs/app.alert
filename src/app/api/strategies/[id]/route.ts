@@ -3,15 +3,20 @@ import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 import { updateStrategyStatusSchema } from '@/lib/validation/strategy';
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+type RouteContext = {
+  params: {
+    id: string;
+  };
+};
+
+export async function PATCH(request: NextRequest, context: RouteContext) {
   try {
     const session = await getSession();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const { params } = context;
 
     const parsed = updateStrategyStatusSchema.safeParse(await request.json());
     if (!parsed.success) {
@@ -41,15 +46,14 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, context: RouteContext) {
   try {
     const session = await getSession();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const { params } = context;
 
     const deleted = await prisma.strategyPlan.deleteMany({
       where: { id: params.id, userId: session.userId },

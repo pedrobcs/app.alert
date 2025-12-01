@@ -68,9 +68,11 @@ export function StrategyForm({ onCreated }: StrategyFormProps) {
       toast.success('Playbook captured');
       setForm(initialState);
       onCreated();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Create strategy error:', error);
-      toast.error(error.message || 'Failed to create strategy');
+      const message =
+        error instanceof Error ? error.message : 'Failed to create strategy';
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }

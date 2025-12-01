@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -77,16 +77,7 @@ export default function StrategiesPage() {
   const [loading, setLoading] = useState(true);
   const [statusUpdating, setStatusUpdating] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!isConnected) {
-      router.push('/');
-      return;
-    }
-
-    fetchPlans();
-  }, [isConnected]);
-
-  const fetchPlans = async () => {
+  const fetchPlans = useCallback(async () => {
     try {
       const res = await fetch('/api/strategies');
       if (!res.ok) {
@@ -96,11 +87,22 @@ export default function StrategiesPage() {
       setData(payload);
     } catch (error) {
       console.error('Strategies fetch error:', error);
-      toast.error('Unable to load playbooks');
+      const message =
+        error instanceof Error ? error.message : 'Unable to load playbooks';
+      toast.error(message);
     } finally {
       setTimeout(() => setLoading(false), 400);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!isConnected) {
+      router.push('/');
+      return;
+    }
+
+    fetchPlans();
+  }, [isConnected, router, fetchPlans]);
 
   const groupedPlans = useMemo(() => {
     const groups: Record<StrategyStatus, StrategyPlan[]> = {
@@ -140,9 +142,11 @@ export default function StrategiesPage() {
         };
       });
       toast.success('Status updated');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Update strategy status error:', error);
-      toast.error(error.message || 'Failed to update status');
+      const message =
+        error instanceof Error ? error.message : 'Failed to update status';
+      toast.error(message);
     } finally {
       setStatusUpdating(null);
     }
