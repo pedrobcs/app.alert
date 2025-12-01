@@ -3,13 +3,10 @@ import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 import { updateStrategyStatusSchema } from '@/lib/validation/strategy';
 
-interface RouteParams {
-  params: {
-    id: string;
-  };
-}
-
-export async function PATCH(request: NextRequest, { params }: RouteParams) {
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const session = await getSession();
     if (!session) {
@@ -44,7 +41,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const session = await getSession();
     if (!session) {
