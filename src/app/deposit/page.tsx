@@ -1,16 +1,37 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/Navbar';
 import { DepositModal } from '@/components/DepositModal';
 
+interface SettingsResponse {
+  operatorWallet: string;
+  tokenSymbol: string;
+  minimumDeposit: number;
+}
+
 export default function DepositPage() {
   const { isConnected } = useAccount();
   const router = useRouter();
-  const [settings, setSettings] = useState<any>(null);
+  const [settings, setSettings] = useState<SettingsResponse | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const fetchSettings = useCallback(async () => {
+    try {
+      const res = await fetch('/api/settings');
+      if (!res.ok) {
+        throw new Error('Failed to fetch settings');
+      }
+      const data = await res.json();
+      setSettings(data);
+    } catch (error) {
+      console.error('Error fetching settings:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (!isConnected) {
@@ -19,20 +40,7 @@ export default function DepositPage() {
     }
 
     fetchSettings();
-  }, [isConnected]);
-
-  const fetchSettings = async () => {
-    try {
-      const res = await fetch('/api/settings');
-      if (!res.ok) throw new Error('Failed to fetch settings');
-      const data = await res.json();
-      setSettings(data);
-    } catch (error) {
-      console.error('Error fetching settings:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [isConnected, router, fetchSettings]);
 
   if (!isConnected || loading) {
     return (

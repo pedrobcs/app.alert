@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -10,10 +10,8 @@ import {
   ArrowRight,
   Gauge,
   NotebookPen,
-  Radar,
   Sparkles,
   Target,
-  TrendingUp,
   CheckCircle2,
 } from 'lucide-react';
 
@@ -92,16 +90,7 @@ export default function DashboardPage() {
   const [workspace, setWorkspace] = useState<WorkspaceSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!isConnected) {
-      router.push('/');
-      return;
-    }
-
-    fetchWorkspace();
-  }, [isConnected, address]);
-
-  const fetchWorkspace = async () => {
+  const fetchWorkspace = useCallback(async () => {
     try {
       const res = await fetch('/api/workspace');
       if (!res.ok) {
@@ -111,11 +100,22 @@ export default function DashboardPage() {
       setWorkspace(data);
     } catch (error) {
       console.error('Error fetching workspace summary:', error);
-      toast.error('Unable to load workspace data');
+      const message =
+        error instanceof Error ? error.message : 'Unable to load workspace data';
+      toast.error(message);
     } finally {
       setTimeout(() => setLoading(false), 600);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!isConnected) {
+      router.push('/');
+      return;
+    }
+
+    fetchWorkspace();
+  }, [isConnected, router, fetchWorkspace]);
 
   if (!isConnected) {
     return null;
@@ -205,7 +205,7 @@ export default function DashboardPage() {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {statCards.map((card, index) => (
+          {statCards.map((card) => (
             <StatCard key={card.label} {...card} />
           ))}
         </div>

@@ -76,7 +76,7 @@ export default function IntelligencePage() {
     if (!isConnected) {
       router.push('/');
     }
-  }, [isConnected]);
+  }, [isConnected, router]);
 
   if (!isConnected) {
     return null;

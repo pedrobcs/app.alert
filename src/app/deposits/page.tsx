@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -31,16 +31,7 @@ export default function DepositsPage() {
   const [txHash, setTxHash] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (!isConnected) {
-      router.push('/');
-      return;
-    }
-
-    fetchDeposits();
-  }, [isConnected]);
-
-  const fetchDeposits = async () => {
+  const fetchDeposits = useCallback(async () => {
     try {
       const res = await fetch('/api/deposits');
       if (!res.ok) throw new Error('Failed to fetch deposits');
@@ -52,7 +43,16 @@ export default function DepositsPage() {
     } finally {
       setTimeout(() => setLoading(false), 500);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!isConnected) {
+      router.push('/');
+      return;
+    }
+
+    fetchDeposits();
+  }, [isConnected, router, fetchDeposits]);
 
   const handleTrackTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,9 +84,11 @@ export default function DepositsPage() {
       toast.success('Deposit tracked successfully!', { id: 'track' });
       setTxHash('');
       fetchDeposits();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Track error:', error);
-      toast.error(error.message || 'Failed to track deposit', { id: 'track' });
+      const message =
+        error instanceof Error ? error.message : 'Failed to track deposit';
+      toast.error(message, { id: 'track' });
     } finally {
       setSubmitting(false);
     }
