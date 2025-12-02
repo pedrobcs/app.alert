@@ -63,7 +63,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a1a1a] relative overflow-hidden">
       <AnimatedBackground />
       <Navbar />
 
@@ -346,12 +346,12 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 relative z-10">
+      <footer className="bg-black text-white py-12 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-400 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-xl">FP</span>
                 </div>
                 <span className="font-bold text-xl">FuturesPilot</span>
@@ -392,9 +392,9 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; {new Date().getFullYear()} FuturesPilot. All rights reserved.</p>
-            <p className="mt-2 text-sm">
-              <strong>Disclaimer:</strong> FuturesPilot provides research workflow software only. It does not execute trades or custody assets. Use the insights at your own discretion and comply with regulations in your jurisdiction.
+            <p>&copy; {new Date().getFullYear()} FuturesPilot — Research workspace for traders.</p>
+            <p className="mt-2 text-sm text-gray-400">
+              FuturesPilot is a planning tool only. It never places trades or moves funds. Always verify information before acting in live markets.
             </p>
           </div>
         </div>

@@ -19,7 +19,7 @@ export function Navbar() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, type: 'spring', bounce: 0.3 }}
-      className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-lg"
+      className="sticky top-0 z-50 bg-black/80 backdrop-blur-xl border-b border-orange-500/20 shadow-[0_20px_60px_rgba(0,0,0,0.6)]"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
@@ -28,7 +28,7 @@ export function Navbar() {
               <motion.div
                 whileHover={{ rotate: 360, scale: 1.1 }}
                 transition={{ duration: 0.6 }}
-                className="w-12 h-12 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-xl relative overflow-hidden"
+                className="w-12 h-12 bg-gradient-to-br from-orange-500 via-amber-500 to-yellow-400 rounded-2xl flex items-center justify-center shadow-xl relative overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
                 <span className="text-white font-bold text-xl relative z-10">FP</span>
@@ -37,7 +37,7 @@ export function Navbar() {
                 <span className="font-bold text-2xl text-gradient block">
                   FuturesPilot
                 </span>
-                <span className="text-xs text-gray-500 flex items-center">
+                <span className="text-xs text-gray-400 flex items-center">
                   <Sparkles className="w-3 h-3 mr-1" />
                   Futures Copilot
                 </span>
@@ -62,20 +62,20 @@ export function Navbar() {
                     className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 relative overflow-hidden group ${
                       pathname === link.href
                         ? 'text-white'
-                        : 'text-gray-600 hover:text-gray-900'
+                        : 'text-gray-400 hover:text-white'
                     }`}
                   >
                     {pathname === link.href && (
                       <motion.div
                         layoutId="navbar-indicator"
-                        className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg"
+                        className="absolute inset-0 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl shadow-lg"
                         transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                       />
                     )}
                     <span className="relative z-10">{link.label}</span>
 
                     {pathname !== link.href && (
-                      <div className="absolute inset-0 bg-gray-100 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="absolute inset-0 bg-white/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
                     )}
                   </Link>
                 </motion.div>
@@ -91,7 +91,7 @@ export function Navbar() {
           >
             <button
               onClick={() => document.getElementById('capabilities')?.scrollIntoView({ behavior: 'smooth' })}
-              className="hidden sm:block text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+              className="hidden sm:block text-sm font-medium text-gray-300 hover:text-white transition-colors"
             >
               Capabilities
             </button>

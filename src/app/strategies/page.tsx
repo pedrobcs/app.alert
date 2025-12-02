@@ -105,7 +105,7 @@ export default function StrategiesPage() {
   const statusOrder: StrategyStatus[] = ['READY', 'LIVE', 'DRAFT', 'ARCHIVED'];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a1a1a] relative overflow-hidden">
       <AnimatedBackground />
       <Navbar />
 

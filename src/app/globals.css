@@ -1,32 +1,33 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-primary: #3b82f6;
-  --color-primary-dark: #2563eb;
-  --color-secondary: #8b5cf6;
+  --color-primary: #ff6b00;
+  --color-primary-dark: #c75000;
+  --color-secondary: #ffb347;
   --color-success: #10b981;
-  --color-warning: #f59e0b;
+  --color-warning: #ff9f1a;
   --color-error: #ef4444;
-  --color-background: #ffffff;
-  --color-surface: #f9fafb;
-  --color-border: #e5e7eb;
+  --color-background: #050505;
+  --color-surface: #0f0f0f;
+  --color-border: #1f1f1f;
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #050505;
+  --foreground: #f5f2ea;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #050505;
+    --foreground: #f5f2ea;
   }
 }
 
 body {
   color: var(--foreground);
-  background: var(--background);
+  background: radial-gradient(circle at top, rgba(255, 107, 0, 0.15), transparent 45%),
+    linear-gradient(180deg, #050505 0%, #0f0f0f 100%);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   overflow-x: hidden;
 }
@@ -46,12 +47,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+  background: linear-gradient(180deg, #ff6b00, #c75000);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #2563eb, #7c3aed);
+  background: linear-gradient(180deg, #ff7e1a, #ff5400);
 }
 
 /* Premium Animations */
@@ -202,23 +203,23 @@ body {
 
 /* Gradient backgrounds */
 .gradient-primary {
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #ff6b00 0%, #ffb347 100%);
 }
 
 .gradient-success {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
 }
 
 .gradient-radial {
-  background: radial-gradient(circle at 50% 50%, #3b82f6 0%, #8b5cf6 100%);
+  background: radial-gradient(circle at 50% 50%, rgba(255, 107, 0, 0.5) 0%, transparent 60%);
 }
 
 .gradient-mesh {
-  background: 
-    radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.3) 0, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.3) 0, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.3) 0, transparent 50%),
-    radial-gradient(at 0% 100%, rgba(16, 185, 129, 0.3) 0, transparent 50%);
+  background:
+    radial-gradient(at 20% 20%, rgba(255, 107, 0, 0.25) 0, transparent 45%),
+    radial-gradient(at 80% 0%, rgba(255, 149, 64, 0.2) 0, transparent 45%),
+    radial-gradient(at 100% 100%, rgba(255, 94, 0, 0.15) 0, transparent 45%),
+    radial-gradient(at 0% 100%, rgba(255, 164, 64, 0.2) 0, transparent 45%);
 }
 
 /* Glass morphism */
@@ -236,26 +237,30 @@ body {
 
 /* Premium Card styles */
 .card {
-  @apply bg-white rounded-2xl shadow-xl border border-gray-100 p-6 transition-all duration-300;
+  @apply rounded-2xl p-6 transition-all duration-300 border border-[#1f1f1f];
+  background: rgba(10, 10, 10, 0.9);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8);
 }
 
 .card:hover {
-  @apply shadow-2xl transform -translate-y-1;
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8);
 }
 
 .card-premium {
-  @apply bg-white rounded-2xl p-6 transition-all duration-300;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(249, 250, 251, 0.9) 100%);
-  box-shadow: 
-    0 10px 30px -5px rgba(0, 0, 0, 0.1),
-    0 0 0 1px rgba(59, 130, 246, 0.1);
-  backdrop-filter: blur(10px);
+  @apply rounded-2xl p-6 transition-all duration-300;
+  background: linear-gradient(135deg, rgba(15, 15, 15, 0.95) 0%, rgba(5, 5, 5, 0.95) 100%);
+  border: 1px solid rgba(255, 107, 0, 0.2);
+  box-shadow:
+    0 20px 40px -10px rgba(0, 0, 0, 0.9),
+    0 0 30px rgba(255, 107, 0, 0.15);
+  backdrop-filter: blur(15px);
 }
 
 .card-premium:hover {
-  box-shadow: 
-    0 20px 40px -5px rgba(59, 130, 246, 0.3),
-    0 0 0 1px rgba(59, 130, 246, 0.2);
+  box-shadow:
+    0 25px 50px -15px rgba(0, 0, 0, 0.9),
+    0 0 40px rgba(255, 107, 0, 0.25);
   transform: translateY(-4px);
 }
 
@@ -280,28 +285,34 @@ body {
 }
 
 .btn-primary {
-  @apply bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg;
+  @apply text-white shadow-lg;
+  background: linear-gradient(120deg, #ff7a18 0%, #ff6b00 50%, #c75000 100%);
 }
 
 .btn-primary:hover {
   @apply shadow-2xl transform scale-105;
-  box-shadow: 0 10px 40px rgba(59, 130, 246, 0.5);
+  box-shadow: 0 15px 45px rgba(255, 107, 0, 0.45);
 }
 
 .btn-secondary {
-  @apply bg-gradient-to-r from-gray-100 to-gray-200 text-gray-900;
+  @apply text-white;
+  background: linear-gradient(120deg, #1a1a1a 0%, #0f0f0f 100%);
 }
 
 .btn-secondary:hover {
-  @apply bg-gradient-to-r from-gray-200 to-gray-300 transform scale-105;
+  @apply transform scale-105;
+  background: linear-gradient(120deg, #222222 0%, #121212 100%);
 }
 
 .btn-outline {
-  @apply border-2 border-blue-600 text-blue-600 bg-transparent;
+  @apply border-2 text-white;
+  border-color: #ff6b00;
+  color: #ff6b00;
 }
 
 .btn-outline:hover {
-  @apply bg-blue-600 text-white transform scale-105;
+  @apply text-black;
+  background: linear-gradient(120deg, #ff7a18 0%, #ff6b00 100%);
 }
 
 /* Number counter animation */
@@ -333,7 +344,7 @@ body {
   position: absolute;
   width: 4px;
   height: 4px;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.8) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 107, 0, 0.7) 0%, transparent 70%);
   border-radius: 50%;
   animation: particle-float 15s infinite ease-in-out;
 }
@@ -359,9 +370,9 @@ body {
 .skeleton {
   background: linear-gradient(
     90deg,
-    #f0f0f0 25%,
-    #e0e0e0 50%,
-    #f0f0f0 75%
+    #1f1f1f 25%,
+    #2b2b2b 50%,
+    #1f1f1f 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
@@ -379,7 +390,7 @@ body {
 
 /* Text gradients */
 .text-gradient {
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+  background: linear-gradient(135deg, #ff7a18 0%, #ffb347 50%, #ffd166 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -394,10 +405,10 @@ body {
 
 /* Neon glow effect */
 .neon-glow {
-  text-shadow: 
-    0 0 10px rgba(59, 130, 246, 0.8),
-    0 0 20px rgba(59, 130, 246, 0.6),
-    0 0 30px rgba(59, 130, 246, 0.4);
+  text-shadow:
+    0 0 10px rgba(255, 107, 0, 0.8),
+    0 0 20px rgba(255, 149, 64, 0.6),
+    0 0 30px rgba(255, 107, 0, 0.4);
 }
 
 /* Backdrop blur variations */
