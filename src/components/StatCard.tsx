@@ -15,19 +15,19 @@ interface StatCardProps {
 }
 
 const colorClasses = {
-  blue: 'from-blue-500 to-blue-600',
-  purple: 'from-purple-500 to-purple-600',
-  green: 'from-green-500 to-green-600',
-  orange: 'from-orange-500 to-orange-600',
-  red: 'from-red-500 to-red-600',
+  blue: 'from-orange-500 to-amber-400',
+  purple: 'from-[#1f1f1f] to-[#0f0f0f]',
+  green: 'from-amber-300 to-yellow-400',
+  orange: 'from-[#ff6b00] to-[#c75000]',
+  red: 'from-[#2b2b2b] to-[#111111]',
 };
 
 const glowClasses = {
-  blue: 'shadow-blue-500/50',
-  purple: 'shadow-purple-500/50',
-  green: 'shadow-green-500/50',
-  orange: 'shadow-orange-500/50',
-  red: 'shadow-red-500/50',
+  blue: 'shadow-orange-500/50',
+  purple: 'shadow-black/40',
+  green: 'shadow-amber-400/40',
+  orange: 'shadow-orange-600/60',
+  red: 'shadow-black/50',
 };
 
 export function StatCard({
@@ -63,6 +63,26 @@ export function StatCard({
     let current = 0;
     let step = 0;
 
+    const formatAnimatedValue = (num: number) => {
+      if (value.includes('$')) {
+        return `$${Math.floor(num).toLocaleString()}`;
+      }
+
+      if (value.toLowerCase().includes('bps')) {
+        return `${num.toFixed(1)} bps`;
+      }
+
+      if (value.includes('%')) {
+        return `${num.toFixed(2)}%`;
+      }
+
+      if (value.includes('.')) {
+        return num.toFixed(1);
+      }
+
+      return Math.floor(num).toString();
+    };
+
     const timer = setInterval(() => {
       current += increment;
       step++;
@@ -71,12 +91,7 @@ export function StatCard({
         setDisplayValue(value);
         clearInterval(timer);
       } else {
-        const formatted = value.includes('$')
-          ? `$${Math.floor(current).toLocaleString()}`
-          : value.includes('%')
-          ? `${current.toFixed(2)}%`
-          : Math.floor(current).toString();
-        setDisplayValue(formatted);
+        setDisplayValue(formatAnimatedValue(current));
       }
     }, duration / steps);
 
@@ -89,7 +104,7 @@ export function StatCard({
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.5, delay: delay / 1000 }}
       whileHover={{ scale: 1.05, y: -5 }}
-      className="card-premium group cursor-pointer"
+      className="card-premium group cursor-pointer border border-[#f3dfcd]"
     >
       <div className="flex items-start justify-between mb-4">
         <motion.div

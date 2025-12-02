@@ -45,92 +45,67 @@ export function DisclaimerModal() {
 
           <div className="space-y-4 text-sm text-gray-700">
             <section>
-              <h3 className="font-bold text-gray-900 mb-2">Risk Disclosure</h3>
+              <h3 className="font-bold text-gray-900 mb-2">Trading & Market Risk</h3>
               <p>
-                Trading cryptocurrencies and digital assets involves substantial risk of loss.
-                The value of your investment may fluctuate significantly, and you may lose some
-                or all of your invested capital. Past performance is not indicative of future results.
+                Crypto futures and perpetual swaps are highly volatile instruments. Leveraged exposure can result
+                in rapid and substantial losses. Past performance, backtests, or scenario plans displayed inside
+                FuturesPilot do not guarantee future outcomes.
               </p>
             </section>
 
             <section>
-              <h3 className="font-bold text-gray-900 mb-2">Non-Custodial Nature</h3>
+              <h3 className="font-bold text-gray-900 mb-2">Software Only & Non-Custodial</h3>
               <p>
-                By using this platform, you understand that you are sending funds directly to
-                the operator&apos;s wallet address. This platform does not custody your funds.
-                Once transferred, funds are under the control of the operator.
+                FuturesPilot is a workflow and research application. It does not execute trades, move capital, or
+                custody assets. All execution decisions remain with you and your trading infrastructure.
               </p>
             </section>
 
             <section>
-              <h3 className="font-bold text-gray-900 mb-2">No Guarantees</h3>
+              <h3 className="font-bold text-gray-900 mb-2">Data Sources & Accuracy</h3>
               <p>
-                We make no guarantees or promises regarding investment returns, profits, or
-                performance. The trading bot&apos;s performance may vary and is subject to market
-                conditions, technical issues, and other factors beyond our control.
+                Market data, funding curves, and AI summaries may rely on third-party APIs. We cannot guarantee
+                timeliness, completeness, or accuracy. Always cross-check numbers before committing real capital.
               </p>
             </section>
 
             <section>
-              <h3 className="font-bold text-gray-900 mb-2">Withdrawal Policy</h3>
+              <h3 className="font-bold text-gray-900 mb-2">Compliance & Eligibility</h3>
               <p>
-                Withdrawals are processed manually and may take 3-5 business days or longer
-                depending on market conditions and liquidity. There is no guarantee that
-                withdrawals will be processed within any specific timeframe.
+                You are responsible for ensuring that use of FuturesPilot complies with applicable laws, exchange
+                terms, and licensing requirements in your jurisdiction. Certain regions or entities may be restricted.
               </p>
             </section>
 
             <section>
-              <h3 className="font-bold text-gray-900 mb-2">Regulatory Status</h3>
+              <h3 className="font-bold text-gray-900 mb-2">Confidentiality</h3>
               <p>
-                This platform may not be registered with any financial regulatory authority.
-                Investments made through this platform may not be protected by investor
-                protection schemes or insurance.
+                Trade ideas, playbooks, and notes you store inside the platform are your responsibility. Do not upload
+                material that infringes on NDAs or third-party confidentiality obligations.
               </p>
             </section>
 
             <section>
               <h3 className="font-bold text-gray-900 mb-2">No Financial Advice</h3>
               <p>
-                Nothing on this platform constitutes financial, investment, legal, or tax advice.
-                You should consult with your own advisors before making any investment decisions.
+                Outputs from FuturesPilot, including AI-generated summaries, do not constitute investment, legal, or tax
+                advice. Consult qualified professionals before executing strategies referenced here.
               </p>
             </section>
 
             <section>
-              <h3 className="font-bold text-gray-900 mb-2">Geographic Restrictions</h3>
+              <h3 className="font-bold text-gray-900 mb-2">AI-Generated Content</h3>
               <p>
-                This platform may not be available to residents of certain jurisdictions.
-                It is your responsibility to ensure that your use of this platform complies
-                with applicable laws in your jurisdiction.
-              </p>
-            </section>
-
-            <section>
-              <h3 className="font-bold text-gray-900 mb-2">Know Your Customer (KYC) / Anti-Money Laundering (AML)</h3>
-              <p>
-                The operator may require you to complete KYC verification at any time. Failure
-                to provide requested information may result in restrictions on your account,
-                including the inability to deposit or withdraw funds.
-              </p>
-            </section>
-
-            <section>
-              <h3 className="font-bold text-gray-900 mb-2">Smart Contract Risk</h3>
-              <p>
-                Transactions on blockchain networks are irreversible. Ensure you send funds
-                to the correct address on the correct network (Arbitrum). We cannot recover
-                funds sent to incorrect addresses or wrong networks.
+                AI copilots may hallucinate or omit context. Validate every recommendation with independent research
+                and your risk framework before acting on it.
               </p>
             </section>
 
             <section>
               <h3 className="font-bold text-gray-900 mb-2">Acceptance</h3>
               <p>
-                By checking the box below and clicking "I Accept," you acknowledge that you
-                have read, understood, and agree to accept all risks associated with using
-                this platform. You confirm that you are investing only funds you can afford
-                to lose.
+                By checking the box below and clicking &quot;I Accept,&quot; you acknowledge that you understand FuturesPilot is
+                a research tool, accept the risks above, and will not rely on it as the sole basis for trading decisions.
               </p>
             </section>
           </div>
@@ -144,9 +119,8 @@ export function DisclaimerModal() {
                 className="mt-1 w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
               />
               <span className="text-sm text-gray-700">
-                I have read and understood the above disclaimers. I acknowledge the risks
-                involved and agree to the terms of use. I am only investing funds that I
-                can afford to lose.
+                I have read and understood the above statements. I accept that FuturesPilot is research software and I remain
+                fully responsible for any trades or capital deployment performed outside this platform.
               </span>
             </label>
           </div>
@@ -160,7 +134,7 @@ export function DisclaimerModal() {
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
-            I Accept and Understand the Risks
+            I Accept the Research Terms
           </button>
         </div>
       </div>

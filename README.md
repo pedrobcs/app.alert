@@ -1,435 +1,103 @@
-# ArbiBot Invest - USDC Investment SaaS Platform
+# FuturesPilot — Trader Intelligence Workspace
 
-A production-ready Next.js SaaS application that enables users to invest USDC on Arbitrum into an automated trading bot. Features wallet authentication, on-chain deposit verification, and a comprehensive investor dashboard.
+FuturesPilot is a Next.js SaaS starter that helps discretionary crypto traders turn loose research into structured, repeatable playbooks. It ships with a landing page, an interactive dashboard, a strategy studio, and an intelligence board—all running entirely on the client, so there’s no wallet connection, database, or secret management to worry about.
 
-## 🚀 Features
+## ✨ Highlights
 
-### 🌐 Public Landing Page
-- Modern, responsive design with Tailwind CSS
-- Value proposition and feature showcase
-- FAQ section and trust indicators
-- One-click wallet connection with RainbowKit
+- **Story-driven marketing site** with hero animations, capability grid, and “how it works” narrative tuned for trading desks.
+- **Workspace dashboard** featuring funding radar, market pulse cards, action queues, and quick links to the playbook studio.
+- **Strategy Studio** that lets you capture ideas (entry, invalidation, targets, risk) and manage them across Draft → Ready → Live → Archived stages using local storage.
+- **Intelligence board** with funding vs. basis charts, positioning heatmaps, and narrative alerts powered by Recharts + Framer Motion.
+- **Offline-first architecture** – everything is persisted in `localStorage`, so Vercel deployments are zero-config and traders can experiment without signing messages or wiring funds.
 
-### 🔐 Wallet Authentication
-- MetaMask and WalletConnect support via wagmi
-- Signature-based authentication (no passwords)
-- Session management with JWT
-- Automatic account creation on first connect
+## 🧱 Tech Stack
 
-### 💼 Investor Dashboard
-- Real-time portfolio overview
-- Total invested, current value, and returns
-- Recent deposits and transaction history
-- Performance tracking with YTD returns
-- Interactive charts with Recharts
+- **Runtime**: Next.js 15 (App Router) + React 19 + TypeScript 5
+- **Styling**: Tailwind CSS 4 + custom glassmorphism utilities
+- **Animation & Charts**: Framer Motion, Recharts, Lucide icons
+- **Notifications**: react-hot-toast for lightweight UX feedback
 
-### 💰 USDC Deposit Flow
-- In-browser USDC transfer using wallet
-- Support for both USDC.e and native USDC on Arbitrum
-- QR code for mobile wallet scanning
-- Manual transaction hash submission
-- Real-time transaction tracking
-
-### ✅ Server-Side Verification
-- On-chain transaction verification via Alchemy/Infura
-- Automatic deposit detection and attribution
-- Configurable confirmation requirements
-- Share calculation based on NAV
-- Duplicate transaction prevention
-
-### 👨‍💼 Admin Dashboard
-- Platform settings management
-- Operator wallet configuration
-- NAV and performance updates
-- Deposit monitoring and approval
-- User statistics and analytics
-
-### ⚖️ Legal & Compliance
-- Comprehensive risk disclosure modal
-- KYC/AML capability (configurable)
-- Terms of service acceptance
-- Jurisdiction warnings
-- Investment disclaimers
-
-## 🛠️ Tech Stack
-
-- **Framework**: Next.js 15 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS 4
-- **Blockchain**: wagmi 2.x, viem, ethers.js 6
-- **Wallet**: RainbowKit 2.x
-- **Database**: PostgreSQL with Prisma ORM
-- **Auth**: JWT with jose
-- **Charts**: Recharts
-- **UI Components**: Lucide React icons, react-hot-toast
-- **QR Codes**: qrcode.react
-
-## 📋 Prerequisites
-
-- Node.js 18+ and npm/yarn
-- PostgreSQL database
-- Alchemy or Infura API key
-- WalletConnect Project ID
-- Operator wallet address on Arbitrum
-
-## 🏗️ Installation
-
-### 1. Clone and Install Dependencies
+## ⚙️ Setup
 
 ```bash
 # Install dependencies
 yarn install
 
-# or with npm
-npm install
-```
-
-### 2. Database Setup
-
-```bash
-# Generate Prisma client
-yarn prisma:generate
-
-# Run database migrations
-yarn prisma:migrate
-
-# (Optional) Open Prisma Studio to view data
-yarn prisma:studio
-```
-
-### 3. Environment Configuration
-
-Create a `.env` file in the root directory:
-
-```bash
-# Copy example environment file
-cp .env.example .env
-```
-
-Edit `.env` with your configuration:
-
-```env
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/usdc_investment"
-
-# Blockchain RPC (choose one or both)
-ALCHEMY_API_KEY="your_alchemy_api_key"
-INFURA_URL="https://arbitrum-mainnet.infura.io/v3/your_project_id"
-ETHERSCAN_API_KEY="your_arbiscan_api_key"
-
-# Chain Configuration
-NEXT_PUBLIC_ARBITRUM_CHAIN_ID=42161
-NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID="your_walletconnect_project_id"
-
-# USDC Token (choose one)
-# Bridged USDC (USDC.e)
-NEXT_PUBLIC_USDC_ADDRESS="0xFF970A61A04b1cA14834A43f5DE4533eBDDB5CC8"
-# OR Native USDC
-# NEXT_PUBLIC_USDC_ADDRESS="0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
-
-# Admin & Operator Wallets
-ADMIN_WALLET_ADDRESS="0xYourAdminWalletAddress"
-OPERATOR_WALLET_ADDRESS="0xYourOperatorWalletAddress"
-
-# Security
-JWT_SECRET="your_super_secret_jwt_key_minimum_32_characters_long"
-NEXTAUTH_SECRET="your_nextauth_secret_key"
-NEXTAUTH_URL="http://localhost:3000"
-
-# App Configuration
-MINIMUM_DEPOSIT_USDC=100
-REQUIRED_CONFIRMATIONS=5
-
-# Feature Flags
-ENABLE_KYC_REQUIREMENT=false
-ENABLE_EMAIL_NOTIFICATIONS=false
-```
-
-### 4. Get Required API Keys
-
-**WalletConnect Project ID:**
-1. Go to https://cloud.walletconnect.com/
-2. Create a new project
-3. Copy the Project ID
-
-**Alchemy API Key:**
-1. Go to https://www.alchemy.com/
-2. Create a free account
-3. Create a new app for "Arbitrum" network
-4. Copy the API key
-
-**Arbiscan API Key (optional):**
-1. Go to https://arbiscan.io/
-2. Create an account
-3. Generate an API key
-
-### 5. Run Development Server
-
-```bash
+# Start the workspace in dev mode
 yarn dev
 
-# or with npm
-npm run dev
+# Build for production
+yarn build && yarn start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+No database, migrations, or secrets are required. All playbooks are saved inside the browser under the `futurespilot_strategies` key. Deleting local storage resets the demo data.
 
-## 🚀 Deployment
+## 📋 Workspace Overview
 
-### Vercel Deployment
+| Area | Description |
+| --- | --- |
+| Landing page | Explains the copilot story, showcases capabilities, and funnels users into `/dashboard`. |
+| `/dashboard` | Displays stat cards, funding radar table, market pulse narratives, action queue, and a highlight reel of upcoming playbooks. |
+| `/strategies` | Full Strategy Studio with kanban-like grouping, status selector, inline delete, and a rich composer form. Data auto-syncs via `localStorage`. |
+| `/intelligence` | Visualization board for funding vs. basis trends, positioning balance, and narrative alerts. |
 
-1. **Push to GitHub**
-```bash
-git add .
-git commit -m "Initial commit"
-git push origin main
+## 🧠 Data Model
+
+Strategies are stored locally with the following shape:
+
+```ts
+export interface StrategyPlan {
+  id: string;
+  title: string;
+  market: string;
+  direction: 'LONG' | 'SHORT' | 'NEUTRAL';
+  timeframe: string;
+  narrative: string;
+  entryPlan: string;
+  invalidation: string;
+  targetPlan: string;
+  conviction: number; // 1-5
+  riskBps: number;    // desk-specific risk budget
+  status: 'DRAFT' | 'READY' | 'LIVE' | 'ARCHIVED';
+  tags: string[];
+  createdAt: string;
+}
 ```
 
-2. **Deploy to Vercel**
-- Go to [vercel.com](https://vercel.com)
-- Import your repository
-- Add environment variables from `.env`
-- Deploy
+Helpers in `src/lib/validation/strategy.ts` take care of bootstrapping seeds, loading from storage, and persisting updates.
 
-3. **Database Setup**
-- Use Vercel Postgres, Supabase, or Railway for production database
-- Update `DATABASE_URL` in Vercel environment variables
-- Run migrations: `yarn prisma:migrate`
+## 🧭 Suggested Workflow
 
-### Environment Variables for Production
+1. **Launch workspace** – land on `/dashboard` to review funding radar and market pulse.
+2. **Capture idea** – open `/strategies`, document the narrative, and tag risk parameters.
+3. **Promote status** – move a playbook to Ready/Live as conditions line up.
+4. **Monitor intelligence** – keep the `/intelligence` board pinned for funding vs. basis context.
+5. **Iterate** – archive completed plays and clone what worked using the Strategy Studio.
 
-Ensure all environment variables are set in your hosting platform:
-- All variables from `.env.example`
-- Use production RPC endpoints (Alchemy/Infura)
-- Set strong, unique `JWT_SECRET` and `NEXTAUTH_SECRET`
-- Update `NEXTAUTH_URL` to your production domain
+## 🧰 Customize It
 
-## 📖 Usage Guide
+- Swap out the seed strategies in `src/lib/validation/strategy.ts` with your own research backlog.
+- Extend the `StrategyPlan` type to include venue-specific sizing, checklist confirmations, or PnL targets.
+- Replace the local-storage store with an API or database if you need multi-user sync (the UI already handles optimistic updates).
+- Inject real analytics into the funding radar and positioning charts by pulling from your data warehouse.
 
-### For Investors
+## 🛡️ Safety & Legal
 
-1. **Connect Wallet**
-   - Visit the landing page
-   - Click "Connect Wallet"
-   - Approve the connection in your wallet
+FuturesPilot is research software only. It never connects to wallets, moves capital, or executes trades. Make sure your team complies with relevant regulations, handles personal data responsibly, and keeps proprietary research encrypted if you later add a backend.
 
-2. **Make a Deposit**
-   - Go to Dashboard → "Make a Deposit"
-   - Enter the amount (minimum $100 USDC)
-   - Approve and send the transaction
-   - Wait for confirmation (usually 1-2 minutes)
+## 📄 Documentation
 
-3. **Track Your Investment**
-   - View your balance in the Dashboard
-   - Check transaction history in the Deposits page
-   - Monitor performance in the Performance page
+- `PROJECT_OVERVIEW.md` – architectural summary and file tree.
+- `API_DOCUMENTATION.md` – explains that data is stored locally and outlines how to extend the project with custom endpoints if desired.
+- `START_HERE.md`, `INSTALLATION_SUMMARY.md`, `SETUP_COMPLETE.md` – quick reference guides for onboarding teammates.
 
-### For Administrators
+## 🤝 Contributing
 
-1. **Access Admin Panel**
-   - Connect with the admin wallet address
-   - Navigate to `/admin`
-
-2. **Configure Settings**
-   - Set operator wallet address
-   - Configure token address (USDC.e or native USDC)
-   - Adjust minimum deposit and confirmations
-   - Update NAV and performance metrics
-
-3. **Monitor Deposits**
-   - View all deposits in the admin dashboard
-   - Check pending transactions
-   - Review user statistics
-
-## 🏗️ Architecture
-
-### Database Schema
-
-- **Users**: Wallet address, KYC status, total invested/shares
-- **Deposits**: Transaction tracking, status, confirmations
-- **Sessions**: JWT session management
-- **AppSettings**: Platform configuration
-- **AdminLogs**: Audit trail for admin actions
-
-### API Routes
-
-**Authentication:**
-- `POST /api/auth/nonce` - Get nonce for wallet signature
-- `POST /api/auth/verify` - Verify signature and create session
-- `POST /api/auth/logout` - End session
-
-**User:**
-- `GET /api/user` - Get user profile and stats
-- `GET /api/deposits` - Get user's deposits
-
-**Deposits:**
-- `POST /api/deposits/track` - Track and verify a deposit
-- `GET /api/settings` - Get public settings
-
-**Admin:**
-- `GET /api/admin/settings` - Get admin settings
-- `POST /api/admin/settings` - Update settings
-- `GET /api/admin/deposits` - List all deposits
-- `GET /api/admin/stats` - Get platform statistics
-
-### Security Considerations
-
-1. **Private Keys**: Never expose operator private keys in the frontend
-2. **Transaction Verification**: All deposits are verified on-chain before crediting
-3. **Admin Access**: Restricted to configured admin wallet address
-4. **Rate Limiting**: Implement rate limiting on API routes in production
-5. **Input Validation**: All inputs are validated using Zod schemas
-6. **Session Security**: JWT tokens with httpOnly cookies
-
-## 🔧 Configuration
-
-### Supported USDC Tokens
-
-**Arbitrum Bridged USDC (USDC.e):**
-- Address: `0xFF970A61A04b1cA14834A43f5DE4533eBDDB5CC8`
-- Most commonly used
-- Bridged from Ethereum
-
-**Arbitrum Native USDC:**
-- Address: `0xaf88d065e77c8cC2239327C5EDb3A432268e5831`
-- Native Circle USDC
-- Newer standard
-
-Choose one in your `.env` file via `NEXT_PUBLIC_USDC_ADDRESS`.
-
-### Confirmation Settings
-
-Adjust `REQUIRED_CONFIRMATIONS` based on your security needs:
-- 1-3 confirmations: Fast (1-2 minutes)
-- 5 confirmations: Balanced (recommended)
-- 10+ confirmations: Very secure (slower)
-
-## 🧪 Testing
-
-### Manual Testing Checklist
-
-- [ ] Wallet connection works
-- [ ] User can view dashboard after connecting
-- [ ] Deposit modal displays correct operator address
-- [ ] USDC transfer initiates from wallet
-- [ ] Transaction is tracked and appears in deposits
-- [ ] Admin can access admin panel
-- [ ] Settings can be updated
-- [ ] Disclaimer modal appears on first visit
-
-### Test on Arbitrum Testnet
-
-To test without real funds:
-1. Change chain configuration to Arbitrum Sepolia (testnet)
-2. Get testnet USDC from faucets
-3. Test full deposit flow
-
-## 📝 Important Notes
-
-### Legal Compliance
-
-- **Disclaimers**: The app includes comprehensive risk disclosures
-- **KYC/AML**: Platform supports KYC requirement (configure via admin)
-- **Regulations**: Ensure compliance with local securities laws
-- **Licensing**: May require licensing depending on jurisdiction
-
-### Security Best Practices
-
-1. **Never commit** `.env` file to version control
-2. **Use hardware wallet** for operator/admin wallets
-3. **Enable 2FA** on all service accounts (Alchemy, Vercel, etc.)
-4. **Regular backups** of database
-5. **Monitor** transaction logs for suspicious activity
-6. **Implement** withdrawal approval workflow
-7. **Add** rate limiting and DDoS protection
-
-### Operational Considerations
-
-- **NAV Updates**: Update NAV regularly via admin panel
-- **Withdrawals**: Implement manual withdrawal approval process
-- **Customer Support**: Set up support email/chat
-- **Performance Reporting**: Provide regular performance updates
-- **Liquidity**: Ensure sufficient liquidity for withdrawals
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**"Transaction verification failed"**
-- Ensure transaction is on Arbitrum network
-- Check that USDC token address is correct
-- Verify minimum deposit amount is met
-- Wait for sufficient confirmations
-
-**"Access denied: Admin only"**
-- Verify `ADMIN_WALLET_ADDRESS` in `.env` matches connected wallet
-- Ensure wallet address is lowercase in environment variable
-
-**Database connection error**
-- Check `DATABASE_URL` is correct
-- Ensure PostgreSQL is running
-- Run `yarn prisma:generate` and `yarn prisma:migrate`
-
-**Wallet connection issues**
-- Verify `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` is set
-- Check that you're on Arbitrum network in your wallet
-- Clear browser cache and reconnect
-
-## 📦 Project Structure
-
-```
-/workspace
-├── prisma/
-│   └── schema.prisma          # Database schema
-├── public/                     # Static assets
-├── src/
-│   ├── app/
-│   │   ├── admin/             # Admin dashboard
-│   │   ├── api/               # API routes
-│   │   ├── dashboard/         # User dashboard
-│   │   ├── deposit/           # Deposit page
-│   │   ├── deposits/          # Transaction history
-│   │   ├── performance/       # Performance charts
-│   │   ├── layout.tsx         # Root layout
-│   │   ├── page.tsx           # Landing page
-│   │   └── providers.tsx      # Context providers
-│   ├── components/            # React components
-│   │   ├── DepositModal.tsx
-│   │   ├── DisclaimerModal.tsx
-│   │   └── Navbar.tsx
-│   └── lib/                   # Utilities
-│       ├── auth.ts            # Authentication
-│       ├── blockchain.ts      # Blockchain interactions
-│       ├── config.ts          # Configuration
-│       ├── prisma.ts          # Prisma client
-│       ├── utils.ts           # Helper functions
-│       └── wagmi.ts           # Wagmi configuration
-├── .env.example               # Environment template
-├── package.json
-└── README.md
-```
-
-## 🤝 Support
-
-For issues or questions:
-- Email: support@arbibot.com
-- GitHub Issues: [Create an issue]
-- Documentation: This README
-
-## ⚠️ Disclaimer
-
-This is a financial application that handles real user funds. Use at your own risk. The creators and contributors are not responsible for any financial losses. Always:
-
-- Test thoroughly before deploying to production
-- Implement proper security measures
-- Comply with all applicable laws and regulations
-- Provide clear risk disclosures to users
-- Only accept funds you can properly manage and secure
-
-## 📄 License
-
-This project is provided as-is for educational and commercial purposes.
+1. Fork the repo & `yarn install`
+2. Make your changes (UI tweaks, new analytics modules, etc.)
+3. Run `yarn lint && yarn build`
+4. Open a pull request
 
 ---
 
-**Built with ❤️ using Next.js, TypeScript, and Arbitrum**
+Built for teams who want to explore trade ideas faster, without tying the experience to wallets or on-chain flows. Plug in your data sources, remix the UI, and ship a trader-facing copilot in hours instead of weeks.

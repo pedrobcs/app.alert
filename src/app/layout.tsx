@@ -4,9 +4,9 @@ import { Providers } from "./providers";
 import { DisclaimerModal } from "@/components/DisclaimerModal";
 
 export const metadata: Metadata = {
-  title: "ArbiBot Invest - Automated USDC Trading on Arbitrum",
-  description: "Invest USDC into an automated BTC trading bot on Arbitrum. Secure, transparent, and profitable.",
-  keywords: "USDC, Arbitrum, DeFi, Trading Bot, Crypto Investment",
+  title: "FuturesPilot — Crypto Futures Research Copilot",
+  description: "FuturesPilot gives discretionary crypto futures teams a workflow OS for research, funding analytics, and execution guardrails without moving capital.",
+  keywords: "crypto futures, perpetual swaps, trading desk software, funding analytics, research copilot",
 };
 
 export default function RootLayout({
