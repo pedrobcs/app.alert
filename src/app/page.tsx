@@ -1,13 +1,10 @@
 'use client';
 
-import { Navbar } from '@/components/Navbar';
-import { AnimatedBackground } from '@/components/AnimatedBackground';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
 import { motion } from 'framer-motion';
+import { Navbar } from '@/components/Navbar';
+import { AnimatedBackground } from '@/components/AnimatedBackground';
 import {
   Shield,
   Zap,
@@ -24,52 +21,26 @@ import {
 } from 'lucide-react';
 
 export default function HomePage() {
-  const { isConnected, address } = useAccount();
   const router = useRouter();
-  const { authenticate, isAuthenticating } = useAuth();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (mounted && isConnected && address) {
-      // Authenticate and redirect to dashboard
-      handleAuthentication();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, address, mounted]);
+  const handleLaunchWorkspace = () => {
+    router.push('/dashboard');
+  };
 
-  const handleAuthentication = async () => {
-    const success = await authenticate();
-    if (success) {
-      setTimeout(() => {
-        router.push('/dashboard');
-      }, 500);
+  const handleScrollToCapabilities = () => {
+    const el = document.getElementById('capabilities');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   if (!mounted) {
     return null;
-  }
-
-  if (isAuthenticating) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
-          <div className="w-20 h-20 mx-auto mb-4">
-            <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-blue-600"></div>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Authenticating...</h2>
-          <p className="text-gray-600">Please sign the message in your wallet</p>
-        </motion.div>
-      </div>
-    );
   }
 
   const containerVariants = {
@@ -131,7 +102,7 @@ export default function HomePage() {
             >
               FuturesPilot pairs contextual research, funding analytics, and reusable playbooks so you can move from thesis to execution without juggling spreadsheets or screenshots.
               <br />
-              <span className="font-semibold text-gray-800">No live trading—just clarity, structure, and better decisions.</span>
+              <span className="font-semibold text-gray-800">No wallets, no deposits—just clarity, structure, and better decisions.</span>
             </motion.p>
 
             {/* CTA Buttons */}
@@ -139,29 +110,25 @@ export default function HomePage() {
               variants={itemVariants}
               className="flex flex-col sm:flex-row gap-6 justify-center items-center"
             >
-              <ConnectButton.Custom>
-                {({ openConnectModal }) => (
-                  <motion.button
-                    onClick={openConnectModal}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="btn btn-primary text-lg px-10 py-5 shadow-2xl hover:shadow-blue-500/50 flex items-center space-x-2 group"
-                  >
-                    <span>Launch Workspace</span>
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </motion.button>
-                )}
-              </ConnectButton.Custom>
+              <motion.button
+                onClick={handleLaunchWorkspace}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="btn btn-primary text-lg px-10 py-5 shadow-2xl hover:shadow-blue-500/50 flex items-center space-x-2 group"
+              >
+                <span>Launch Workspace</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </motion.button>
 
-              <motion.a
-                href="#capabilities"
+              <motion.button
+                onClick={handleScrollToCapabilities}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="btn btn-outline text-lg px-10 py-5 flex items-center space-x-2 group"
               >
                 <span>See the capabilities</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </motion.a>
+              </motion.button>
             </motion.div>
 
             {/* Stats */}
@@ -309,8 +276,8 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {[
-              { step: '1', title: 'Connect & sync context', description: 'Authenticate with your wallet to unlock your private workspace, set preferred exchanges, and import any existing notes.' },
-              { step: '2', title: 'Build the playbook', description: 'Document the trade idea with entry plan, invalidation, liquidity venues, and risk budget so the whole desk can align.' },
+              { step: '1', title: 'Create your cockpit', description: 'Launch the workspace and tailor telemetry modules to the markets you trade most.' },
+              { step: '2', title: 'Build the playbook', description: 'Document the trade idea with entry plan, invalidation, liquidity venues, and risk budget.' },
               { step: '3', title: 'Monitor the signals', description: 'Let Funding Radar, Desk Telemetry, and scenario alerts nudge you when the setup is ripe or needs to be shelved.' },
             ].map((step, index) => (
               <motion.div
@@ -366,18 +333,14 @@ export default function HomePage() {
             <p className="text-xl text-gray-600 mb-10">
               Align research, risk, and execution in one view—without running live capital through the platform.
             </p>
-            <ConnectButton.Custom>
-              {({ openConnectModal }) => (
-                <motion.button
-                  onClick={openConnectModal}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="btn btn-primary text-lg px-12 py-5 shadow-2xl hover:shadow-blue-500/50"
-                >
-                  Launch FuturesPilot
-                </motion.button>
-              )}
-            </ConnectButton.Custom>
+            <motion.button
+              onClick={handleLaunchWorkspace}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="btn btn-primary text-lg px-12 py-5 shadow-2xl hover:shadow-blue-500/50"
+            >
+              Launch FuturesPilot
+            </motion.button>
           </motion.div>
         </div>
       </section>
@@ -421,15 +384,15 @@ export default function HomePage() {
               <h4 className="font-bold mb-4">Support</h4>
               <ul className="space-y-2 text-gray-400">
                 <li>
-                  <a href="mailto:support@arbibot.com" className="hover:text-white transition-colors">
-                    support@arbibot.com
+                  <a href="mailto:hello@futurespilot.app" className="hover:text-white transition-colors">
+                    hello@futurespilot.app
                   </a>
                 </li>
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 FuturesPilot. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} FuturesPilot. All rights reserved.</p>
             <p className="mt-2 text-sm">
               <strong>Disclaimer:</strong> FuturesPilot provides research workflow software only. It does not execute trades or custody assets. Use the insights at your own discretion and comply with regulations in your jurisdiction.
             </p>

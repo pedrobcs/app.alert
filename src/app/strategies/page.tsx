@@ -1,8 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useAccount } from 'wagmi';
-import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, ArrowRight, PenSquare } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -12,40 +10,14 @@ import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { StrategyForm } from '@/components/StrategyForm';
 import {
-  StrategyDirection,
+  StrategyPlan,
   StrategyStatus,
+  defaultStrategies,
+  loadStrategies,
+  persistStrategies,
   strategyStatusValues,
 } from '@/lib/validation/strategy';
 import { formatDate } from '@/lib/utils';
-
-interface StrategyPlan {
-  id: string;
-  title: string;
-  market: string;
-  direction: StrategyDirection;
-  timeframe: string;
-  narrative: string;
-  entryPlan: string;
-  invalidation: string;
-  targetPlan: string;
-  conviction: number;
-  riskBps: number;
-  status: StrategyStatus;
-  tags: string[];
-  createdAt: string;
-}
-
-interface StrategiesResponse {
-  plans: StrategyPlan[];
-  summary: {
-    total: number;
-    statusCounts: Record<string, number>;
-    avgRiskBps: number;
-    avgConviction: string;
-    activeMarkets: number;
-    nextUp: StrategyPlan[];
-  };
-}
 
 const statusDetails: Record<StrategyStatus, { label: string; accent: string; description: string }> = {
   DRAFT: {
@@ -71,38 +43,29 @@ const statusDetails: Record<StrategyStatus, { label: string; accent: string; des
 };
 
 export default function StrategiesPage() {
-  const { isConnected } = useAccount();
-  const router = useRouter();
-  const [data, setData] = useState<StrategiesResponse | null>(null);
+  const [plans, setPlans] = useState<StrategyPlan[]>(defaultStrategies);
   const [loading, setLoading] = useState(true);
-  const [statusUpdating, setStatusUpdating] = useState<string | null>(null);
+  const [initialized, setInitialized] = useState(false);
 
-  const fetchPlans = useCallback(async () => {
-    try {
-      const res = await fetch('/api/strategies');
-      if (!res.ok) {
-        throw new Error('Failed to load strategies');
-      }
-      const payload = await res.json();
-      setData(payload);
-    } catch (error) {
-      console.error('Strategies fetch error:', error);
-      const message =
-        error instanceof Error ? error.message : 'Unable to load playbooks';
-      toast.error(message);
-    } finally {
-      setTimeout(() => setLoading(false), 400);
-    }
+  useEffect(() => {
+    const stored = loadStrategies();
+    setPlans(stored);
+    setInitialized(true);
+    setLoading(false);
+
+    const syncFromStorage = () => {
+      const updated = loadStrategies();
+      setPlans(updated);
+    };
+
+    window.addEventListener('storage', syncFromStorage);
+    return () => window.removeEventListener('storage', syncFromStorage);
   }, []);
 
   useEffect(() => {
-    if (!isConnected) {
-      router.push('/');
-      return;
-    }
-
-    fetchPlans();
-  }, [isConnected, router, fetchPlans]);
+    if (!initialized) return;
+    persistStrategies(plans);
+  }, [plans, initialized]);
 
   const groupedPlans = useMemo(() => {
     const groups: Record<StrategyStatus, StrategyPlan[]> = {
@@ -112,64 +75,31 @@ export default function StrategiesPage() {
       ARCHIVED: [],
     };
 
-    data?.plans.forEach((plan) => {
+    plans.forEach((plan) => {
       groups[plan.status].push(plan);
     });
 
     return groups;
-  }, [data]);
+  }, [plans]);
 
-  const handleStatusChange = async (id: string, status: StrategyStatus) => {
-    try {
-      setStatusUpdating(id);
-      const res = await fetch(`/api/strategies/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status }),
-      });
-
-      if (!res.ok) {
-        const payload = await res.json();
-        throw new Error(payload.error || 'Failed to update status');
-      }
-
-      const updated = await res.json();
-      setData((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          plans: prev.plans.map((plan) => (plan.id === id ? updated.plan : plan)),
-        };
-      });
-      toast.success('Status updated');
-    } catch (error) {
-      console.error('Update strategy status error:', error);
-      const message =
-        error instanceof Error ? error.message : 'Failed to update status';
-      toast.error(message);
-    } finally {
-      setStatusUpdating(null);
-    }
+  const handleCreate = (plan: StrategyPlan) => {
+    setPlans((prev) => [plan, ...prev]);
   };
 
-  if (!isConnected) {
-    return null;
-  }
+  const handleStatusChange = (id: string, status: StrategyStatus) => {
+    setPlans((prev) =>
+      prev.map((plan) => (plan.id === id ? { ...plan, status } : plan))
+    );
+    toast.success(`Status updated to ${status}`);
+  };
+
+  const handleDelete = (id: string) => {
+    setPlans((prev) => prev.filter((plan) => plan.id !== id));
+    toast.success('Playbook removed');
+  };
 
   if (loading) {
     return <LoadingScreen />;
-  }
-
-  if (!data) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-        <Navbar />
-        <AnimatedBackground />
-        <div className="flex items-center justify-center min-h-[80vh]">
-          <p className="text-gray-600">Unable to load strategies.</p>
-        </div>
-      </div>
-    );
   }
 
   const statusOrder: StrategyStatus[] = ['READY', 'LIVE', 'DRAFT', 'ARCHIVED'];
@@ -239,7 +169,6 @@ export default function StrategiesPage() {
                             <select
                               className="input w-40"
                               value={plan.status}
-                              disabled={statusUpdating === plan.id}
                               onChange={(e) =>
                                 handleStatusChange(plan.id, e.target.value as StrategyStatus)
                               }
@@ -281,6 +210,12 @@ export default function StrategiesPage() {
                               </span>
                             ))}
                           </div>
+                          <button
+                            onClick={() => handleDelete(plan.id)}
+                            className="text-xs font-semibold text-red-500 hover:text-red-600"
+                          >
+                            Remove
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -296,7 +231,7 @@ export default function StrategiesPage() {
           </div>
 
           <div className="space-y-8">
-            <StrategyForm onCreated={fetchPlans} />
+            <StrategyForm onCreate={handleCreate} />
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -307,12 +242,12 @@ export default function StrategiesPage() {
               <p className="text-xs uppercase tracking-[0.4em] text-gray-500 mb-2">Need inspo?</p>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Review ready queue</h3>
               <p className="text-sm text-gray-600">
-                {data.summary.nextUp.length > 0
+                {groupedPlans.READY.length > 0
                   ? 'Take one of the ready playbooks live once liquidity and funding align.'
                   : 'Once you add playbooks they will show up here for quick review.'}
               </p>
               <div className="mt-4 space-y-3">
-                {data.summary.nextUp.slice(0, 3).map((plan) => (
+                {groupedPlans.READY.slice(0, 3).map((plan) => (
                   <div key={plan.id} className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-semibold text-gray-900">{plan.title}</p>

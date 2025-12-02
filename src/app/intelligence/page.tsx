@@ -1,8 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useAccount } from 'wagmi';
-import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/Navbar';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { motion } from 'framer-motion';
@@ -69,19 +66,6 @@ const telemetryCards = [
 ];
 
 export default function IntelligencePage() {
-  const { isConnected } = useAccount();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isConnected) {
-      router.push('/');
-    }
-  }, [isConnected, router]);
-
-  if (!isConnected) {
-    return null;
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 relative overflow-hidden">
       <AnimatedBackground />

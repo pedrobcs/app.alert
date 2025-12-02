@@ -2,148 +2,81 @@
 
 ## Executive Summary
 
-FuturesPilot is a production-ready Next.js SaaS application that helps discretionary crypto futures desks organize research, funding analytics, and trade playbooks without executing real trades. Wallet-gated workspaces consolidate strategy documentation, intelligence dashboards, and action queues so teams can move from idea to execution-ready states while keeping capital flows external.
+FuturesPilot is a client-side SaaS starter that helps discretionary crypto desks document trade ideas, monitor funding telemetry, and keep intelligence flows in one workspace—no wallets, servers, or databases required. Everything runs inside Next.js 15 with data persisted to the browser’s `localStorage`, making it ideal for rapid prototyping or internal research tooling.
 
 ## Feature Highlights
 
-1. **Immersive Landing Page**
-   - Futures-focused hero copy, capability grid, and story-driven stats
-   - Wallet CTA + updated disclaimer emphasising “research only”
-   - Animated gradients and motion-powered sections
-
-2. **Wallet Authentication**
-   - RainbowKit (MetaMask, WalletConnect)
-   - Signature challenge mentioning FuturesPilot
-   - JWT cookie sessions stored via Prisma
-
-3. **Workspace Dashboard**
-   - Stat cards (live/ready strategies, average conviction, risk per play)
-   - Funding radar table, market pulse narratives, action queue
-   - Upcoming playbooks timeline sourced from StrategyPlan data
-
-4. **Strategy Studio**
-   - Rich form for title, narrative, entry math, invalidation, targets, conviction slider, risk bps, tags
-   - Kanban-style sections for Draft, Ready, Live, Archived with status selector
-   - Backed by new `/api/strategies` CRUD endpoints
-
-5. **Intelligence Board**
-   - Funding vs. basis dual-axis chart
-   - Positioning (long vs. short) area chart
-   - Alert tape of qualitative insights
-
-6. **Legal & Safety**
-   - Research-only disclaimer modal
-   - No custody, no execution, no automated trading
+1. **Immersive Landing Page** – futures narrative, capability grid, CTA buttons, and a “How it works” walkthrough.
+2. **Workspace Dashboard** – stat cards, funding radar table, market pulse narratives, action queue, and upcoming playbooks.
+3. **Strategy Studio** – local-storage powered CRUD experience with conviction sliders, risk budgets, tags, and kanban-style grouping.
+4. **Intelligence Board** – funding vs. basis dual-axis chart, positioning breakdown, and alert tape for qualitative insights.
+5. **Research-only UX** – no wallet connection, no deposits, and no backend dependencies; perfect for mock trading or ideation sessions.
 
 ## Technology Stack
 
-### Frontend
-- Next.js 15 (App Router) + React 19 + TypeScript 5
-- Tailwind CSS 4 with custom glass morph styles
-- Framer Motion for micro-interactions
-- Recharts for funding/positioning visualizations
-
-### Wallet & Data
-- wagmi 2.x + RainbowKit 2.1 for wallet UX
-- viem/ethers scaffolding (legacy deposit flow still available but hidden)
-- Prisma ORM (PostgreSQL)
-- Zod validation
-
-### Backend
-- Next.js Route Handlers (`/api/*`)
-- JWT auth with `jose`
-- Cookie-based session management
-
-### DevOps
-- Works seamlessly on Vercel + hosted Postgres (Vercel Postgres, Supabase, Neon, Railway)
-- WalletConnect Cloud project ID for production wallets
+- **Framework**: Next.js 15 (App Router) + React 19 + TypeScript 5
+- **Styling**: Tailwind CSS 4, Framer Motion accents
+- **Charts & Icons**: Recharts + Lucide
+- **State/Persistence**: Browser `localStorage` helpers in `src/lib/validation/strategy.ts`
+- **Notifications**: react-hot-toast
 
 ## Project Structure
 
 ```
 /workspace
-├── prisma/
-│   └── schema.prisma          # Users, Sessions, StrategyPlans, legacy deposit tables
 ├── src/
 │   ├── app/
-│   │   ├── api/               # Auth, settings, strategies, workspace
-│   │   ├── dashboard/         # Workspace home
-│   │   ├── strategies/        # Strategy Studio (new)
-│   │   ├── intelligence/      # Intelligence board (new)
-│   │   ├── layout.tsx         # Providers + disclaimer
-│   │   └── page.tsx           # Landing page
+│   │   ├── dashboard/         # Workspace home (funding radar + playbook reel)
+│   │   ├── strategies/        # Strategy Studio (local storage CRUD)
+│   │   ├── intelligence/      # Funding vs. basis visualizations
+│   │   ├── layout.tsx         # Root layout + disclaimer modal
+│   │   ├── page.tsx           # Marketing landing page
+│   │   └── providers.tsx      # Toast provider
 │   ├── components/
-│   │   ├── StrategyForm.tsx   # Strategy composer
-│   │   ├── StatCard.tsx       # Animated stat cards
+│   │   ├── StrategyForm.tsx   # Playbook composer
+│   │   ├── StatCard.tsx       # Animated metrics card
 │   │   ├── Navbar.tsx         # Rebranded navigation
 │   │   └── DisclaimerModal.tsx
 │   └── lib/
-│       ├── validation/strategy.ts # Zod schemas + shared enums
-│       ├── auth.ts
-│       ├── prisma.ts
-│       ├── config.ts
-│       └── wagmi.ts
-├── README.md
-├── PROJECT_OVERVIEW.md (this file)
+│       ├── validation/strategy.ts # Strategy types, seeds, and storage helpers
+│       └── utils.ts                # Formatting helpers
+├── public/                       # Static assets
+├── README.md                     # Product documentation
 └── ...
 ```
 
-## Database Schema Snapshot
+## Data & Persistence
 
-| Table | Purpose |
-| --- | --- |
-| `users` | Wallet-first identity, optional KYC fields, historical totals (from legacy deposit era). |
-| `sessions` | JWT tokens with expiry for server-side auth. |
-| `strategy_plans` *(new)* | Structured playbooks: market, direction, narrative, entry, invalidation, targets, conviction, risk (bps), tags, status. |
-| `app_settings`, `deposits`, `withdrawals`, `admin_logs` | Retained for future capital flows; not exposed in the current UI. |
+Strategies are stored in local storage under `futurespilot_strategies`. The helper functions exported from `src/lib/validation/strategy.ts` provide:
 
-## API Surface
+- `loadStrategies()` – reads from storage or seeds demo data on first load.
+- `persistStrategies(plans)` – saves the latest array.
+- `buildStrategyPlan(partial)` – fabricates ids/timestamps for new ideas.
 
-- `POST /api/auth/nonce`, `POST /api/auth/verify`, `POST /api/auth/logout`
-- `GET /api/workspace` – dashboard summary data
-- `GET /api/strategies` – list playbooks
-- `POST /api/strategies` – create playbook (validated with Zod)
-- `PATCH /api/strategies/:id` – update status (Draft/Ready/Live/Archived)
-- `DELETE /api/strategies/:id` – delete playbook
-- `GET /api/settings` – legacy settings (still available for backwards compatibility)
+Because the project is client-only, you can deploy to Vercel without environment variables or Prisma migrations.
 
-## User Journey (Desk Lead)
+## Suggested Customizations
 
-1. **Connect wallet** to unlock a private workspace.
-2. **Capture idea** via Strategy Studio (define narrative, entry math, invalidation, tags).
-3. **Monitor dashboard** for funding radar + action queue nudges.
-4. **Promote status** when conditions are satisfied (Draft → Ready → Live).
-5. **Review intelligence** charts before sending real orders through external OMS/HF infrastructure.
-
-## Security & Compliance Considerations
-
-- Wallet signature authentication + JWT sessions
-- Research-only workflows (no token transfers, no custodial logic)
-- Prisma parameterization prevents SQL injection
-- Legacy deposit verification code remains isolated for future use but is not referenced in the UI
+- Replace the seed strategies with real research from your desk.
+- Extend the `StrategyPlan` interface with venue sizing, approvals, or checklists.
+- Wire the funding radar/market pulse modules into your own data feeds (REST, GraphQL, or CSV exports) if you later add an API route.
+- Swap the local-storage helpers for a backend when you’re ready for multi-user synchronization.
 
 ## Deployment Checklist
 
-- [ ] Populate `.env` with DB URL, WalletConnect Project ID, admin wallet, JWT secret
-- [ ] Run `yarn prisma:generate` (and migrations if needed)
-- [ ] Verify RainbowKit project configuration for production origin
-- [ ] Configure Vercel/Supabase/Neon Postgres
-- [ ] Double-check disclaimer + support contact info
+- [x] `yarn install`
+- [x] `yarn build`
+- [x] `vercel deploy`
+- [x] Confirm local storage seeding works in production (private window test)
 
-## Maintenance Notes
+## Maintenance Tips
 
-- Refresh funding/insight mock data or wire to your internal data pipeline
-- Expand `StrategyPlan` model with PnL targets, execution venues, or approvals as needed
-- Leverage legacy deposit tables if you later add capital coordination modules
+- Use the browser devtools “Application → Local Storage” tab to inspect or reset playbooks.
+- Keep the seed strategies fresh so first-time visitors see relevant examples.
+- When evolving into a full SaaS, reintroduce API routes and swap the persistence helpers for real services.
 
-## Future Enhancements
+## Status
 
-- Live data ingestion for funding curves and positioning (WebSockets, Kafka, etc.)
-- Role-based workspaces (research vs. execution vs. compliance)
-- Notification system (email/Telegram/Slack) for upcoming playbooks
-- Rich commenting + collaborative annotations within Strategy Studio
-- Optional integration with OMS/EMS for read-only status sync
+**✅ Feature Complete for the research-copilot scope.**
 
----
-
-Project status: **✅ Feature Complete** for the research-copilot scope. Ready for customization, data wiring, and deployment to Vercel or any Node 18+ environment.
+The project now focuses entirely on trader tooling—no wallet connections, no deposits, no database setup. Plug in your own data sources or keep it lightweight for workshops and ideation sprints.

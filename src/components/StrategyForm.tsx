@@ -1,13 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { StrategyDirection, strategyDirectionValues } from '@/lib/validation/strategy';
+import toast from 'react-hot-toast';
+import {
+  StrategyDirection,
+  StrategyPlan,
+  buildStrategyPlan,
+  strategyDirectionValues,
+} from '@/lib/validation/strategy';
 import { motion } from 'framer-motion';
 import { Loader2, PlusCircle } from 'lucide-react';
-import toast from 'react-hot-toast';
 
 interface StrategyFormProps {
-  onCreated: () => void;
+  onCreate: (plan: StrategyPlan) => void;
 }
 
 const initialState = {
@@ -27,7 +32,7 @@ const initialState = {
 const inputClasses =
   'w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm text-gray-900';
 
-export function StrategyForm({ onCreated }: StrategyFormProps) {
+export function StrategyForm({ onCreate }: StrategyFormProps) {
   const [form, setForm] = useState(initialState);
   const [submitting, setSubmitting] = useState(false);
 
@@ -37,42 +42,41 @@ export function StrategyForm({ onCreated }: StrategyFormProps) {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
     if (!form.title || !form.narrative || !form.entryPlan || !form.invalidation || !form.targetPlan) {
       toast.error('Please complete all required fields');
       return;
     }
 
+    setSubmitting(true);
+
     try {
-      setSubmitting(true);
       const tags = form.tags
         .split(',')
         .map((tag) => tag.trim())
         .filter(Boolean);
 
-      const payload = {
-        ...form,
+      const plan = buildStrategyPlan({
+        title: form.title.trim(),
+        market: form.market.trim().toUpperCase(),
+        direction: form.direction,
+        timeframe: form.timeframe.trim(),
+        narrative: form.narrative.trim(),
+        entryPlan: form.entryPlan.trim(),
+        invalidation: form.invalidation.trim(),
+        targetPlan: form.targetPlan.trim(),
+        conviction: form.conviction,
+        riskBps: form.riskBps,
+        status: 'DRAFT',
         tags,
-      };
-
-      const res = await fetch('/api/strategies', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to create strategy');
-      }
-
-      toast.success('Playbook captured');
+      onCreate(plan);
       setForm(initialState);
-      onCreated();
+      toast.success('Playbook captured');
     } catch (error) {
       console.error('Create strategy error:', error);
-      const message =
-        error instanceof Error ? error.message : 'Failed to create strategy';
-      toast.error(message);
+      toast.error('Failed to capture playbook');
     } finally {
       setSubmitting(false);
     }
@@ -89,7 +93,9 @@ export function StrategyForm({ onCreated }: StrategyFormProps) {
       <div>
         <p className="text-xs uppercase tracking-[0.4em] text-blue-500 mb-2">New playbook</p>
         <h2 className="text-2xl font-bold text-gray-900">Capture a futures idea</h2>
-        <p className="text-sm text-gray-600">Define narrative, risk, and execution guardrails. No live trades occur inside FuturesPilot.</p>
+        <p className="text-sm text-gray-600">
+          Define narrative, risk, and execution guardrails. FuturesPilot keeps everything organized—no live trading required.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -109,7 +115,7 @@ export function StrategyForm({ onCreated }: StrategyFormProps) {
           <input
             type="text"
             value={form.market}
-            onChange={(e) => updateField('market', e.target.value.toUpperCase())}
+            onChange={(e) => updateField('market', e.target.value)}
             className={inputClasses}
             placeholder="BTC"
             required
@@ -149,7 +155,7 @@ export function StrategyForm({ onCreated }: StrategyFormProps) {
             value={form.riskBps}
             min={10}
             max={500}
-            step={10}
+            step={5}
             onChange={(e) => updateField('riskBps', Number(e.target.value))}
             className={inputClasses}
           />

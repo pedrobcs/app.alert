@@ -1,44 +1,16 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { useAccount } from 'wagmi';
-import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import {
-  Activity,
-  ArrowRight,
-  Gauge,
-  NotebookPen,
-  Sparkles,
-  Target,
-  CheckCircle2,
-} from 'lucide-react';
+import { Activity, ArrowRight, Gauge, NotebookPen, Sparkles, Target, CheckCircle2 } from 'lucide-react';
 
 import { Navbar } from '@/components/Navbar';
 import { StatCard } from '@/components/StatCard';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
-import { StrategyDirection, StrategyStatus } from '@/lib/validation/strategy';
+import { StrategyPlan, loadStrategies } from '@/lib/validation/strategy';
 import { formatDate } from '@/lib/utils';
-import toast from 'react-hot-toast';
-
-interface StrategyPlan {
-  id: string;
-  title: string;
-  market: string;
-  direction: StrategyDirection;
-  timeframe: string;
-  narrative: string;
-  entryPlan: string;
-  invalidation: string;
-  targetPlan: string;
-  conviction: number;
-  riskBps: number;
-  status: StrategyStatus;
-  tags: string[];
-  createdAt: string;
-}
 
 interface FundingRow {
   id: string;
@@ -63,90 +35,132 @@ interface ActionItem {
   description: string;
 }
 
-interface WorkspaceSummary {
-  profile: {
-    walletAddress: string;
-    onboardedAt: string;
-    totalPlans: number;
-  };
-  strategySummary: {
-    livePlans: number;
-    readyPlans: number;
-    drafts: number;
-    avgConviction: string;
-    avgRiskBps: number;
-    activeMarkets: number;
-  };
-  upcoming: StrategyPlan[];
-  fundingRadar: FundingRow[];
-  marketPulse: MarketPulseItem[];
-  actionItems: ActionItem[];
-  lastUpdated: string;
-}
+const fundingRadar: FundingRow[] = [
+  {
+    id: 'btc-binance',
+    pair: 'BTC-PERP',
+    venue: 'Binance',
+    fundingBps: -6.2,
+    nextWindow: '08:00 UTC',
+    pressure: 'Longs paying shorts',
+    confidence: 'HIGH',
+  },
+  {
+    id: 'eth-okx',
+    pair: 'ETH-PERP',
+    venue: 'OKX',
+    fundingBps: -2.1,
+    nextWindow: '12:00 UTC',
+    pressure: 'Neutralizing',
+    confidence: 'MED',
+  },
+  {
+    id: 'sol-bybit',
+    pair: 'SOL-PERP',
+    venue: 'Bybit',
+    fundingBps: 4.4,
+    nextWindow: '16:00 UTC',
+    pressure: 'Shorts paying longs',
+    confidence: 'LOW',
+  },
+];
+
+const marketPulse: MarketPulseItem[] = [
+  {
+    id: 'open-interest',
+    title: 'Open interest expansion',
+    change: '+8.3%',
+    detail: 'OI on BTC perps added $480M overnight with no spot follow through. Dealers likely short gamma into Asia.',
+  },
+  {
+    id: 'basis',
+    title: 'Basis normalized',
+    change: '-12 bps',
+    detail: 'Quarterly futures basis retraced back inside 60bps annualized after aggressive short hedging.',
+  },
+  {
+    id: 'liquidity',
+    title: 'Liquidity pockets',
+    change: 'New level',
+    detail: 'CVD shows resting bids at 62.8k BTC with thin books above 65k. Expect slippage if chasing breakout legs.',
+  },
+];
+
+const actionItems: ActionItem[] = [
+  {
+    id: 'journal-touch',
+    label: 'Journal update',
+    description: 'Document why ETH structure shifted to balanced after Shanghai gamma roll-off.',
+  },
+  {
+    id: 'funding-check',
+    label: 'Funding hedge',
+    description: 'Consider offsetting BTC funding bleed with calendar spreads if premium persists.',
+  },
+  {
+    id: 'liquidity-review',
+    label: 'Liquidity review',
+    description: 'Recalculate max venue size for SOL after Bybit slippage alert triggered.',
+  },
+];
 
 export default function DashboardPage() {
-  const { isConnected } = useAccount();
-  const router = useRouter();
-  const [workspace, setWorkspace] = useState<WorkspaceSummary | null>(null);
+  const [strategies, setStrategies] = useState<StrategyPlan[]>([]);
+  const [lastUpdated, setLastUpdated] = useState<string>(new Date().toISOString());
   const [loading, setLoading] = useState(true);
 
-  const fetchWorkspace = useCallback(async () => {
-    try {
-      const res = await fetch('/api/workspace');
-      if (!res.ok) {
-        throw new Error('Failed to fetch workspace data');
-      }
-      const data = await res.json();
-      setWorkspace(data);
-    } catch (error) {
-      console.error('Error fetching workspace summary:', error);
-      const message =
-        error instanceof Error ? error.message : 'Unable to load workspace data';
-      toast.error(message);
-    } finally {
-      setTimeout(() => setLoading(false), 600);
-    }
+  useEffect(() => {
+    const load = () => {
+      const stored = loadStrategies();
+      setStrategies(stored);
+      setLastUpdated(new Date().toISOString());
+      setLoading(false);
+    };
+
+    load();
+    const syncFromStorage = () => load();
+    window.addEventListener('storage', syncFromStorage);
+    return () => window.removeEventListener('storage', syncFromStorage);
   }, []);
 
-  useEffect(() => {
-    if (!isConnected) {
-      router.push('/');
-      return;
+  const strategySummary = useMemo(() => {
+    if (!strategies.length) {
+      return {
+        livePlans: 0,
+        readyPlans: 0,
+        drafts: 0,
+        avgConviction: '0.0',
+        avgRiskBps: 0,
+        activeMarkets: 0,
+      };
     }
 
-    fetchWorkspace();
-  }, [isConnected, router, fetchWorkspace]);
+    const livePlans = strategies.filter((plan) => plan.status === 'LIVE').length;
+    const readyPlans = strategies.filter((plan) => plan.status === 'READY').length;
+    const drafts = strategies.filter((plan) => plan.status === 'DRAFT').length;
+    const totalConviction = strategies.reduce((sum, plan) => sum + plan.conviction, 0);
+    const totalRisk = strategies.reduce((sum, plan) => sum + plan.riskBps, 0);
+    const activeMarkets = new Set(strategies.map((plan) => plan.market)).size;
 
-  if (!isConnected) {
-    return null;
-  }
+    return {
+      livePlans,
+      readyPlans,
+      drafts,
+      avgConviction: (totalConviction / strategies.length).toFixed(1),
+      avgRiskBps: Math.round(totalRisk / strategies.length),
+      activeMarkets,
+    };
+  }, [strategies]);
+
+  const upcoming = useMemo(
+    () => strategies.filter((plan) => plan.status !== 'ARCHIVED').slice(0, 4),
+    [strategies]
+  );
 
   if (loading) {
     return <LoadingScreen />;
   }
 
-  if (!workspace) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-        <Navbar />
-        <AnimatedBackground />
-        <div className="flex items-center justify-center min-h-[80vh]">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center"
-          >
-            <p className="text-xl text-gray-600 mb-4">Workspace data unavailable</p>
-            <button onClick={fetchWorkspace} className="btn btn-primary">
-              Retry
-            </button>
-          </motion.div>
-        </div>
-      </div>
-    );
-  }
-
-  const { strategySummary, upcoming, fundingRadar, marketPulse, actionItems, lastUpdated } = workspace;
   const statCards = [
     {
       icon: NotebookPen,
@@ -193,9 +207,7 @@ export default function DashboardPage() {
           <div className="flex items-center space-x-3 mb-4">
             <Sparkles className="w-8 h-8 text-yellow-500" />
             <div>
-              <p className="text-sm uppercase tracking-[0.3em] text-gray-500">
-                FuturesPilot Workspace
-              </p>
+              <p className="text-sm uppercase tracking-[0.3em] text-gray-500">FuturesPilot Workspace</p>
               <h1 className="text-4xl md:text-5xl font-bold text-gradient">Research cockpit</h1>
             </div>
           </div>
