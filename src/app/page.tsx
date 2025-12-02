@@ -63,7 +63,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a1a1a] relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-white via-[#fef9f4] to-[#f8efe7] relative overflow-hidden">
       <AnimatedBackground />
       <Navbar />
 
@@ -77,10 +77,10 @@ export default function HomePage() {
             className="text-center"
           >
             {/* Badge */}
-            <motion.div variants={itemVariants} className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 text-sm font-bold mb-8 shadow-lg">
-              <Zap className="w-5 h-5 mr-2 animate-pulse" />
+            <motion.div variants={itemVariants} className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-amber-100 to-orange-100 text-orange-700 text-sm font-bold mb-8 shadow-lg">
+              <Zap className="w-5 h-5 mr-2 animate-pulse text-orange-500" />
               <span>Purpose-built for discretionary futures teams</span>
-              <Sparkles className="w-5 h-5 ml-2" />
+              <Sparkles className="w-5 h-5 ml-2 text-orange-500" />
             </motion.div>
 
             {/* Main Heading */}
@@ -114,7 +114,7 @@ export default function HomePage() {
                 onClick={handleLaunchWorkspace}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="btn btn-primary text-lg px-10 py-5 shadow-2xl hover:shadow-blue-500/50 flex items-center space-x-2 group"
+                className="btn btn-primary text-lg px-10 py-5 shadow-2xl hover:shadow-orange-500/50 flex items-center space-x-2 group"
               >
                 <span>Launch Workspace</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -145,7 +145,7 @@ export default function HomePage() {
                   key={stat.label}
                   variants={itemVariants}
                   whileHover={{ y: -10 }}
-                  className="card-premium text-center group"
+                  className="card-premium text-center group border border-[#f3dfcd]"
                 >
                   <div className={`w-16 h-16 bg-gradient-to-br ${
                     stat.color === 'blue' ? 'from-blue-500 to-blue-600' :

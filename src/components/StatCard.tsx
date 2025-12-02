@@ -104,7 +104,7 @@ export function StatCard({
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.5, delay: delay / 1000 }}
       whileHover={{ scale: 1.05, y: -5 }}
-      className="card-premium group cursor-pointer"
+      className="card-premium group cursor-pointer border border-[#f3dfcd]"
     >
       <div className="flex items-start justify-between mb-4">
         <motion.div

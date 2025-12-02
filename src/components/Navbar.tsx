@@ -19,7 +19,7 @@ export function Navbar() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, type: 'spring', bounce: 0.3 }}
-      className="sticky top-0 z-50 bg-black/80 backdrop-blur-xl border-b border-orange-500/20 shadow-[0_20px_60px_rgba(0,0,0,0.6)]"
+      className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-orange-100 shadow-[0_10px_35px_rgba(250,182,122,0.35)]"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
@@ -61,21 +61,21 @@ export function Navbar() {
                     href={link.href}
                     className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 relative overflow-hidden group ${
                       pathname === link.href
-                        ? 'text-white'
-                        : 'text-gray-400 hover:text-white'
+                        ? 'text-black'
+                        : 'text-gray-500 hover:text-gray-900'
                     }`}
                   >
                     {pathname === link.href && (
                       <motion.div
                         layoutId="navbar-indicator"
-                        className="absolute inset-0 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl shadow-lg"
+                        className="absolute inset-0 bg-gradient-to-r from-orange-100 to-amber-100 rounded-xl shadow-lg"
                         transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                       />
                     )}
                     <span className="relative z-10">{link.label}</span>
 
                     {pathname !== link.href && (
-                      <div className="absolute inset-0 bg-white/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="absolute inset-0 bg-orange-50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
                     )}
                   </Link>
                 </motion.div>

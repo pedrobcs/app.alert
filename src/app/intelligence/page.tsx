@@ -67,7 +67,7 @@ const telemetryCards = [
 
 export default function IntelligencePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-[#0c0c0c] to-[#1a1a1a] relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-white via-[#fef9f4] to-[#f8efe7] relative overflow-hidden">
       <AnimatedBackground />
       <Navbar />
 
@@ -94,7 +94,7 @@ export default function IntelligencePage() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              className="card-premium flex items-start space-x-4"
+                  className="card-premium flex items-start space-x-4 border border-[#f3dfcd]"
             >
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white shadow-lg">
                 <card.icon className="w-6 h-6" />

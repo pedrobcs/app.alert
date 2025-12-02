@@ -53,7 +53,7 @@ export function AnimatedBackground() {
         // Draw particle
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 107, 0, ${0.35})`;
+        ctx.fillStyle = `rgba(255, 180, 120, ${0.35})`;
         ctx.fill();
 
         // Draw connections
@@ -68,7 +68,7 @@ export function AnimatedBackground() {
             ctx.beginPath();
             ctx.moveTo(particle.x, particle.y);
             ctx.lineTo(otherParticle.x, otherParticle.y);
-            ctx.strokeStyle = `rgba(255, 166, 77, ${0.12 * (1 - distance / 150)})`;
+            ctx.strokeStyle = `rgba(255, 179, 120, ${0.12 * (1 - distance / 150)})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
