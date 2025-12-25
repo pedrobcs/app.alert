@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
-import { DisclaimerModal } from "@/components/DisclaimerModal";
 
 export const metadata: Metadata = {
-  title: "ArbiBot Invest - Automated USDC Trading on Arbitrum",
-  description: "Invest USDC into an automated BTC trading bot on Arbitrum. Secure, transparent, and profitable.",
-  keywords: "USDC, Arbitrum, DeFi, Trading Bot, Crypto Investment",
+  title: "Construction Master Web — Calculadora de Obra",
+  description:
+    "Web-app responsivo com calculadoras de obra (pitch/rise/run/diag, conversões, escadas e mais).",
+  keywords:
+    "calculadora de construção, pitch, rise, run, diagonal, escadas, conversões, fita métrica, obras",
 };
 
 export default function RootLayout({
@@ -15,12 +16,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="pt">
       <body className="antialiased">
-        <Providers>
-          {children}
-          <DisclaimerModal />
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
