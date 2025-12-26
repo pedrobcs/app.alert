@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import { Providers } from "./providers";
-import { DisclaimerModal } from "@/components/DisclaimerModal";
+import type { Metadata } from 'next';
+import './globals.css';
+import { Providers } from './providers';
 
 export const metadata: Metadata = {
-  title: "ArbiBot Invest - Automated USDC Trading on Arbitrum",
-  description: "Invest USDC into an automated BTC trading bot on Arbitrum. Secure, transparent, and profitable.",
-  keywords: "USDC, Arbitrum, DeFi, Trading Bot, Crypto Investment",
+  title: 'Construction Calculator — Web App',
+  description:
+    'A responsive construction calculator web-app with pitch, rise/run, diagonal, conversions, stairs, and more.',
+  keywords:
+    'construction calculator, pitch, rise, run, diagonal, conversions, stairs, fractions, i18n',
 };
 
 export default function RootLayout({
@@ -17,10 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        <Providers>
-          {children}
-          <DisclaimerModal />
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

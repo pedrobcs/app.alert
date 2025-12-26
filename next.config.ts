@@ -1,9 +1,9 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   // Enable React strict mode for better development experience
   reactStrictMode: true,
-  
+
   // Webpack configuration for Prisma
   webpack: (config, { isServer }) => {
     if (isServer) {

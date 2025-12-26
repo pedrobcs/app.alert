@@ -27,7 +27,8 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   overflow-x: hidden;
 }
 
@@ -109,7 +110,8 @@ body {
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -118,7 +120,8 @@ body {
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -136,7 +139,8 @@ body {
 }
 
 @keyframes glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
   }
   50% {
@@ -214,7 +218,7 @@ body {
 }
 
 .gradient-mesh {
-  background: 
+  background:
     radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.3) 0, transparent 50%),
     radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.3) 0, transparent 50%),
     radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.3) 0, transparent 50%),
@@ -246,14 +250,14 @@ body {
 .card-premium {
   @apply bg-white rounded-2xl p-6 transition-all duration-300;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(249, 250, 251, 0.9) 100%);
-  box-shadow: 
+  box-shadow:
     0 10px 30px -5px rgba(0, 0, 0, 0.1),
     0 0 0 1px rgba(59, 130, 246, 0.1);
   backdrop-filter: blur(10px);
 }
 
 .card-premium:hover {
-  box-shadow: 
+  box-shadow:
     0 20px 40px -5px rgba(59, 130, 246, 0.3),
     0 0 0 1px rgba(59, 130, 246, 0.2);
   transform: translateY(-4px);
@@ -339,7 +343,8 @@ body {
 }
 
 @keyframes particle-float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0) translateX(0);
     opacity: 0;
   }
@@ -357,12 +362,7 @@ body {
 
 /* Loading shimmer effect */
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    #f0f0f0 25%,
-    #e0e0e0 50%,
-    #f0f0f0 75%
-  );
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
@@ -394,7 +394,7 @@ body {
 
 /* Neon glow effect */
 .neon-glow {
-  text-shadow: 
+  text-shadow:
     0 0 10px rgba(59, 130, 246, 0.8),
     0 0 20px rgba(59, 130, 246, 0.6),
     0 0 30px rgba(59, 130, 246, 0.4);
@@ -417,29 +417,24 @@ body {
   .card {
     @apply bg-gray-800 border-gray-700;
   }
-  
+
   .card-premium {
     background: linear-gradient(135deg, rgba(31, 41, 55, 0.9) 0%, rgba(17, 24, 39, 0.9) 100%);
-    box-shadow: 
+    box-shadow:
       0 10px 30px -5px rgba(0, 0, 0, 0.5),
       0 0 0 1px rgba(59, 130, 246, 0.2);
   }
-  
+
   .btn-secondary {
     @apply bg-gradient-to-r from-gray-700 to-gray-800 text-white;
   }
-  
+
   .btn-secondary:hover {
     @apply bg-gradient-to-r from-gray-600 to-gray-700;
   }
-  
+
   .skeleton {
-    background: linear-gradient(
-      90deg,
-      #1f2937 25%,
-      #374151 50%,
-      #1f2937 75%
-    );
+    background: linear-gradient(90deg, #1f2937 25%, #374151 50%, #1f2937 75%);
   }
 }
 
@@ -449,9 +444,21 @@ body {
   animation: fadeInUp 0.6s ease-out forwards;
 }
 
-.stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
-.stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
-.stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
-.stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
-.stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
-.stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
+.stagger-children > *:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.stagger-children > *:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.stagger-children > *:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.stagger-children > *:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.stagger-children > *:nth-child(5) {
+  animation-delay: 0.5s;
+}
+.stagger-children > *:nth-child(6) {
+  animation-delay: 0.6s;
+}
