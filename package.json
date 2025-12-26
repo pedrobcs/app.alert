@@ -1,50 +1,38 @@
 {
-  "name": "usdc-investment-saas",
+  "name": "construction-master-web",
   "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "yarn prisma:generate && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "yarn prisma:generate || true",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check"
   },
   "dependencies": {
+    "lucide-react": "^0.436.0",
+    "next": "15.5.5",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "next": "15.5.5",
-    "@prisma/client": "^5.18.0",
-    "@rainbow-me/rainbowkit": "^2.1.0",
-    "wagmi": "^2.12.0",
-    "viem": "^2.19.0",
-    "@tanstack/react-query": "^5.51.0",
-    "ethers": "^6.13.0",
-    "recharts": "^2.12.0",
-    "framer-motion": "^11.3.0",
-    "jose": "^5.6.0",
-    "qrcode.react": "^3.1.0",
-    "react-hot-toast": "^2.4.1",
-    "zod": "^3.23.0",
-    "date-fns": "^3.6.0",
-    "lucide-react": "^0.436.0"
+    "zod": "^3.23.0"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
+    "@vitest/coverage-v8": "^4.0.16",
     "eslint": "^9",
     "eslint-config-next": "15.5.5",
-    "@eslint/eslintrc": "^3",
-    "prisma": "^5.18.0",
-    "ts-node": "^10.9.0"
-  },
-  "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+    "jsdom": "^27.3.0",
+    "prettier": "^3.7.4",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vitest": "^4.0.16"
   }
 }
