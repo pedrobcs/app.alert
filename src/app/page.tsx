@@ -161,7 +161,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* Left: info panel */}
             <div className="lg:col-span-5 space-y-6">
-              <div className="card-premium p-6 sm:p-8">
+              <div className="card-silver p-6 sm:p-8">
                 <div className="flex items-start gap-3">
                   <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-700 to-blue-500 flex items-center justify-center shadow-lg">
                     <Info className="w-6 h-6 text-white" />
