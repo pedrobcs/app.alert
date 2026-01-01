@@ -163,7 +163,7 @@ export default function HomePage() {
             <div className="lg:col-span-5 space-y-6">
               <div className="card-silver p-6 sm:p-8">
                 <div className="flex items-start gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-700 to-blue-500 flex items-center justify-center shadow-lg">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-900 to-blue-700 flex items-center justify-center shadow-lg">
                     <Info className="w-6 h-6 text-white" />
                   </div>
                   <div>
@@ -195,8 +195,8 @@ export default function HomePage() {
 
               <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 sm:p-8">
                 <div className="flex items-start gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center">
-                    <ShieldCheck className="w-6 h-6 text-amber-900" />
+                  <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center shadow-lg">
+                    <ShieldCheck className="w-6 h-6 text-white" />
                   </div>
                   <div>
                     <div className="font-bold text-amber-950">Não é um site oficial do governo</div>
