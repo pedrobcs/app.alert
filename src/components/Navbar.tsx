@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowRight, ShieldCheck } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -25,7 +25,9 @@ export function Navbar() {
                 className="w-12 h-12 bg-gradient-to-br from-blue-700 to-blue-500 rounded-2xl flex items-center justify-center shadow-xl relative overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
-                <ShieldCheck className="w-6 h-6 text-white relative z-10" />
+                <span className="text-white font-extrabold text-xl tracking-tight relative z-10">
+                  IA
+                </span>
               </motion.div>
               <div>
                 <span className="font-bold text-2xl text-gradient block">
