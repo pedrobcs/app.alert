@@ -209,7 +209,7 @@ export default function HomePage() {
             </div>
 
             {/* Right: form */}
-            <div id="form" className="lg:col-span-7 card-premium p-6 sm:p-10">
+            <div id="form" className="lg:col-span-7 card-silver p-6 sm:p-10">
               <div className="flex items-start justify-between gap-4 mb-6">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900">Preencha suas informações</h2>
