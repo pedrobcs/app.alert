@@ -1,430 +1,404 @@
 'use client';
 
+import { useEffect, useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Navbar } from '@/components/Navbar';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useAccount } from 'wagmi';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { motion } from 'framer-motion';
-import { Shield, TrendingUp, Lock, Zap, BarChart3, CheckCircle, ArrowRight, Sparkles, Star, DollarSign, Users } from 'lucide-react';
+import { ArrowRight, Camera, CheckCircle2, Info, ShieldCheck, UploadCloud } from 'lucide-react';
+
+type IntentFormState = {
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  dateOfBirth: string;
+  countryOfCitizenship: string;
+  email: string;
+  phone: string;
+};
+
+const MAX_SELFIE_BYTES = 5 * 1024 * 1024; // 5MB
 
 export default function HomePage() {
-  const { isConnected, address } = useAccount();
-  const router = useRouter();
-  const { authenticate, isAuthenticating } = useAuth();
   const [mounted, setMounted] = useState(false);
+  const [form, setForm] = useState<IntentFormState>({
+    firstName: '',
+    middleName: '',
+    lastName: '',
+    dateOfBirth: '',
+    countryOfCitizenship: '',
+    email: '',
+    phone: '',
+  });
+  const [selfie, setSelfie] = useState<File | null>(null);
+  const [selfiePreviewUrl, setSelfiePreviewUrl] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [confirmationId, setConfirmationId] = useState<string | null>(null);
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (mounted && isConnected && address) {
-      // Authenticate and redirect to dashboard
-      handleAuthentication();
+    if (!selfie) {
+      setSelfiePreviewUrl(null);
+      return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, address, mounted]);
+    const url = URL.createObjectURL(selfie);
+    setSelfiePreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [selfie]);
 
-  const handleAuthentication = async () => {
-    const success = await authenticate();
-    if (success) {
-      setTimeout(() => {
-        router.push('/dashboard');
-      }, 500);
-    }
-  };
-
-  if (!mounted) {
-    return null;
-  }
-
-  if (isAuthenticating) {
+  const isValid = useMemo(() => {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
-          <div className="w-20 h-20 mx-auto mb-4">
-            <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-blue-600"></div>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Authenticating...</h2>
-          <p className="text-gray-600">Please sign the message in your wallet</p>
-        </motion.div>
-      </div>
+      form.firstName.trim().length > 0 &&
+      form.lastName.trim().length > 0 &&
+      form.dateOfBirth.trim().length > 0 &&
+      form.countryOfCitizenship.trim().length > 0 &&
+      form.email.trim().length > 0 &&
+      form.phone.trim().length > 0 &&
+      !!selfie
     );
-  }
+  }, [form, selfie]);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
+  const onChange = (key: keyof IntentFormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm((prev) => ({ ...prev, [key]: e.target.value }));
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6 },
-    },
+  const handleSelfieChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    if (!file) {
+      setSelfie(null);
+      return;
+    }
+    if (!file.type.startsWith('image/')) {
+      setError('Selfie must be an image file (JPG/PNG/WebP).');
+      setSelfie(null);
+      return;
+    }
+    if (file.size > MAX_SELFIE_BYTES) {
+      setError('Selfie is too large. Please upload an image under 5MB.');
+      setSelfie(null);
+      return;
+    }
+    setError(null);
+    setSelfie(file);
   };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setConfirmationId(null);
+
+    if (!isValid || !selfie) {
+      setError('Please fill in all required fields and upload a clear selfie.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const body = new FormData();
+      body.set('firstName', form.firstName.trim());
+      body.set('middleName', form.middleName.trim());
+      body.set('lastName', form.lastName.trim());
+      body.set('dateOfBirth', form.dateOfBirth);
+      body.set('countryOfCitizenship', form.countryOfCitizenship.trim());
+      body.set('email', form.email.trim());
+      body.set('phone', form.phone.trim());
+      body.set('selfie', selfie);
+
+      const res = await fetch('/api/departure-intent', { method: 'POST', body });
+      const json = (await res.json()) as { ok?: boolean; confirmationId?: string; error?: string };
+      if (!res.ok || !json.ok || !json.confirmationId) {
+        throw new Error(json.error || 'Submission failed. Please try again.');
+      }
+
+      setConfirmationId(json.confirmationId);
+      setForm({
+        firstName: '',
+        middleName: '',
+        lastName: '',
+        dateOfBirth: '',
+        countryOfCitizenship: '',
+        email: '',
+        phone: '',
+      });
+      setSelfie(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Submission failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (!mounted) return null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 relative overflow-hidden">
       <AnimatedBackground />
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="pt-20 pb-32 px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="max-w-7xl mx-auto">
+      <main className="relative z-10 px-4 sm:px-6 lg:px-8 pt-16 pb-24">
+        <div className="max-w-6xl mx-auto">
           <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={containerVariants}
-            className="text-center"
-          >
-            {/* Badge */}
-            <motion.div variants={itemVariants} className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 text-sm font-bold mb-8 shadow-lg">
-              <Zap className="w-5 h-5 mr-2 animate-pulse" />
-              <span>Powered by Arbitrum Layer 2</span>
-              <Sparkles className="w-5 h-5 ml-2" />
-            </motion.div>
-
-            {/* Main Heading */}
-            <motion.h1
-              variants={itemVariants}
-              className="text-5xl md:text-7xl lg:text-8xl font-bold text-gray-900 mb-6"
-            >
-              Invest USDC into
-              <br />
-              <span className="text-gradient block mt-2">
-                Automated Trading
-              </span>
-            </motion.h1>
-
-            {/* Subheading */}
-            <motion.p
-              variants={itemVariants}
-              className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed"
-            >
-              Put your USDC to work with our proven BTC trading bot on Arbitrum.
-              <br />
-              <span className="font-semibold text-gray-800">Transparent, secure, and designed for consistent returns.</span>
-            </motion.p>
-
-            {/* CTA Buttons */}
-            <motion.div
-              variants={itemVariants}
-              className="flex flex-col sm:flex-row gap-6 justify-center items-center"
-            >
-              <ConnectButton.Custom>
-                {({ openConnectModal }) => (
-                  <motion.button
-                    onClick={openConnectModal}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="btn btn-primary text-lg px-10 py-5 shadow-2xl hover:shadow-blue-500/50 flex items-center space-x-2 group"
-                  >
-                    <span>Connect Wallet to Start</span>
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </motion.button>
-                )}
-              </ConnectButton.Custom>
-
-              <motion.a
-                href="#how-it-works"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="btn btn-outline text-lg px-10 py-5 flex items-center space-x-2 group"
-              >
-                <span>Learn How It Works</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </motion.a>
-            </motion.div>
-
-            {/* Stats */}
-            <motion.div
-              variants={containerVariants}
-              className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-24 max-w-5xl mx-auto"
-            >
-              {[
-                { value: '$2.5M+', label: 'Assets Under Management', icon: DollarSign, color: 'blue' },
-                { value: '+24.3%', label: 'YTD Returns', icon: TrendingUp, color: 'green' },
-                { value: '500+', label: 'Active Investors', icon: Users, color: 'purple' },
-              ].map((stat, index) => (
-                <motion.div
-                  key={stat.label}
-                  variants={itemVariants}
-                  whileHover={{ y: -10 }}
-                  className="card-premium text-center group"
-                >
-                  <div className={`w-16 h-16 bg-gradient-to-br ${
-                    stat.color === 'blue' ? 'from-blue-500 to-blue-600' :
-                    stat.color === 'green' ? 'from-green-500 to-green-600' :
-                    'from-purple-500 to-purple-600'
-                  } rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-2xl transition-shadow`}>
-                    <stat.icon className="w-8 h-8 text-white" />
-                  </div>
-                  <div className="text-4xl font-bold text-gray-900 mb-2 number-counter">
-                    {stat.value}
-                  </div>
-                  <div className="text-gray-600">{stat.label}</div>
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="py-24 bg-white/50 backdrop-blur-sm relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-20"
+            className="text-center mb-10"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Why Choose <span className="text-gradient">ArbiBot</span>?
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Professional-grade trading, accessible to everyone
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Shield,
-                title: 'Secure & Transparent',
-                description: 'All deposits are on-chain and verifiable. Your funds go directly to the operator wallet with full transparency.',
-                color: 'blue',
-              },
-              {
-                icon: TrendingUp,
-                title: 'Proven Strategy',
-                description: 'Our algorithmic trading bot has consistently outperformed the market with systematic BTC strategies.',
-                color: 'green',
-              },
-              {
-                icon: Lock,
-                title: 'Non-Custodial',
-                description: 'You control your wallet. Deposits are tracked on-chain and credited to your account automatically.',
-                color: 'purple',
-              },
-              {
-                icon: Zap,
-                title: 'Arbitrum Speed',
-                description: 'Low fees and fast confirmations on Arbitrum L2. Your deposits are confirmed in minutes.',
-                color: 'orange',
-              },
-              {
-                icon: BarChart3,
-                title: 'Real-time Dashboard',
-                description: 'Track your investments, view transaction history, and monitor performance in real-time.',
-                color: 'pink',
-              },
-              {
-                icon: CheckCircle,
-                title: 'Simple Process',
-                description: 'Connect wallet, send USDC, and start earning. No complex procedures or paperwork required.',
-                color: 'indigo',
-              },
-            ].map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                whileHover={{ y: -10 }}
-                className="card-premium group cursor-pointer"
-              >
-                <motion.div
-                  whileHover={{ rotate: 360 }}
-                  transition={{ duration: 0.6 }}
-                  className={`w-16 h-16 bg-gradient-to-br ${
-                    feature.color === 'blue' ? 'from-blue-500 to-blue-600' :
-                    feature.color === 'green' ? 'from-green-500 to-green-600' :
-                    feature.color === 'purple' ? 'from-purple-500 to-purple-600' :
-                    feature.color === 'orange' ? 'from-orange-500 to-orange-600' :
-                    feature.color === 'pink' ? 'from-pink-500 to-pink-600' :
-                    'from-indigo-500 to-indigo-600'
-                  } rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:shadow-2xl transition-shadow`}
-                >
-                  <feature.icon className="w-8 h-8 text-white" />
-                </motion.div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {feature.description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section id="how-it-works" className="py-24 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-20"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              How It Works
-            </h2>
-            <p className="text-xl text-gray-600">
-              Start investing in 3 simple steps
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {[
-              { step: '1', title: 'Connect Wallet', description: 'Connect your MetaMask or WalletConnect wallet. Make sure you are on Arbitrum network.' },
-              { step: '2', title: 'Send USDC', description: 'Transfer USDC to the operator wallet address. Minimum deposit $100. Your transaction is verified on-chain.' },
-              { step: '3', title: 'Track Returns', description: 'Monitor your investment in the dashboard. View real-time performance and transaction history.' },
-            ].map((step, index) => (
-              <motion.div
-                key={step.step}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                className="text-center group"
-              >
-                <motion.div
-                  whileHover={{ scale: 1.1, rotate: 360 }}
-                  transition={{ duration: 0.6 }}
-                  className="w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-8 shadow-2xl group-hover:shadow-blue-500/50"
-                >
-                  {step.step}
-                </motion.div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  {step.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {step.description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-24 relative z-10">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="card-premium p-12"
-          >
-            <div className="flex justify-center mb-6">
-              {[...Array(5)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 2, repeat: Infinity, delay: i * 0.2 }}
-                >
-                  <Star className="w-8 h-8 text-yellow-500 fill-yellow-500" />
-                </motion.div>
-              ))}
+            <div className="inline-flex items-center px-5 py-2 rounded-full bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-900 text-sm font-bold mb-6 shadow-lg">
+              <ShieldCheck className="w-4 h-4 mr-2" />
+              Intent to Depart helper • Potential reward up to $1,000
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gradient">
-              Ready to Start Earning?
-            </h2>
-            <p className="text-xl text-gray-600 mb-10">
-              Join hundreds of investors already earning with ArbiBot
-            </p>
-            <ConnectButton.Custom>
-              {({ openConnectModal }) => (
-                <motion.button
-                  onClick={openConnectModal}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="btn btn-primary text-lg px-12 py-5 shadow-2xl hover:shadow-blue-500/50"
-                >
-                  Connect Wallet Now
-                </motion.button>
-              )}
-            </ConnectButton.Custom>
-          </motion.div>
-        </div>
-      </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">AB</span>
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4">
+              CBP Home “Intent to Depart”
+              <span className="text-gradient block mt-1">All required info, in one place.</span>
+            </h1>
+            <p className="text-gray-600 text-lg md:text-xl max-w-3xl mx-auto">
+              Enter the details requested by the CBP Home Mobile app when submitting an Intent to Depart, then upload a clear selfie.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Left: info panel */}
+            <div className="lg:col-span-5 space-y-6">
+              <div className="card-premium p-6 sm:p-8">
+                <div className="flex items-start gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg">
+                    <Info className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">What you’ll need</h2>
+                    <p className="text-gray-600 mt-1">
+                      When submitting an Intent to Depart via the CBP Home Mobile app, you’ll be asked for:
+                    </p>
+                  </div>
                 </div>
-                <span className="font-bold text-xl">ArbiBot</span>
+
+                <ul className="mt-5 space-y-3 text-gray-800">
+                  {[
+                    'First name',
+                    'Middle name',
+                    'Last name',
+                    'Date of birth',
+                    'Country of citizenship',
+                    'Email address',
+                    'Phone number',
+                    'A clear self-photo, or selfie',
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-3">
+                      <span className="mt-2 w-2 h-2 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex-shrink-0" />
+                      <span className="leading-relaxed">{item}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <p className="text-gray-400">
-                Automated USDC trading on Arbitrum
-              </p>
+
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 sm:p-8">
+                <div className="flex items-start gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center">
+                    <ShieldCheck className="w-6 h-6 text-amber-900" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-amber-950">Not an official government site</div>
+                    <div className="text-sm text-amber-900 mt-1">
+                      This page is an independent helper. It is not affiliated with CBP. Reward eligibility (including “up to $1,000”) depends on external rules and is not guaranteed here.
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div>
-              <h4 className="font-bold mb-4">Legal</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Terms of Service
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Risk Disclosure
-                  </a>
-                </li>
-              </ul>
+
+            {/* Right: form */}
+            <div id="form" className="lg:col-span-7 card-premium p-6 sm:p-10">
+              <div className="flex items-start justify-between gap-4 mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">Enter your information</h2>
+                  <p className="text-gray-600 mt-1">Fields marked with * are required.</p>
+                </div>
+                <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600">
+                  <Camera className="w-4 h-4" />
+                  <span>Selfie required</span>
+                </div>
+              </div>
+
+              {confirmationId && (
+                <div className="mb-6 rounded-xl border border-green-200 bg-green-50 p-4 text-green-900">
+                  <div className="flex items-center gap-2 font-semibold">
+                    <CheckCircle2 className="w-5 h-5" />
+                    Submitted successfully
+                  </div>
+                  <div className="text-sm mt-1">
+                    Confirmation ID: <span className="font-mono font-semibold">{confirmationId}</span>
+                  </div>
+                </div>
+              )}
+
+              {error && (
+                <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-900">
+                  <div className="font-semibold">Fix this to continue</div>
+                  <div className="text-sm mt-1">{error}</div>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">First name *</label>
+                    <input
+                      value={form.firstName}
+                      onChange={onChange('firstName')}
+                      autoComplete="given-name"
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="First name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">Middle name</label>
+                    <input
+                      value={form.middleName}
+                      onChange={onChange('middleName')}
+                      autoComplete="additional-name"
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Middle name (optional)"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">Last name *</label>
+                    <input
+                      value={form.lastName}
+                      onChange={onChange('lastName')}
+                      autoComplete="family-name"
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Last name"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">Date of birth *</label>
+                    <input
+                      type="date"
+                      value={form.dateOfBirth}
+                      onChange={onChange('dateOfBirth')}
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">Country of citizenship *</label>
+                    <input
+                      value={form.countryOfCitizenship}
+                      onChange={onChange('countryOfCitizenship')}
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Country of citizenship"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">Email address *</label>
+                    <input
+                      type="email"
+                      value={form.email}
+                      onChange={onChange('email')}
+                      autoComplete="email"
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Email address"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">Phone number *</label>
+                    <input
+                      type="tel"
+                      value={form.phone}
+                      onChange={onChange('phone')}
+                      autoComplete="tel"
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Phone number"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-800 mb-2">A clear self-photo / selfie *</label>
+                  <div className="rounded-2xl border border-dashed border-gray-300 bg-white/60 p-5">
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg">
+                          <UploadCloud className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-gray-900">Upload a clear selfie</div>
+                          <div className="text-sm text-gray-600">JPG/PNG/WebP, max 5MB</div>
+                        </div>
+                      </div>
+
+                      <div className="md:ml-auto flex items-center gap-3">
+                        <label className="btn btn-outline cursor-pointer">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleSelfieChange}
+                            className="hidden"
+                            required={!selfie}
+                          />
+                          Choose file
+                        </label>
+                        {selfie && (
+                          <button
+                            type="button"
+                            onClick={() => setSelfie(null)}
+                            className="btn btn-secondary"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {selfiePreviewUrl && (
+                      <div className="mt-5">
+                        <div className="text-sm font-semibold text-gray-800 mb-2">Preview</div>
+                        <div className="rounded-2xl overflow-hidden border border-gray-200 bg-white">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={selfiePreviewUrl}
+                            alt="Selfie preview"
+                            className="w-full max-h-[360px] object-contain bg-gray-50"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className={`btn btn-primary text-lg px-8 py-4 flex items-center justify-center gap-2 ${
+                      isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    {isSubmitting ? 'Submitting…' : 'Submit intent'}
+                    <ArrowRight className="w-5 h-5" />
+                  </button>
+                  <div className="text-sm text-gray-600">
+                    By submitting, you confirm the information is accurate and the selfie is clearly identifiable.
+                  </div>
+                </div>
+              </form>
             </div>
-            <div>
-              <h4 className="font-bold mb-4">Support</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <a href="mailto:support@arbibot.com" className="hover:text-white transition-colors">
-                    support@arbibot.com
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 ArbiBot. All rights reserved.</p>
-            <p className="mt-2 text-sm">
-              <strong>Disclaimer:</strong> Trading cryptocurrencies involves risk.
-              You may lose some or all of your investment. Only invest what you can
-              afford to lose.
-            </p>
           </div>
         </div>
-      </footer>
+      </main>
     </div>
   );
 }

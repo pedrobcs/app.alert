@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
-import { DisclaimerModal } from "@/components/DisclaimerModal";
 
 export const metadata: Metadata = {
-  title: "ArbiBot Invest - Automated USDC Trading on Arbitrum",
-  description: "Invest USDC into an automated BTC trading bot on Arbitrum. Secure, transparent, and profitable.",
-  keywords: "USDC, Arbitrum, DeFi, Trading Bot, Crypto Investment",
+  title: "IntentAssist — Intent to Depart helper",
+  description: "A simple helper page to collect required information for submitting an Intent to Depart, including a clear selfie.",
+  keywords: "intent to depart, CBP Home, selfie, departure, form",
 };
 
 export default function RootLayout({
@@ -19,7 +18,6 @@ export default function RootLayout({
       <body className="antialiased">
         <Providers>
           {children}
-          <DisclaimerModal />
         </Providers>
       </body>
     </html>

@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, ShieldCheck } from 'lucide-react';
 
 export function DisclaimerModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [accepted, setAccepted] = useState(false);
 
   useEffect(() => {
-    const hasAccepted = localStorage.getItem('disclaimer_accepted');
+    const hasAccepted = localStorage.getItem('intent_notice_accepted');
     if (!hasAccepted) {
       setIsOpen(true);
     }
@@ -16,7 +16,7 @@ export function DisclaimerModal() {
 
   const handleAccept = () => {
     if (!accepted) return;
-    localStorage.setItem('disclaimer_accepted', 'true');
+    localStorage.setItem('intent_notice_accepted', 'true');
     setIsOpen(false);
   };
 
@@ -31,7 +31,7 @@ export function DisclaimerModal() {
               <AlertTriangle className="w-6 h-6 text-red-600" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900">
-              Important Legal Disclaimer
+              Important Notice
             </h2>
           </div>
         </div>
@@ -45,92 +45,41 @@ export function DisclaimerModal() {
 
           <div className="space-y-4 text-sm text-gray-700">
             <section>
-              <h3 className="font-bold text-gray-900 mb-2">Risk Disclosure</h3>
+              <h3 className="font-bold text-gray-900 mb-2">Not an official government app</h3>
               <p>
-                Trading cryptocurrencies and digital assets involves substantial risk of loss.
-                The value of your investment may fluctuate significantly, and you may lose some
-                or all of your invested capital. Past performance is not indicative of future results.
+                This site is an independent helper page. It is <strong>not</strong> affiliated with, endorsed by,
+                or operated by U.S. Customs and Border Protection (CBP) or any government agency.
               </p>
             </section>
 
             <section>
-              <h3 className="font-bold text-gray-900 mb-2">Non-Custodial Nature</h3>
+              <h3 className="font-bold text-gray-900 mb-2">Personal information</h3>
               <p>
-                By using this platform, you understand that you are sending funds directly to
-                the operator&apos;s wallet address. This platform does not custody your funds.
-                Once transferred, funds are under the control of the operator.
+                You will be asked to enter personal details (name, date of birth, citizenship, contact info)
+                and upload a selfie. Only submit information that is accurate and that you have the right to provide.
               </p>
             </section>
 
             <section>
-              <h3 className="font-bold text-gray-900 mb-2">No Guarantees</h3>
+              <h3 className="font-bold text-gray-900 mb-2">Reward information</h3>
               <p>
-                We make no guarantees or promises regarding investment returns, profits, or
-                performance. The trading bot&apos;s performance may vary and is subject to market
-                conditions, technical issues, and other factors beyond our control.
+                Any mention of a “$1,000 reward” is informational and may depend on eligibility and external program rules.
+                This site does not guarantee payment.
               </p>
             </section>
 
             <section>
-              <h3 className="font-bold text-gray-900 mb-2">Withdrawal Policy</h3>
+              <h3 className="font-bold text-gray-900 mb-2">Privacy & security</h3>
               <p>
-                Withdrawals are processed manually and may take 3-5 business days or longer
-                depending on market conditions and liquidity. There is no guarantee that
-                withdrawals will be processed within any specific timeframe.
-              </p>
-            </section>
-
-            <section>
-              <h3 className="font-bold text-gray-900 mb-2">Regulatory Status</h3>
-              <p>
-                This platform may not be registered with any financial regulatory authority.
-                Investments made through this platform may not be protected by investor
-                protection schemes or insurance.
-              </p>
-            </section>
-
-            <section>
-              <h3 className="font-bold text-gray-900 mb-2">No Financial Advice</h3>
-              <p>
-                Nothing on this platform constitutes financial, investment, legal, or tax advice.
-                You should consult with your own advisors before making any investment decisions.
-              </p>
-            </section>
-
-            <section>
-              <h3 className="font-bold text-gray-900 mb-2">Geographic Restrictions</h3>
-              <p>
-                This platform may not be available to residents of certain jurisdictions.
-                It is your responsibility to ensure that your use of this platform complies
-                with applicable laws in your jurisdiction.
-              </p>
-            </section>
-
-            <section>
-              <h3 className="font-bold text-gray-900 mb-2">Know Your Customer (KYC) / Anti-Money Laundering (AML)</h3>
-              <p>
-                The operator may require you to complete KYC verification at any time. Failure
-                to provide requested information may result in restrictions on your account,
-                including the inability to deposit or withdraw funds.
-              </p>
-            </section>
-
-            <section>
-              <h3 className="font-bold text-gray-900 mb-2">Smart Contract Risk</h3>
-              <p>
-                Transactions on blockchain networks are irreversible. Ensure you send funds
-                to the correct address on the correct network (Arbitrum). We cannot recover
-                funds sent to incorrect addresses or wrong networks.
+                Do not submit passwords, financial account details, or highly sensitive information beyond what is requested.
+                Use a secure network and device when uploading your selfie.
               </p>
             </section>
 
             <section>
               <h3 className="font-bold text-gray-900 mb-2">Acceptance</h3>
               <p>
-                By checking the box below and clicking "I Accept," you acknowledge that you
-                have read, understood, and agree to accept all risks associated with using
-                this platform. You confirm that you are investing only funds you can afford
-                to lose.
+                By checking the box below and clicking “I Understand,” you acknowledge you have read this notice.
               </p>
             </section>
           </div>
@@ -144,9 +93,7 @@ export function DisclaimerModal() {
                 className="mt-1 w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
               />
               <span className="text-sm text-gray-700">
-                I have read and understood the above disclaimers. I acknowledge the risks
-                involved and agree to the terms of use. I am only investing funds that I
-                can afford to lose.
+                I understand this is not an official CBP application and I consent to providing the requested information on this site.
               </span>
             </label>
           </div>
@@ -160,7 +107,10 @@ export function DisclaimerModal() {
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
-            I Accept and Understand the Risks
+            <span className="inline-flex items-center justify-center gap-2">
+              <ShieldCheck className="w-5 h-5" />
+              I Understand
+            </span>
           </button>
         </div>
       </div>
