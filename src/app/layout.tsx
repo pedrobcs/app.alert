@@ -3,9 +3,9 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "IntentAssist — Intent to Depart helper",
-  description: "A simple helper page to collect required information for submitting an Intent to Depart, including a clear selfie.",
-  keywords: "intent to depart, CBP Home, selfie, departure, form",
+  title: "IntentAssist — Ajuda para Intenção de Partida",
+  description: "Uma página simples para reunir as informações necessárias para enviar uma Intenção de Partida, incluindo uma selfie nítida.",
+  keywords: "intenção de partida, CBP Home, selfie, formulário, saída voluntária",
 };
 
 export default function RootLayout({
@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body className="antialiased">
         <Providers>
           {children}

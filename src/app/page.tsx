@@ -70,12 +70,12 @@ export default function HomePage() {
       return;
     }
     if (!file.type.startsWith('image/')) {
-      setError('Selfie must be an image file (JPG/PNG/WebP).');
+      setError('A selfie precisa ser uma imagem (JPG/PNG/WebP).');
       setSelfie(null);
       return;
     }
     if (file.size > MAX_SELFIE_BYTES) {
-      setError('Selfie is too large. Please upload an image under 5MB.');
+      setError('A selfie é muito grande. Envie uma imagem com menos de 5MB.');
       setSelfie(null);
       return;
     }
@@ -89,7 +89,7 @@ export default function HomePage() {
     setConfirmationId(null);
 
     if (!isValid || !selfie) {
-      setError('Please fill in all required fields and upload a clear selfie.');
+      setError('Preencha todos os campos obrigatórios e envie uma selfie nítida.');
       return;
     }
 
@@ -108,7 +108,7 @@ export default function HomePage() {
       const res = await fetch('/api/departure-intent', { method: 'POST', body });
       const json = (await res.json()) as { ok?: boolean; confirmationId?: string; error?: string };
       if (!res.ok || !json.ok || !json.confirmationId) {
-        throw new Error(json.error || 'Submission failed. Please try again.');
+        throw new Error(json.error || 'Falha ao enviar. Tente novamente.');
       }
 
       setConfirmationId(json.confirmationId);
@@ -123,7 +123,7 @@ export default function HomePage() {
       });
       setSelfie(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Submission failed. Please try again.');
+      setError(err instanceof Error ? err.message : 'Falha ao enviar. Tente novamente.');
     } finally {
       setIsSubmitting(false);
     }
@@ -132,7 +132,7 @@ export default function HomePage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-white relative overflow-hidden">
       <AnimatedBackground />
       <Navbar />
 
@@ -144,17 +144,17 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-10"
           >
-            <div className="inline-flex items-center px-5 py-2 rounded-full bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-900 text-sm font-bold mb-6 shadow-lg">
+            <div className="inline-flex items-center px-5 py-2 rounded-full bg-gradient-to-r from-blue-50 to-blue-100 text-blue-900 text-sm font-bold mb-6 shadow-lg">
               <ShieldCheck className="w-4 h-4 mr-2" />
-              Intent to Depart helper • Potential reward up to $1,000
+              Ajuda para “Intenção de Partida” • Possível recompensa de até US$ 1.000
             </div>
 
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4">
-              CBP Home “Intent to Depart”
-              <span className="text-gradient block mt-1">All required info, in one place.</span>
+              CBP Home — “Intenção de Partida”
+              <span className="text-gradient block mt-1">Tudo o que pedem, em um só lugar.</span>
             </h1>
             <p className="text-gray-600 text-lg md:text-xl max-w-3xl mx-auto">
-              Enter the details requested by the CBP Home Mobile app when submitting an Intent to Depart, then upload a clear selfie.
+              Preencha os dados solicitados no app móvel CBP Home ao enviar uma Intenção de Partida e depois envie uma selfie nítida.
             </p>
           </motion.div>
 
@@ -163,30 +163,30 @@ export default function HomePage() {
             <div className="lg:col-span-5 space-y-6">
               <div className="card-premium p-6 sm:p-8">
                 <div className="flex items-start gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-700 to-blue-500 flex items-center justify-center shadow-lg">
                     <Info className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900">What you’ll need</h2>
+                    <h2 className="text-2xl font-bold text-gray-900">O que você vai precisar</h2>
                     <p className="text-gray-600 mt-1">
-                      When submitting an Intent to Depart via the CBP Home Mobile app, you’ll be asked for:
+                      Ao enviar uma Intenção de Partida pelo app CBP Home, será solicitado:
                     </p>
                   </div>
                 </div>
 
                 <ul className="mt-5 space-y-3 text-gray-800">
                   {[
-                    'First name',
-                    'Middle name',
-                    'Last name',
-                    'Date of birth',
-                    'Country of citizenship',
-                    'Email address',
-                    'Phone number',
-                    'A clear self-photo, or selfie',
+                    'Primeiro nome',
+                    'Nome do meio',
+                    'Sobrenome',
+                    'Data de nascimento',
+                    'País de cidadania',
+                    'Endereço de e-mail',
+                    'Número de telefone',
+                    'Uma foto nítida (selfie)',
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-3">
-                      <span className="mt-2 w-2 h-2 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex-shrink-0" />
+                      <span className="mt-2 w-2 h-2 rounded-full bg-gradient-to-r from-blue-700 to-blue-500 flex-shrink-0" />
                       <span className="leading-relaxed">{item}</span>
                     </li>
                   ))}
@@ -199,9 +199,9 @@ export default function HomePage() {
                     <ShieldCheck className="w-6 h-6 text-amber-900" />
                   </div>
                   <div>
-                    <div className="font-bold text-amber-950">Not an official government site</div>
+                    <div className="font-bold text-amber-950">Não é um site oficial do governo</div>
                     <div className="text-sm text-amber-900 mt-1">
-                      This page is an independent helper. It is not affiliated with CBP. Reward eligibility (including “up to $1,000”) depends on external rules and is not guaranteed here.
+                      Esta página é um assistente independente. Não é afiliada ao CBP. A elegibilidade para recompensa (incluindo “até US$ 1.000”) depende de regras externas e não é garantida aqui.
                     </div>
                   </div>
                 </div>
@@ -212,12 +212,12 @@ export default function HomePage() {
             <div id="form" className="lg:col-span-7 card-premium p-6 sm:p-10">
               <div className="flex items-start justify-between gap-4 mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Enter your information</h2>
-                  <p className="text-gray-600 mt-1">Fields marked with * are required.</p>
+                  <h2 className="text-2xl font-bold text-gray-900">Preencha suas informações</h2>
+                  <p className="text-gray-600 mt-1">Campos com * são obrigatórios.</p>
                 </div>
                 <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600">
                   <Camera className="w-4 h-4" />
-                  <span>Selfie required</span>
+                  <span>Selfie obrigatória</span>
                 </div>
               </div>
 
@@ -225,17 +225,17 @@ export default function HomePage() {
                 <div className="mb-6 rounded-xl border border-green-200 bg-green-50 p-4 text-green-900">
                   <div className="flex items-center gap-2 font-semibold">
                     <CheckCircle2 className="w-5 h-5" />
-                    Submitted successfully
+                    Enviado com sucesso
                   </div>
                   <div className="text-sm mt-1">
-                    Confirmation ID: <span className="font-mono font-semibold">{confirmationId}</span>
+                    ID de confirmação: <span className="font-mono font-semibold">{confirmationId}</span>
                   </div>
                 </div>
               )}
 
               {error && (
                 <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-900">
-                  <div className="font-semibold">Fix this to continue</div>
+                  <div className="font-semibold">Ajuste para continuar</div>
                   <div className="text-sm mt-1">{error}</div>
                 </div>
               )}
@@ -243,34 +243,34 @@ export default function HomePage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-800 mb-2">First name *</label>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">Primeiro nome *</label>
                     <input
                       value={form.firstName}
                       onChange={onChange('firstName')}
                       autoComplete="given-name"
                       className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="First name"
+                      placeholder="Primeiro nome"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-800 mb-2">Middle name</label>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">Nome do meio</label>
                     <input
                       value={form.middleName}
                       onChange={onChange('middleName')}
                       autoComplete="additional-name"
                       className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Middle name (optional)"
+                      placeholder="Nome do meio (opcional)"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-800 mb-2">Last name *</label>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">Sobrenome *</label>
                     <input
                       value={form.lastName}
                       onChange={onChange('lastName')}
                       autoComplete="family-name"
                       className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Last name"
+                      placeholder="Sobrenome"
                       required
                     />
                   </div>
@@ -278,7 +278,7 @@ export default function HomePage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-800 mb-2">Date of birth *</label>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">Data de nascimento *</label>
                     <input
                       type="date"
                       value={form.dateOfBirth}
@@ -288,12 +288,12 @@ export default function HomePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-800 mb-2">Country of citizenship *</label>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">País de cidadania *</label>
                     <input
                       value={form.countryOfCitizenship}
                       onChange={onChange('countryOfCitizenship')}
                       className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Country of citizenship"
+                      placeholder="País de cidadania"
                       required
                     />
                   </div>
@@ -301,42 +301,42 @@ export default function HomePage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-800 mb-2">Email address *</label>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">E-mail *</label>
                     <input
                       type="email"
                       value={form.email}
                       onChange={onChange('email')}
                       autoComplete="email"
                       className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Email address"
+                      placeholder="seuemail@exemplo.com"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-800 mb-2">Phone number *</label>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">Telefone *</label>
                     <input
                       type="tel"
                       value={form.phone}
                       onChange={onChange('phone')}
                       autoComplete="tel"
                       className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Phone number"
+                      placeholder="+1 555 123 4567"
                       required
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-2">A clear self-photo / selfie *</label>
+                  <label className="block text-sm font-semibold text-gray-800 mb-2">Uma selfie nítida *</label>
                   <div className="rounded-2xl border border-dashed border-gray-300 bg-white/60 p-5">
                     <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-700 to-blue-500 flex items-center justify-center shadow-lg">
                           <UploadCloud className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                          <div className="font-semibold text-gray-900">Upload a clear selfie</div>
-                          <div className="text-sm text-gray-600">JPG/PNG/WebP, max 5MB</div>
+                          <div className="font-semibold text-gray-900">Enviar selfie nítida</div>
+                          <div className="text-sm text-gray-600">JPG/PNG/WebP, até 5MB</div>
                         </div>
                       </div>
 
@@ -349,7 +349,7 @@ export default function HomePage() {
                             className="hidden"
                             required={!selfie}
                           />
-                          Choose file
+                          Escolher arquivo
                         </label>
                         {selfie && (
                           <button
@@ -357,7 +357,7 @@ export default function HomePage() {
                             onClick={() => setSelfie(null)}
                             className="btn btn-secondary"
                           >
-                            Remove
+                            Remover
                           </button>
                         )}
                       </div>
@@ -365,12 +365,12 @@ export default function HomePage() {
 
                     {selfiePreviewUrl && (
                       <div className="mt-5">
-                        <div className="text-sm font-semibold text-gray-800 mb-2">Preview</div>
+                        <div className="text-sm font-semibold text-gray-800 mb-2">Pré-visualização</div>
                         <div className="rounded-2xl overflow-hidden border border-gray-200 bg-white">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={selfiePreviewUrl}
-                            alt="Selfie preview"
+                            alt="Pré-visualização da selfie"
                             className="w-full max-h-[360px] object-contain bg-gray-50"
                           />
                         </div>
@@ -387,11 +387,11 @@ export default function HomePage() {
                       isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
                     }`}
                   >
-                    {isSubmitting ? 'Submitting…' : 'Submit intent'}
+                    {isSubmitting ? 'Enviando…' : 'Enviar intenção'}
                     <ArrowRight className="w-5 h-5" />
                   </button>
                   <div className="text-sm text-gray-600">
-                    By submitting, you confirm the information is accurate and the selfie is clearly identifiable.
+                    Ao enviar, você confirma que as informações são corretas e que a selfie está nítida e identificável.
                   </div>
                 </div>
               </form>
