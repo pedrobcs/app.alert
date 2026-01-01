@@ -161,20 +161,20 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* Left: info panel */}
             <div className="lg:col-span-5 space-y-6">
-              <div className="card-silver p-6 sm:p-8">
+              <div className="card-silver-dark p-6 sm:p-8">
                 <div className="flex items-start gap-3">
                   <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-900 to-blue-700 flex items-center justify-center shadow-lg">
                     <Info className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900">O que você vai precisar</h2>
-                    <p className="text-gray-600 mt-1">
+                    <h2 className="text-2xl font-bold text-white">O que você vai precisar</h2>
+                    <p className="text-blue-100/90 mt-1">
                       Ao enviar uma Intenção de Partida pelo app CBP Home, será solicitado:
                     </p>
                   </div>
                 </div>
 
-                <ul className="mt-5 space-y-3 text-gray-800">
+                <ul className="mt-5 space-y-3 text-white">
                   {[
                     'Primeiro nome',
                     'Nome do meio',
@@ -186,7 +186,7 @@ export default function HomePage() {
                     'Uma foto nítida (selfie)',
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-3">
-                      <span className="mt-2 w-2 h-2 rounded-full bg-gradient-to-r from-blue-700 to-blue-500 flex-shrink-0" />
+                      <span className="mt-2 w-2 h-2 rounded-full bg-gradient-to-r from-blue-300 to-blue-100 flex-shrink-0" />
                       <span className="leading-relaxed">{item}</span>
                     </li>
                   ))}
