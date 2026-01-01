@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
-import { DisclaimerModal } from "@/components/DisclaimerModal";
 
 export const metadata: Metadata = {
   title: "IntentAssist — Intent to Depart helper",
@@ -19,7 +18,6 @@ export default function RootLayout({
       <body className="antialiased">
         <Providers>
           {children}
-          <DisclaimerModal />
         </Providers>
       </body>
     </html>

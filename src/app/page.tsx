@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Navbar } from '@/components/Navbar';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
-import { ArrowRight, Camera, CheckCircle2, FileImage, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Camera, CheckCircle2, Info, ShieldCheck, UploadCloud } from 'lucide-react';
 
 type IntentFormState = {
   firstName: string;
@@ -137,213 +137,265 @@ export default function HomePage() {
       <Navbar />
 
       <main className="relative z-10 px-4 sm:px-6 lg:px-8 pt-16 pb-24">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className="text-center mb-10"
           >
-            <div className="inline-flex items-center px-5 py-2 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 text-sm font-bold mb-6 shadow-lg">
+            <div className="inline-flex items-center px-5 py-2 rounded-full bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-900 text-sm font-bold mb-6 shadow-lg">
               <ShieldCheck className="w-4 h-4 mr-2" />
-              Submit your Intent to Depart • Reward up to $1,000
+              Intent to Depart helper • Potential reward up to $1,000
             </div>
 
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4">
-              Intent to Depart
-              <span className="text-gradient block mt-1">Simple. Fast. Clear.</span>
+              CBP Home “Intent to Depart”
+              <span className="text-gradient block mt-1">All required info, in one place.</span>
             </h1>
             <p className="text-gray-600 text-lg md:text-xl max-w-3xl mx-auto">
-              Provide the required details and a clear selfie to submit an Intent to Depart (as requested for CBP Home Mobile app submissions).
+              Enter the details requested by the CBP Home Mobile app when submitting an Intent to Depart, then upload a clear selfie.
             </p>
           </motion.div>
 
-          <div id="form" className="card-premium p-6 sm:p-10">
-            <div className="flex items-start justify-between gap-4 mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">Your information</h2>
-                <p className="text-gray-600 mt-1">Fields marked with * are required.</p>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Left: info panel */}
+            <div className="lg:col-span-5 space-y-6">
+              <div className="card-premium p-6 sm:p-8">
+                <div className="flex items-start gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg">
+                    <Info className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">What you’ll need</h2>
+                    <p className="text-gray-600 mt-1">
+                      When submitting an Intent to Depart via the CBP Home Mobile app, you’ll be asked for:
+                    </p>
+                  </div>
+                </div>
+
+                <ul className="mt-5 space-y-3 text-gray-800">
+                  {[
+                    'First name',
+                    'Middle name',
+                    'Last name',
+                    'Date of birth',
+                    'Country of citizenship',
+                    'Email address',
+                    'Phone number',
+                    'A clear self-photo, or selfie',
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-3">
+                      <span className="mt-2 w-2 h-2 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex-shrink-0" />
+                      <span className="leading-relaxed">{item}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600">
-                <Camera className="w-4 h-4" />
-                <span>Selfie required</span>
+
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 sm:p-8">
+                <div className="flex items-start gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center">
+                    <ShieldCheck className="w-6 h-6 text-amber-900" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-amber-950">Not an official government site</div>
+                    <div className="text-sm text-amber-900 mt-1">
+                      This page is an independent helper. It is not affiliated with CBP. Reward eligibility (including “up to $1,000”) depends on external rules and is not guaranteed here.
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {confirmationId && (
-              <div className="mb-6 rounded-xl border border-green-200 bg-green-50 p-4 text-green-900">
-                <div className="flex items-center gap-2 font-semibold">
-                  <CheckCircle2 className="w-5 h-5" />
-                  Submitted successfully
-                </div>
-                <div className="text-sm mt-1">
-                  Confirmation ID: <span className="font-mono font-semibold">{confirmationId}</span>
-                </div>
-              </div>
-            )}
-
-            {error && (
-              <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-900">
-                <div className="font-semibold">Fix this to continue</div>
-                <div className="text-sm mt-1">{error}</div>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Right: form */}
+            <div id="form" className="lg:col-span-7 card-premium p-6 sm:p-10">
+              <div className="flex items-start justify-between gap-4 mb-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-2">First name *</label>
-                  <input
-                    value={form.firstName}
-                    onChange={onChange('firstName')}
-                    autoComplete="given-name"
-                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="First name"
-                    required
-                  />
+                  <h2 className="text-2xl font-bold text-gray-900">Enter your information</h2>
+                  <p className="text-gray-600 mt-1">Fields marked with * are required.</p>
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-2">Middle name</label>
-                  <input
-                    value={form.middleName}
-                    onChange={onChange('middleName')}
-                    autoComplete="additional-name"
-                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Middle name (optional)"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-2">Last name *</label>
-                  <input
-                    value={form.lastName}
-                    onChange={onChange('lastName')}
-                    autoComplete="family-name"
-                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Last name"
-                    required
-                  />
+                <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600">
+                  <Camera className="w-4 h-4" />
+                  <span>Selfie required</span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-2">Date of birth *</label>
-                  <input
-                    type="date"
-                    value={form.dateOfBirth}
-                    onChange={onChange('dateOfBirth')}
-                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-2">Country of citizenship *</label>
-                  <input
-                    value={form.countryOfCitizenship}
-                    onChange={onChange('countryOfCitizenship')}
-                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g., Mexico"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-2">Email address *</label>
-                  <input
-                    type="email"
-                    value={form.email}
-                    onChange={onChange('email')}
-                    autoComplete="email"
-                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="name@example.com"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-2">Phone number *</label>
-                  <input
-                    type="tel"
-                    value={form.phone}
-                    onChange={onChange('phone')}
-                    autoComplete="tel"
-                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="+1 555 123 4567"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-2">Clear self-photo / selfie *</label>
-                <div className="rounded-2xl border border-dashed border-gray-300 bg-white/60 p-5">
-                  <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-lg">
-                        <FileImage className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-gray-900">Upload a clear selfie</div>
-                        <div className="text-sm text-gray-600">JPG/PNG/WebP, max 5MB</div>
-                      </div>
-                    </div>
-
-                    <div className="md:ml-auto flex items-center gap-3">
-                      <label className="btn btn-outline cursor-pointer">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleSelfieChange}
-                          className="hidden"
-                          required={!selfie}
-                        />
-                        Choose file
-                      </label>
-                      {selfie && (
-                        <button
-                          type="button"
-                          onClick={() => setSelfie(null)}
-                          className="btn btn-secondary"
-                        >
-                          Remove
-                        </button>
-                      )}
-                    </div>
+              {confirmationId && (
+                <div className="mb-6 rounded-xl border border-green-200 bg-green-50 p-4 text-green-900">
+                  <div className="flex items-center gap-2 font-semibold">
+                    <CheckCircle2 className="w-5 h-5" />
+                    Submitted successfully
                   </div>
+                  <div className="text-sm mt-1">
+                    Confirmation ID: <span className="font-mono font-semibold">{confirmationId}</span>
+                  </div>
+                </div>
+              )}
 
-                  {selfiePreviewUrl && (
-                    <div className="mt-5">
-                      <div className="text-sm font-semibold text-gray-800 mb-2">Preview</div>
-                      <div className="rounded-2xl overflow-hidden border border-gray-200 bg-white">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={selfiePreviewUrl}
-                          alt="Selfie preview"
-                          className="w-full max-h-[360px] object-contain bg-gray-50"
-                        />
+              {error && (
+                <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-900">
+                  <div className="font-semibold">Fix this to continue</div>
+                  <div className="text-sm mt-1">{error}</div>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">First name *</label>
+                    <input
+                      value={form.firstName}
+                      onChange={onChange('firstName')}
+                      autoComplete="given-name"
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="First name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">Middle name</label>
+                    <input
+                      value={form.middleName}
+                      onChange={onChange('middleName')}
+                      autoComplete="additional-name"
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Middle name (optional)"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">Last name *</label>
+                    <input
+                      value={form.lastName}
+                      onChange={onChange('lastName')}
+                      autoComplete="family-name"
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Last name"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">Date of birth *</label>
+                    <input
+                      type="date"
+                      value={form.dateOfBirth}
+                      onChange={onChange('dateOfBirth')}
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">Country of citizenship *</label>
+                    <input
+                      value={form.countryOfCitizenship}
+                      onChange={onChange('countryOfCitizenship')}
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Country of citizenship"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">Email address *</label>
+                    <input
+                      type="email"
+                      value={form.email}
+                      onChange={onChange('email')}
+                      autoComplete="email"
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Email address"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">Phone number *</label>
+                    <input
+                      type="tel"
+                      value={form.phone}
+                      onChange={onChange('phone')}
+                      autoComplete="tel"
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Phone number"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-800 mb-2">A clear self-photo / selfie *</label>
+                  <div className="rounded-2xl border border-dashed border-gray-300 bg-white/60 p-5">
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg">
+                          <UploadCloud className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-gray-900">Upload a clear selfie</div>
+                          <div className="text-sm text-gray-600">JPG/PNG/WebP, max 5MB</div>
+                        </div>
+                      </div>
+
+                      <div className="md:ml-auto flex items-center gap-3">
+                        <label className="btn btn-outline cursor-pointer">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleSelfieChange}
+                            className="hidden"
+                            required={!selfie}
+                          />
+                          Choose file
+                        </label>
+                        {selfie && (
+                          <button
+                            type="button"
+                            onClick={() => setSelfie(null)}
+                            className="btn btn-secondary"
+                          >
+                            Remove
+                          </button>
+                        )}
                       </div>
                     </div>
-                  )}
-                </div>
-              </div>
 
-              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className={`btn btn-primary text-lg px-8 py-4 flex items-center justify-center gap-2 ${
-                    isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
-                  }`}
-                >
-                  {isSubmitting ? 'Submitting…' : 'Submit intent'}
-                  <ArrowRight className="w-5 h-5" />
-                </button>
-                <div className="text-sm text-gray-600">
-                  By submitting, you confirm the information is accurate and the selfie is clearly identifiable.
+                    {selfiePreviewUrl && (
+                      <div className="mt-5">
+                        <div className="text-sm font-semibold text-gray-800 mb-2">Preview</div>
+                        <div className="rounded-2xl overflow-hidden border border-gray-200 bg-white">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={selfiePreviewUrl}
+                            alt="Selfie preview"
+                            className="w-full max-h-[360px] object-contain bg-gray-50"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </form>
+
+                <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className={`btn btn-primary text-lg px-8 py-4 flex items-center justify-center gap-2 ${
+                      isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    {isSubmitting ? 'Submitting…' : 'Submit intent'}
+                    <ArrowRight className="w-5 h-5" />
+                  </button>
+                  <div className="text-sm text-gray-600">
+                    By submitting, you confirm the information is accurate and the selfie is clearly identifiable.
+                  </div>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       </main>
